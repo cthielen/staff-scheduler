@@ -3,4 +3,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-DssStaffScheduler::Application.load_tasks
+StaffScheduler::Application.load_tasks

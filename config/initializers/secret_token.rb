@@ -9,4 +9,4 @@
 
 # Make sure your secret_key_base is kept private
 # if you're sharing your code publicly.
-DssStaffScheduler::Application.config.secret_key_base = 'e533dbe20fc49e8493bf1aafff10bc1c613206b3077a758473b58fa48f8f2ce2c63f23243b280b30ba350225a91ba9bb3317bc5d5201ef9b91bf6d1e6d49256b'
+StaffScheduler::Application.config.secret_key_base = 'e533dbe20fc49e8493bf1aafff10bc1c613206b3077a758473b58fa48f8f2ce2c63f23243b280b30ba350225a91ba9bb3317bc5d5201ef9b91bf6d1e6d49256b'
