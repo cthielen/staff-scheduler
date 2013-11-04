@@ -1,0 +1,29 @@
+<h1>Listing skill_assignments</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Location</th>
+      <th>Employee</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @skill_assignments.each do |skill_assignment| %>
+      <tr>
+        <td><%= skill_assignment.location_id %></td>
+        <td><%= skill_assignment.employee_id %></td>
+        <td><%= link_to 'Show', skill_assignment %></td>
+        <td><%= link_to 'Edit', edit_skill_assignment_path(skill_assignment) %></td>
+        <td><%= link_to 'Destroy', skill_assignment, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Skill assignment', new_skill_assignment_path %>

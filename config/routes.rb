@@ -1,4 +1,8 @@
 StaffScheduler::Application.routes.draw do
+  resources :skill_assignments
+
+  resources :location_assignments
+
   resources :shift_exceptions
 
   resources :employee_availabilities

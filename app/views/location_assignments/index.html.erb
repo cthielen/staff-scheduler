@@ -1,0 +1,29 @@
+<h1>Listing location_assignments</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Location</th>
+      <th>Employee</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @location_assignments.each do |location_assignment| %>
+      <tr>
+        <td><%= location_assignment.location_id %></td>
+        <td><%= location_assignment.employee_id %></td>
+        <td><%= link_to 'Show', location_assignment %></td>
+        <td><%= link_to 'Edit', edit_location_assignment_path(location_assignment) %></td>
+        <td><%= link_to 'Destroy', location_assignment, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Location assignment', new_location_assignment_path %>

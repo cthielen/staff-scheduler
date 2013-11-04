@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131104220054) do
+ActiveRecord::Schema.define(version: 20131104223349) do
 
   create_table "employee_availabilities", force: true do |t|
     t.datetime "start_datetime"
@@ -26,6 +26,13 @@ ActiveRecord::Schema.define(version: 20131104220054) do
     t.string   "email"
     t.string   "name"
     t.boolean  "disabled"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "location_assignments", force: true do |t|
+    t.integer  "location_id"
+    t.integer  "employee_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -63,6 +70,13 @@ ActiveRecord::Schema.define(version: 20131104220054) do
     t.boolean  "is_mandatory"
     t.integer  "location_id"
     t.integer  "skill_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "skill_assignments", force: true do |t|
+    t.integer  "location_id"
+    t.integer  "employee_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

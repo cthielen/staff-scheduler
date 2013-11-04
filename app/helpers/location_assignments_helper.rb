@@ -1,0 +1,2 @@
+module LocationAssignmentsHelper
+end

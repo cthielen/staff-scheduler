@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Location:</strong>
+  <%= @skill_assignment.location_id %>
+</p>
+
+<p>
+  <strong>Employee:</strong>
+  <%= @skill_assignment.employee_id %>
+</p>
+
+<%= link_to 'Edit', edit_skill_assignment_path(@skill_assignment) %> |
+<%= link_to 'Back', skill_assignments_path %>
