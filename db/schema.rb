@@ -11,6 +11,82 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 20131104220054) do
+
+  create_table "employee_availabilities", force: true do |t|
+    t.datetime "start_datetime"
+    t.datetime "end_datetime"
+    t.integer  "employee_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "employees", force: true do |t|
+    t.integer  "max_hours"
+    t.string   "email"
+    t.string   "name"
+    t.boolean  "disabled"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "locations", force: true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "shift_assignments", force: true do |t|
+    t.datetime "start_datetime"
+    t.datetime "end_datetime"
+    t.integer  "employee_id"
+    t.boolean  "is_absence"
+    t.boolean  "is_confirmed"
+    t.integer  "shift_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "shift_exceptions", force: true do |t|
+    t.datetime "start_datetime"
+    t.datetime "end_datetime"
+    t.integer  "employee_id"
+    t.boolean  "is_absence"
+    t.integer  "shift_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "shifts", force: true do |t|
+    t.datetime "start_datetime"
+    t.datetime "end_datetime"
+    t.boolean  "is_mandatory"
+    t.integer  "location_id"
+    t.integer  "skill_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "skills", force: true do |t|
+    t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "users", force: true do |t|
+    t.string   "loginid"
+    t.integer  "employee_id"
+    t.boolean  "is_manager"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "wages", force: true do |t|
+    t.integer  "amount"
+    t.integer  "employee_id"
+    t.date     "starting_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end
