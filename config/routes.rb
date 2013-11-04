@@ -1,4 +1,22 @@
 StaffScheduler::Application.routes.draw do
+  resources :shift_exceptions
+
+  resources :employee_availabilities
+
+  resources :locations
+
+  resources :skills
+
+  resources :shift_assignments
+
+  resources :shifts
+
+  resources :employees
+
+  resources :wages
+
+  resources :users
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

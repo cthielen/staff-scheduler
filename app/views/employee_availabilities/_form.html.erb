@@ -1,0 +1,29 @@
+<%= form_for(@employee_availability) do |f| %>
+  <% if @employee_availability.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@employee_availability.errors.count, "error") %> prohibited this employee_availability from being saved:</h2>
+
+      <ul>
+      <% @employee_availability.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :start_datetime %><br>
+    <%= f.datetime_select :start_datetime %>
+  </div>
+  <div class="field">
+    <%= f.label :end_datetime %><br>
+    <%= f.datetime_select :end_datetime %>
+  </div>
+  <div class="field">
+    <%= f.label :employee_id %><br>
+    <%= f.number_field :employee_id %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,41 @@
+<%= form_for(@shift_assignment) do |f| %>
+  <% if @shift_assignment.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@shift_assignment.errors.count, "error") %> prohibited this shift_assignment from being saved:</h2>
+
+      <ul>
+      <% @shift_assignment.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :start_datetime %><br>
+    <%= f.datetime_select :start_datetime %>
+  </div>
+  <div class="field">
+    <%= f.label :end_datetime %><br>
+    <%= f.datetime_select :end_datetime %>
+  </div>
+  <div class="field">
+    <%= f.label :employee_id %><br>
+    <%= f.number_field :employee_id %>
+  </div>
+  <div class="field">
+    <%= f.label :is_absence %><br>
+    <%= f.check_box :is_absence %>
+  </div>
+  <div class="field">
+    <%= f.label :is_confirmed %><br>
+    <%= f.check_box :is_confirmed %>
+  </div>
+  <div class="field">
+    <%= f.label :shift_id %><br>
+    <%= f.number_field :shift_id %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

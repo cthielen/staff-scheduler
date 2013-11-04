@@ -1,0 +1,2 @@
+module EmployeeAvailabilitiesHelper
+end

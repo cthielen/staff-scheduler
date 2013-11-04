@@ -1,0 +1,31 @@
+<h1>Listing employee_availabilities</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Start datetime</th>
+      <th>End datetime</th>
+      <th>Employee</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @employee_availabilities.each do |employee_availability| %>
+      <tr>
+        <td><%= employee_availability.start_datetime %></td>
+        <td><%= employee_availability.end_datetime %></td>
+        <td><%= employee_availability.employee_id %></td>
+        <td><%= link_to 'Show', employee_availability %></td>
+        <td><%= link_to 'Edit', edit_employee_availability_path(employee_availability) %></td>
+        <td><%= link_to 'Destroy', employee_availability, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Employee availability', new_employee_availability_path %>

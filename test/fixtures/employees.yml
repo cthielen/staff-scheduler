@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  max_hours: 1
+  email: MyString
+  name: MyString
+  disabled: false
+
+two:
+  max_hours: 1
+  email: MyString
+  name: MyString
+  disabled: false

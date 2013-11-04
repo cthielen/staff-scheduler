@@ -1,0 +1,31 @@
+<h1>Listing wages</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Amount</th>
+      <th>Employee</th>
+      <th>Starting date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @wages.each do |wage| %>
+      <tr>
+        <td><%= wage.amount %></td>
+        <td><%= wage.employee_id %></td>
+        <td><%= wage.starting_date %></td>
+        <td><%= link_to 'Show', wage %></td>
+        <td><%= link_to 'Edit', edit_wage_path(wage) %></td>
+        <td><%= link_to 'Destroy', wage, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Wage', new_wage_path %>

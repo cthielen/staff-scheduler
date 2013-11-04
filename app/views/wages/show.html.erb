@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Amount:</strong>
+  <%= @wage.amount %>
+</p>
+
+<p>
+  <strong>Employee:</strong>
+  <%= @wage.employee_id %>
+</p>
+
+<p>
+  <strong>Starting date:</strong>
+  <%= @wage.starting_date %>
+</p>
+
+<%= link_to 'Edit', edit_wage_path(@wage) %> |
+<%= link_to 'Back', wages_path %>

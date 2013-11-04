@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  start_datetime: 2013-11-04 13:57:54
+  end_datetime: 2013-11-04 13:57:54
+  employee_id: 1
+  is_absence: false
+  is_confirmed: false
+  shift_id: 1
+
+two:
+  start_datetime: 2013-11-04 13:57:54
+  end_datetime: 2013-11-04 13:57:54
+  employee_id: 1
+  is_absence: false
+  is_confirmed: false
+  shift_id: 1

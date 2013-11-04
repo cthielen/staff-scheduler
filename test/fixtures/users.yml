@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  loginid: MyString
+  employee_id: 1
+  is_manager: false
+
+two:
+  loginid: MyString
+  employee_id: 1
+  is_manager: false

@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Start datetime:</strong>
+  <%= @shift_assignment.start_datetime %>
+</p>
+
+<p>
+  <strong>End datetime:</strong>
+  <%= @shift_assignment.end_datetime %>
+</p>
+
+<p>
+  <strong>Employee:</strong>
+  <%= @shift_assignment.employee_id %>
+</p>
+
+<p>
+  <strong>Is absence:</strong>
+  <%= @shift_assignment.is_absence %>
+</p>
+
+<p>
+  <strong>Is confirmed:</strong>
+  <%= @shift_assignment.is_confirmed %>
+</p>
+
+<p>
+  <strong>Shift:</strong>
+  <%= @shift_assignment.shift_id %>
+</p>
+
+<%= link_to 'Edit', edit_shift_assignment_path(@shift_assignment) %> |
+<%= link_to 'Back', shift_assignments_path %>

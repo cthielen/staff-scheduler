@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  amount: 1
+  employee_id: 1
+  starting_date: 2013-11-04
+
+two:
+  amount: 1
+  employee_id: 1
+  starting_date: 2013-11-04

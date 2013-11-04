@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Start datetime:</strong>
+  <%= @employee_availability.start_datetime %>
+</p>
+
+<p>
+  <strong>End datetime:</strong>
+  <%= @employee_availability.end_datetime %>
+</p>
+
+<p>
+  <strong>Employee:</strong>
+  <%= @employee_availability.employee_id %>
+</p>
+
+<%= link_to 'Edit', edit_employee_availability_path(@employee_availability) %> |
+<%= link_to 'Back', employee_availabilities_path %>
