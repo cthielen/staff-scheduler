@@ -22,6 +22,8 @@ gem 'coffee-rails', '~> 4.0.0'
 gem 'jquery-rails'
 
 gem 'declarative_authorization'
+gem "angularjs-rails", "~> 1.0.8"
+gem 'anjlab-bootstrap-rails', '~> 3.0.1.0', :require => 'bootstrap-rails'
 
 # javascript interpreter
 gem 'therubyracer'
