@@ -3,8 +3,8 @@
 <table>
   <thead>
     <tr>
-      <th>Location</th>
       <th>Employee</th>
+      <th>Skill</th>
       <th></th>
       <th></th>
       <th></th>
@@ -14,8 +14,8 @@
   <tbody>
     <% @skill_assignments.each do |skill_assignment| %>
       <tr>
-        <td><%= skill_assignment.location_id %></td>
         <td><%= skill_assignment.employee_id %></td>
+        <td><%= skill_assignment.skill_id %></td>
         <td><%= link_to 'Show', skill_assignment %></td>
         <td><%= link_to 'Edit', edit_skill_assignment_path(skill_assignment) %></td>
         <td><%= link_to 'Destroy', skill_assignment, method: :delete, data: { confirm: 'Are you sure?' } %></td>

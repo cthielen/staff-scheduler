@@ -18,7 +18,7 @@ class SkillAssignmentsControllerTest < ActionController::TestCase
 
   test "should create skill_assignment" do
     assert_difference('SkillAssignment.count') do
-      post :create, skill_assignment: { employee_id: @skill_assignment.employee_id, location_id: @skill_assignment.location_id }
+      post :create, skill_assignment: { employee_id: @skill_assignment.employee_id, skill_id: @skill_assignment.skill_id }
     end
 
     assert_redirected_to skill_assignment_path(assigns(:skill_assignment))
@@ -35,7 +35,7 @@ class SkillAssignmentsControllerTest < ActionController::TestCase
   end
 
   test "should update skill_assignment" do
-    patch :update, id: @skill_assignment, skill_assignment: { employee_id: @skill_assignment.employee_id, location_id: @skill_assignment.location_id }
+    patch :update, id: @skill_assignment, skill_assignment: { employee_id: @skill_assignment.employee_id, skill_id: @skill_assignment.skill_id }
     assert_redirected_to skill_assignment_path(assigns(:skill_assignment))
   end
 
