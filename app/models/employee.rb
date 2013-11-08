@@ -7,5 +7,6 @@ class Employee < ActiveRecord::Base
   has_many :locations, through: :location_assignments
   has_many :wages
   has_many :employee_availabilities
-    
+  
+  validates :max_hours, :email, :name, :disabled, presence: true
 end
