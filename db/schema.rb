@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131105225259) do
+ActiveRecord::Schema.define(version: 20131112231801) do
 
   create_table "employee_availabilities", force: true do |t|
     t.datetime "start_datetime"
@@ -39,6 +39,13 @@ ActiveRecord::Schema.define(version: 20131105225259) do
 
   create_table "locations", force: true do |t|
     t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "schedules", force: true do |t|
+    t.date     "start_date"
+    t.date     "end_date"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -72,6 +79,7 @@ ActiveRecord::Schema.define(version: 20131105225259) do
     t.integer  "skill_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "schedule_id"
   end
 
   create_table "skill_assignments", force: true do |t|
