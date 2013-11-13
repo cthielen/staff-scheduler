@@ -13,4 +13,10 @@ class EmployeeTest < ActiveSupport::TestCase
     e.employee_availabilities
   end
   
+    test "Should destroy wages when employee is destroyed" do
+    e = Employee.find(1)
+    w = e.wage
+    e.destroy
+  end
+  
 end
