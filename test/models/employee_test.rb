@@ -13,10 +13,40 @@ class EmployeeTest < ActiveSupport::TestCase
     e.employee_availabilities
   end
   
-    test "Should destroy wages when employee is destroyed" do
+  test "Should destroy wages when employee is destroyed" do
     e = Employee.find(1)
-    w = e.wage
+    w = e.wages
     e.destroy
+    assert !w.exists?, "Wages still exist after employee was destroyed"
   end
+  
+  test "Should destroy shift_assignments when employee is destroyed" do
+    e = Employee.find(1)
+    s = e.shift_assignments
+    e.destroy
+    assert !s.exists?, "Shift assignments still exist after employee was destroyed"
+  end
+
+  test "Should destroy shift_exceptions when employee is destroyed" do
+    e = Employee.find(1)
+    s = e.shift_exceptions
+    e.destroy
+    assert !s.exists?, "Shift assignments still exist after employee was destroyed"
+  end  
+  
+  test "Should destroy skill_assignments when employee is destroyed" do
+    e = Employee.find(1)
+    s = e.skill_assignments
+    e.destroy
+    assert !s.exists?, "Shift assignments still exist after employee was destroyed"
+  end
+  
+  test "Should destroy location_assignments when employee is destroyed" do
+    e = Employee.find(1)
+    l = e.location_assignments
+    e.destroy
+    assert !l.exists?, "Shift assignments still exist after employee was destroyed"
+  end  
+  
   
 end
