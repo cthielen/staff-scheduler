@@ -1,12 +1,14 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
+  id: 1
   max_hours: 10
   email: John@gmail.com
   name: John
   disabled: false
 
 two:
+  id: 2
   max_hours: 14
   email: billbo@gmail.com
   name: Bill
