@@ -11,5 +11,5 @@ class Employee < ActiveRecord::Base
   has_many :users
   
   validates :max_hours, :email, :name, presence: true
-  validates :disabled, inclusion: { in: [true, false] }
+  validates :is_disabled, inclusion: { in: [true, false] }
 end
