@@ -26,7 +26,7 @@ gem "fullcalendar-rails", "~> 1.6.4.0"
 gem 'jquery-rails'
 
 gem 'declarative_authorization'
-gem "angularjs-rails", "~> 1.0.8"
+gem "angularjs-rails", "~> 1.2.0"
 gem 'anjlab-bootstrap-rails', '~> 3.0.1.0', :require => 'bootstrap-rails'
 
 # javascript interpreter
