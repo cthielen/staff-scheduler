@@ -17,3 +17,4 @@
 //= require angular
 //= require twitter/bootstrap
 //= require underscore
+//= require fullcalendar
