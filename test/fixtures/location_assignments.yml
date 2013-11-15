@@ -1,9 +1,11 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
+  id: 1
   location_id: 1
   employee_id: 1
 
 two:
+  id: 2
   location_id: 1
   employee_id: 1

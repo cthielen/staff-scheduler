@@ -1,16 +1,19 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
+  id: 1
   amount: 100
   employee_id: 1
   starting_date: 2013-11-04
 
 two:
+  id: 2
   amount: 65
   employee_id: 2
   starting_date: 2013-11-04
   
 three:
+  id: 3
   amount: 3412
   employee_id: 1
   starting_date: 2013-11-04

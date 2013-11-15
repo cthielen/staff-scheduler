@@ -1,9 +1,11 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
+  id: 1
   start_date: 2013-11-12
   end_date: 2013-11-12
 
 two:
+  id: 2
   start_date: 2013-11-12
   end_date: 2013-11-12
