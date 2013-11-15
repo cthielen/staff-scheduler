@@ -4,5 +4,4 @@ class Location < ActiveRecord::Base
   has_many :shifts
   
   validates :name, presence: true, uniqueness: true
-
 end
