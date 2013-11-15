@@ -7,4 +7,9 @@ class WageTest < ActiveSupport::TestCase
     w.employee
   end
 
+  test "Should not save model with missing employee field" do
+    w = Wage.new
+    refute w.save, " |||||ERROR||||| Saved the message without subject"
+  end
+
 end
