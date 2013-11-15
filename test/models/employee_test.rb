@@ -12,7 +12,7 @@ class EmployeeTest < ActiveSupport::TestCase
     e.location_assignments
     e.wages
     e.employee_availabilities
-    e.users
+    e.user
   end
   
   test "Should destroy wages when employee is destroyed" do

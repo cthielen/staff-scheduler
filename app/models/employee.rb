@@ -8,7 +8,7 @@ class Employee < ActiveRecord::Base
   has_many :shifts, through: :shift_assignments
   has_many :wages, dependent: :destroy
   has_many :employee_availabilities, dependent: :destroy
-  has_many :users
+  has_one :user
   
   validates :max_hours, :email, :name, presence: true
   validates :is_disabled, inclusion: { in: [true, false] }
