@@ -1,7 +1,11 @@
 require 'test_helper'
 
 class ShiftExceptionTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+
+  test "Should be able to access Shift_exception associated models" do
+    s = ShiftException.find(1)
+    s.shift
+    s.employee
+  end
+  
 end

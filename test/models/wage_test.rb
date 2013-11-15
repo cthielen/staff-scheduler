@@ -1,7 +1,10 @@
 require 'test_helper'
 
 class WageTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+
+  test "Should be able to access Wage associated models" do
+    w = Wage.find(1)
+    w.employee
+  end
+
 end
