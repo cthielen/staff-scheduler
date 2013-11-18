@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131115010442) do
+ActiveRecord::Schema.define(version: 20131118183845) do
 
   create_table "employee_availabilities", force: true do |t|
     t.datetime "start_datetime"
@@ -102,6 +102,8 @@ ActiveRecord::Schema.define(version: 20131115010442) do
     t.boolean  "is_manager"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "disabled",     default: false
+    t.datetime "logged_in_at"
   end
 
   create_table "wages", force: true do |t|
