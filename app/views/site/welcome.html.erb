@@ -12,6 +12,10 @@
 
     <!-- Bootstrap core CSS -->
     <%= stylesheet_link_tag "bootstrap.css" %>
+    <%= javascript_include_tag "angular.js" %>
+    <%= javascript_include_tag "angular-route.js" %>
+    <%= javascript_include_tag "router.js" %>
+    <%= javascript_include_tag "controllers/signup.js" %>
 
     <style text="text/css">
     /* Space out content a bit */
@@ -104,45 +108,17 @@
 
   <body>
 
-    <div class="container">
+    <div class="container" ng-app="scheduler">
       <div class="header">
-        <!--<ul class="nav nav-pills pull-right">
+        <!-- <ul class="nav nav-pills pull-right">
           <li class="active"><a href="#">Home</a></li>
           <li><a href="#">About</a></li>
           <li><a href="#">Contact</a></li>
-        </ul>-->
+        </ul> -->
         <h3 class="text-muted">Staff Scheduler</h3>
       </div>
 
-      <div class="jumbotron">
-        <h1>Jumbotron heading</h1>
-        <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-        <p><a class="btn btn-lg btn-success" href="#" role="button">Sign up</a> <%= link_to 'Log in', schedules_url, class: 'btn btn-lg btn-primary', role: 'button' %></p>
-      </div>
-
-      <div class="row marketing">
-        <div class="col-lg-6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
-
-        <div class="col-lg-6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
-      </div>
+      <div ng-view></div>
 
       <div class="footer">
         <p>&copy; University of California Davis Division of Social Science IT 2013</p>

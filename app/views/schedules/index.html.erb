@@ -1,29 +1,3 @@
-<h1>Listing schedules</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th>Start date</th>
-      <th>End date</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @schedules.each do |schedule| %>
-      <tr>
-        <td><%= schedule.start_date %></td>
-        <td><%= schedule.end_date %></td>
-        <td><%= link_to 'Show', schedule %></td>
-        <td><%= link_to 'Edit', edit_schedule_path(schedule) %></td>
-        <td><%= link_to 'Destroy', schedule, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<br>
-
-<%= link_to 'New Schedule', new_schedule_path %>
+<div ng-controller="scheduleCtrl">
+  <div id="calendar"></div>
+</div>
