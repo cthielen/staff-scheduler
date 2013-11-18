@@ -1,13 +1,13 @@
-function shiftsCtrl ($scope) {
+function scheduleCtrl ($scope) {
 
   $("#calendar").fullCalendar({
     weekends: false,
     contentHeight: 600,
     defaultView: 'agendaWeek',
     header: {
-      left: "prev,next ",
+      left: "prev,next",
       center: "title",
-      right: "agendaWeek,agendaDay",
+      right: "today agendaWeek,agendaDay",
       ignoreTimezone: false
     }
   });
