@@ -6,3 +6,4 @@
 //= require angular-resource
 //= require underscore
 //= require_tree ./controllers
+//= require router
