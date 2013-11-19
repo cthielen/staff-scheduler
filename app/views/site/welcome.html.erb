@@ -11,12 +11,10 @@
     <title>Staff Scheduler</title>
 
     <!-- Bootstrap core CSS -->
-    <%= stylesheet_link_tag "bootstrap.css" %>
-    <%= javascript_include_tag "jquery-1.10.2.js" %>
-    <%= javascript_include_tag "angular.js" %>
-    <%= javascript_include_tag "angular-route.js" %>
-    <%= javascript_include_tag "router.js" %>
-    <%= javascript_include_tag "controllers/signup.js" %>
+    <%= stylesheet_link_tag "bootstrap" %>
+    <%= javascript_include_tag "application" %>
+    <%= javascript_include_tag "routers/welcome" %>
+    <%= javascript_include_tag "controllers/signup" %>
     
     <%= csrf_meta_tags %>
     
@@ -111,7 +109,7 @@
 
   <body>
 
-    <div class="container" ng-app="scheduler">
+    <div class="container" ng-app="welcome">
       <div class="header">
         <!-- <ul class="nav nav-pills pull-right">
           <li class="active"><a href="#">Home</a></li>

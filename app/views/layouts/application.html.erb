@@ -16,6 +16,7 @@
       <title>Staff Scheduler</title>
       <%= stylesheet_link_tag    "application", media: "all" %>
       <%= javascript_include_tag "application" %>
+      <%= javascript_include_tag "scheduler" %>
       <%= csrf_meta_tags %>
   </head>
 
@@ -35,15 +36,15 @@
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Schedule</a></li>
+            <li class="active" id="schedule"><a href="#/">Schedule</a></li>
+            <li id="employees"><a href="#/employees">Employees</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
     </div>
 
-    <div class="container" ng-app>
-      <%= yield %>
-
+    <div class="container" ng-app="scheduler">
+      <div ng-view></div>
     </div> <!-- /container -->
 
 

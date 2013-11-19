@@ -8,13 +8,15 @@ class SiteController < ApplicationController
   end
   
   def signup
-    @name = params[:name]
-    @email = params[:email]
-    @reason = params[:reason]
-    SignUpMailer.signup_email().deliver
+    SignUpMailer.signup_email(signup_params).deliver
+    
+    respond_to do |format|
+      format.html { redirect_to root_path }
+      format.json { head :no_content }
+    end
   end
   
   def signup_params
-    params.require(:signup).permit(:name, :email, :reason)
+    params.require(:site).permit(:name, :email, :reason)
   end
 end
