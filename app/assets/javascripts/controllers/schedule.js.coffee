@@ -11,6 +11,6 @@ StaffScheduler.controller "ScheduleCtrl", @ScheduleCtrl = ($scope) ->
       center: "title"
       right: "today agendaWeek,agendaDay"
       ignoreTimezone: false
-
+  
   $scope.$on "$destroy", ->
     $("#calendar").fullCalendar "destroy"
