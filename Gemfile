@@ -17,11 +17,7 @@ gem 'coffee-rails', '~> 4.0.0'
 
 gem 'rubycas-client'
 
-# gem "fullcalendar-rails", "~> 1.6.4.0"
-
-# Use jquery as the JavaScript library
-gem 'jquery-rails'
-
+# Provides authorization layer
 gem 'declarative_authorization'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -30,6 +26,12 @@ gem 'jbuilder', '~> 1.2'
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
   gem 'sdoc', require: false
+end
+
+# For Javascript testing
+group :development do
+  gem 'teaspoon'
+  gem 'phantomjs'
 end
 
 # Use Capistrano for deployment
