@@ -1,4 +1,6 @@
 class Employee < ActiveRecord::Base
+  using_access_control
+  
   has_many :shift_assignments, dependent: :destroy
   has_many :shift_exceptions, dependent: :destroy
   has_many :skill_assignments, dependent: :destroy

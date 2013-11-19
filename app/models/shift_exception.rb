@@ -1,4 +1,6 @@
 class ShiftException < ActiveRecord::Base
+  using_access_control
+  
   belongs_to :employee
   belongs_to :shift
   

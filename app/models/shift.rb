@@ -1,4 +1,6 @@
 class Shift < ActiveRecord::Base
+  using_access_control
+  
   belongs_to :skill
   belongs_to :location
   belongs_to :schedule, touch: true
