@@ -7,6 +7,12 @@ class SiteController < ApplicationController
     end
   end
   
+  def access_denied
+    respond_to do |format|
+      format.html { render 'access_denied', layout: false }
+    end
+  end
+  
   def signup
     SignUpMailer.signup_email(signup_params).deliver
     
