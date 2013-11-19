@@ -9,4 +9,3 @@ Welcome.controller "SignupCtrl", @SignupCtrl = ($scope, $http) ->
       $("#success").removeClass "hidden"
     ).error ->
       $("#error").removeClass "hidden"
-
