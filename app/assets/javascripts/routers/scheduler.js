@@ -7,11 +7,12 @@ StaffScheduler.config(includeCSRF);
 function schedulerRouter ($routeProvider) {
 	$routeProvider
 	.when('/', {
-    templateUrl: '/assets/partials/welcome.html',
+    templateUrl: '/assets/partials/schedule.html',
+    controller: 'ScheduleCtrl'
   })
-  .when('/signup', {
-      templateUrl: '/assets/partials/signup.html',
-      controller: 'SignupCtrl'
+  .when('/employees', {
+      templateUrl: '/assets/partials/employees.html',
+      controller: 'EmployeesCtrl'
     });
 }
 
