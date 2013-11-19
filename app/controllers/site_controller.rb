@@ -1,5 +1,6 @@
 class SiteController < ApplicationController
   skip_before_filter :authenticate, :only => [:status, :welcome, :access_denied]
+  respond_to :html
   
   def welcome
     respond_to do |format|
@@ -18,7 +19,6 @@ class SiteController < ApplicationController
     
     respond_to do |format|
       format.html { redirect_to root_path }
-      format.json { head :no_content }
     end
   end
   

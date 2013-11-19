@@ -1,1 +1,16 @@
-blablahblah
+<table class="table table-hover table-striped" id="employees">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>E-Mail</th>
+      <th>Max Hours</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="employee in employees">
+      <td>{{ employee.name }}</td>
+      <td>{{ employee.email }}</td>
+      <td>{{ employee.max_hours }}</td>
+    </tr>
+  </tbody>
+</table>
