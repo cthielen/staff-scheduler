@@ -1,5 +1,5 @@
 class SignUpMailer < ActionMailer::Base
-  default from: "from@example.com"
+  default from: "noreply@dss.ucdavis.edu"
   def signup_email
     mail(to: "ltwheeler@ucdavis.edu", subject: 'testing send on staff scheduler')
   end
