@@ -14,4 +14,5 @@ StaffScheduler::Application.routes.draw do
   resources :users
 
   root :to => 'site#welcome'
+  post '/signup', to: 'site#signup'
 end

@@ -6,4 +6,15 @@ class SiteController < ApplicationController
       format.html { render 'welcome', layout: false }
     end
   end
+  
+  def signup
+    @name = params[:name]
+    @email = params[:email]
+    @reason = params[:reason]
+    SignUpMailer.signup_email().deliver
+  end
+  
+  def signup_params
+    params.require(:signup).permit(:name, :email, :reason)
+  end
 end

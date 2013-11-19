@@ -60,12 +60,6 @@ class UsersController < ApplicationController
       format.json { head :no_content }
     end
   end
-  
-  def signup
-    respond_to do |format|
-      format.html
-    end
-  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
