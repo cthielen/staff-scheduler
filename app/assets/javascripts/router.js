@@ -1,5 +1,8 @@
-angular.module('scheduler', ['ngRoute'])
-	.config(schedulerRouter);
+var StaffScheduler = angular.module('scheduler', ['ngRoute']);
+
+StaffScheduler.config(schedulerRouter);
+StaffScheduler.config(includeCSRF);
+
 
 function schedulerRouter ($routeProvider) {
 	$routeProvider
@@ -10,4 +13,8 @@ function schedulerRouter ($routeProvider) {
       templateUrl: '/assets/partials/signup.html',
       controller: 'SignupCtrl'
     });
+}
+
+function includeCSRF ($httpProvider) {
+  $httpProvider.defaults.headers.common['X-CSRF-Token'] = $('meta[name=csrf-token]').attr('content');
 }

@@ -1,8 +1,13 @@
 function SignupCtrl ($scope, $http) {
-  $http.defaults.headers.common['X-CSRF-Token'] = $('meta[name=csrf-token]').attr('content');
 
   $scope.SendRequest = function() {
-    console.log('sending');
-    $http.post("/signup", { name: $scope.name, email: $scope.email, reason: $scope.reason});
+    $http.post("/signup", { name: $scope.name, email: $scope.email, reason: $scope.reason})
+    .success( function () {
+      $scope.name = $scope.email = $scope.reason = '';
+      $('#success').removeClass('hidden');
+    })
+    .error( function () {
+      $('#error').removeClass('hidden');
+    });
   }
 }
