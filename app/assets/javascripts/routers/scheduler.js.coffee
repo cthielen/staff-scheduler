@@ -9,6 +9,6 @@ schedulerRouter = ($routeProvider) ->
 includeCSRF = ($httpProvider) ->
   $httpProvider.defaults.headers.common["X-CSRF-Token"] = $("meta[name=csrf-token]").attr("content")
 
-window.StaffScheduler = angular.module("scheduler", ["ngRoute"])
+window.StaffScheduler = angular.module("scheduler", ["ngRoute","schedulerServices"])
 StaffScheduler.config schedulerRouter
 StaffScheduler.config includeCSRF
