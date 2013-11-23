@@ -6,3 +6,5 @@
 //= require ./controllers/schedule
 //= require ./controllers/employees
 //= require ./directives/calendar
+//= require ./directives/newEmployee
+//= require ./directives/onEnter
