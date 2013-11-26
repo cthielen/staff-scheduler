@@ -5,7 +5,7 @@ class EmployeesController < ApplicationController
   # GET /employees
   # GET /employees.json
   def index
-    @employees = Employee.all
+    @employees = Employee.where(is_disabled: false)
     
     respond_with @employees
   end
