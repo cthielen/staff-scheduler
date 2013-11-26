@@ -1,0 +1,6 @@
+<td>{{ employee.name }}</td>
+<td>{{ employee.email }}</td>
+<td>{{ employee.max_hours }}</td>
+<td ng-show="showDelete" class="employee-options">
+  <button type="button" class="close" aria-hidden="true" ng-click="deleteEmployee(employee)">&times;</button>
+</td>

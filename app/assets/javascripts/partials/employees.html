@@ -8,10 +8,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="employee in employees">
-      <td>{{ employee.name }}</td>
-      <td>{{ employee.email }}</td>
-      <td>{{ employee.max_hours }}</td>
+    <tr ng-repeat="employee in employees" employee="employee" ng-mouseover="showOptions()" ng-mouseleave="hideOptions()">
     </tr>
     <tr new-employee>
     </tr>
