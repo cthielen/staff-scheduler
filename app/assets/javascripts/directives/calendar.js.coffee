@@ -1,11 +1,7 @@
 StaffScheduler.directive "calendar", @calendar = () ->
   link: (scope, element, attrs) ->
-    scope.modalVisible = false
-
     createShift = (startDate, endDate, allDay) ->
-      scope.modalTemplate = "assets/partials/newShift.html"
-      scope.modalVisible = true
-      scope.$apply() unless scope.$$phase
+      scope.showModal("assets/partials/newShift.html")
       
     element.fullCalendar
       weekends: false

@@ -1,14 +1,16 @@
-StaffScheduler.directive "modal", @modal = () ->
+StaffScheduler.directive "modal", @modal = ($compile) ->
   restrict: 'E'
+  scope:
+    modalVisible: '='
+    okFn: '&'
+    cancelFn: '&'
   link: (scope, element, attrs) ->
+    # This will make sure the content of the template iscomplied in order to use the ng components
+    $compile(element.contents())(scope)
+    scope.title = attrs.title
+
     scope.$watch "modalVisible ", (newVal, oldVal) ->
       if newVal
         element.modal()
       else
         element.modal "hide"
-
-    scope.okFn = ->
-      scope.dismissModal()
-
-    scope.cancelFn = ->
-      scope.dismissModal()
