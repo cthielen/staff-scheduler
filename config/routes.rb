@@ -8,7 +8,7 @@ StaffScheduler::Application.routes.draw do
   # resources :locations
   # resources :skills
   # resources :shift_assignments
-  # resources :shifts
+  resources :shifts
   resources :employees
   # resources :wages
   # resources :users

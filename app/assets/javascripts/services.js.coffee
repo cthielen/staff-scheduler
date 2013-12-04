@@ -5,3 +5,9 @@ angular.module("schedulerServices", ["ngResource"])
     ,
       update:
         method: "PUT"
+  .factory "Shifts", ($resource) ->
+    $resource "/shifts/:id.json",
+      id: "@id"
+    ,
+      update:
+        method: "PUT"
