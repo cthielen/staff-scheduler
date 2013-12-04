@@ -30,4 +30,8 @@ class Schedule < ActiveRecord::Base
   # Action Triggers: Unfilled Shift_exception in schedule tomorrow - email managers a notification
   # Leave State Condition: Change to state 3 when Availability and shift_assignment conflict is detected - email managers a notification
   # Leave State Condition: Change to state 3 when new shift_assignment detected 
+  # Leave State Condition: Change to state 5 when schedule end_date is passed
+  
+  # Schedule no longer in use
+  INACTIVE = 5
 end
