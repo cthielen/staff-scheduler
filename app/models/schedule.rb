@@ -1,4 +1,9 @@
 class Schedule < ActiveRecord::Base
+  using_access_control
+  
+  has_many :shifts
+  
+  validates :start_date, :end_date, presence: true
 
   # State Machine
 
@@ -24,12 +29,5 @@ class Schedule < ActiveRecord::Base
   # Action Triggers: Shift_assignment Absence generated - email all employees a link to the schedule
   # Action Triggers: Unfilled Shift_exception in schedule tomorrow - email managers a notification
   # Leave State Condition: Change to state 3 when Availability and shift_assignment conflict is detected - email managers a notification
-  # Leave State Condition: Change to state 3 when new shift_assignment detected
-  
-  
-  using_access_control
-  
-  has_many :shifts
-  
-  validates :start_date, :end_date, presence: true
+  # Leave State Condition: Change to state 3 when new shift_assignment detected 
 end
