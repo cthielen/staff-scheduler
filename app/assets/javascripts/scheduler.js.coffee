@@ -5,6 +5,7 @@
 //= require ./routers/scheduler
 //= require ./controllers/schedule
 //= require ./controllers/employees
+//= require ./controllers/schedules
 //= require ./directives/modal
 //= require ./directives/calendar
 //= require ./directives/newEmployee

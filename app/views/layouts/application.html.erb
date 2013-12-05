@@ -36,8 +36,15 @@
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
+            <% permitted_to? :read, :shifts do %>
             <li class="active" id="schedule"><a href="#/">Schedule</a></li>
+            <% end %>
+            <% permitted_to? :read, :employees do %>
             <li id="employees"><a href="#/employees">Employees</a></li>
+            <% end %>
+            <% permitted_to? :read, :schedules do %>
+            <li id="schedules"><a href="#/schedules">Schedules</a></li>
+            <% end %>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
