@@ -3,7 +3,7 @@
 //= require typeahead
 //= require services
 //= require ./routers/scheduler
-//= require ./controllers/schedule
+//= require ./controllers/shifts
 //= require ./controllers/employees
 //= require ./controllers/schedules
 //= require ./directives/modal

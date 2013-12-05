@@ -1,8 +1,8 @@
-StaffScheduler.controller "ScheduleCtrl", @ScheduleCtrl = ($scope, Shifts) ->
+StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, Shifts) ->
   $scope.modalTemplate = null
   $scope.modalVisible = false
   $(".navbar-nav li").removeClass "active"
-  $("li#schedule").addClass "active"
+  $("li#shifts").addClass "active"
 
   $scope.showModal = (template) ->
     $scope.modalTemplate = template
