@@ -8,6 +8,8 @@ StaffScheduler.directive "calendar", @calendar = () ->
       contentHeight: 600
       defaultView: "agendaWeek"
       selectable: true
+      minTime: 7
+      maxTime: 19
       header:
         left: "prev,next"
         center: "title"
