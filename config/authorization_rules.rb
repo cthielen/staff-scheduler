@@ -1,5 +1,11 @@
 authorization do
-
+  role :manager do
+    has_permission_on :employees, :to => :manage
+    has_permission_on :shifts, :to => :manage
+  end
+  role :employee do
+    has_permission_on :shifts, :to => :read
+  end
 end
 
 privileges do
