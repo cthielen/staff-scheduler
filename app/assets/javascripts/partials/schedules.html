@@ -1,1 +1,14 @@
-<h3>Schedules</h3>
+<table class="table table-hover table-striped" id="schedules">
+  <thead>
+    <tr>
+      <th>Start Date</th>
+      <th>End Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="schedule in schedules">
+      <td>{{schedule.start_date}}</td>
+      <td>{{schedule.end_date}}</td>
+    </tr>
+  </tbody>
+</table>
