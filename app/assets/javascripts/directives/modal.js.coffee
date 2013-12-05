@@ -1,9 +1,5 @@
 StaffScheduler.directive "modal", @modal = ($compile) ->
   restrict: 'E'
-  scope:
-    modalVisible: '='
-    okFn: '&'
-    cancelFn: '&'
   link: (scope, element, attrs) ->
     # This will make sure the content of the template iscomplied in order to use the ng components
     $compile(element.contents())(scope)
