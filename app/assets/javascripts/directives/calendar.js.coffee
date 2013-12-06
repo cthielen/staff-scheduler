@@ -1,7 +1,7 @@
 StaffScheduler.directive "calendar", @calendar = () ->
   link: (scope, element, attrs) ->
     createShift = (startDate, endDate, allDay) ->
-      scope.showModal("assets/partials/newShift.html")
+      scope.showModal("/assets/partials/newShift.html")
       
     element.fullCalendar
       weekends: false
