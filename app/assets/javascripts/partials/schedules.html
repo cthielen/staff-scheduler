@@ -1,3 +1,5 @@
+<a ng-click="newSchedule()" class="btn btn-default pull-right">New Schedule</a>
+
 <table class="table table-hover table-striped" id="schedules">
   <thead>
     <tr>
@@ -6,6 +8,10 @@
     </tr>
   </thead>
   <tbody>
+    <tr ng-show="addNew">
+      <td><input ng-model="newSched.start_date" name="new-start" placeholder="Start Date" class="form-control" type="text" on-enter="createSchedule()"></td>
+      <td><input ng-model="newSched.end_date" name="new-end" placeholder="End Date" class="form-control" type="text" on-enter="createSchedule()"></td>
+    </tr>
     <tr ng-repeat="schedule in schedules">
       <td>{{schedule.start_date}}</td>
       <td>{{schedule.end_date}}</td>
