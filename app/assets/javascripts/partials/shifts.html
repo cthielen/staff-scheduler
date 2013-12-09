@@ -1,2 +1,10 @@
 <modal title="New Shift" class="modal" ng-include src="modalTemplate"></modal>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <select ng-model="shift.schedule.id" ng-options="schedule.id as schedule.start_date for schedule in schedules" ng-change="showSelected()" class="form-control">
+    </select>
+  </div>
+</div>
+
 <div calendar></div>
