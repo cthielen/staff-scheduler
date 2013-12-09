@@ -1,4 +1,4 @@
-StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, Shifts, Schedules) ->
+StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, Shifts, Schedules) ->
   $scope.modalTemplate = null
   $scope.modalVisible = false
   $(".navbar-nav li").removeClass "active"
@@ -9,7 +9,11 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, Shifts, Schedules
     success = (data) ->
       $scope.shift.schedule = data[0]
     )
-  
+
+  $scope.scheduleName = (sched) ->
+    $filter('date')(sched.start_date, 'MM/dd/yyyy') + ' - ' + $filter('date')(sched.end_date, 'MM/dd/yyyy')
+    # TODO: Change to 'name' of the schedule after adding a new column, and fall back to above if name is empty
+
   $scope.showSelected = ->
     console.log $scope.shift.schedule
 
