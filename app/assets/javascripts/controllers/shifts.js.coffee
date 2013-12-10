@@ -5,10 +5,15 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, Shifts, 
   $("li#shifts").addClass "active"
 
   $scope.newShift = {is_mandatory: true}
-  $scope.schedules = Schedules.query(
+  Shifts.query(
     success = (data) ->
+      $scope.shifts = data
+  )
+  Schedules.query(
+    success = (data) ->
+      $scope.schedules = data
       $scope.newShift.schedule_id = data[0].id
-    )
+  )
 
   $scope.scheduleName = (sched) ->
     $filter('date')(sched.start_date, 'MM/dd/yyyy') + ' - ' + $filter('date')(sched.end_date, 'MM/dd/yyyy')
@@ -27,5 +32,5 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, Shifts, 
 
   $scope.createShift =  ->
     Shifts.save $scope.newShift, (data) ->
-      # $scope.shifts.push(data);
+      $scope.shifts.push(data)
       $scope.modalVisible = false

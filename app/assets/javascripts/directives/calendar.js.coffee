@@ -1,5 +1,8 @@
 StaffScheduler.directive "calendar", @calendar = () ->
   link: (scope, element, attrs) ->
+    scope.$watch "shifts", (newVal, oldVal) ->
+      element.fullCalendar "refetchEvents"
+
     createShift = (startDate, endDate, allDay) ->
       scope.showModal("/assets/partials/newShift.html", startDate, endDate, allDay)
       
@@ -15,6 +18,7 @@ StaffScheduler.directive "calendar", @calendar = () ->
         center: "title"
         right: "today agendaWeek,agendaDay"
         ignoreTimezone: false
+      events: "/shifts.json"
       select: (startDate, endDate, allDay, jsEvent, view) =>
         createShift(startDate, endDate, allDay)
 
