@@ -1,11 +1,9 @@
-StaffScheduler.directive "calendar", @calendar = () ->
+StaffScheduler.directive "calendar", @calendar = ($modal) ->
   link: (scope, element, attrs) ->
     scope.$watch "shifts", (newVal, oldVal) ->
       element.fullCalendar "refetchEvents"
+    ,true
 
-    createShift = (startDate, endDate, allDay) ->
-      scope.showModal("/assets/partials/newShift.html", startDate, endDate, allDay)
-      
     element.fullCalendar
       weekends: false
       contentHeight: 600
@@ -20,7 +18,20 @@ StaffScheduler.directive "calendar", @calendar = () ->
         ignoreTimezone: false
       events: "/shifts.json"
       select: (startDate, endDate, allDay, jsEvent, view) =>
-        createShift(startDate, endDate, allDay)
+        scope.newShift.start_datetime = startDate
+        scope.newShift.end_datetime = endDate
+
+        modalInstance = $modal.open
+          templateUrl: "/assets/partials/newShift.html"
+          controller: NewShiftCtrl
+          resolve:
+            shifts: ->
+              scope.shifts
+            newShift: ->
+              scope.newShift
+
+        modalInstance.result.then (shifts) ->
+          scope.shifts = shifts
 
     element.on "$destroy", ->
       element.fullCalendar "destroy"

@@ -1,3 +1,4 @@
+//= require ui-bootstrap-custom-tpls-0.7.0
 //= require fullcalendar
 //= require underscore
 //= require typeahead
@@ -6,7 +7,7 @@
 //= require ./controllers/shifts
 //= require ./controllers/employees
 //= require ./controllers/schedules
-//= require ./directives/modal
+//= require ./controllers/NewShift
 //= require ./directives/calendar
 //= require ./directives/newEmployee
 //= require ./directives/employee

@@ -2,37 +2,33 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h4 class="modal-title" id="myModalLabel">{{title}}</h4>
+      <h4 class="modal-title" id="myModalLabel">New Shift</h4>
     </div>
     <div class="modal-body">
-      <form class="form-horizontal" role="form">
-        <div class="form-group">
-          <label for="mandatory" class="col-sm-2 control-label">Mandatory</label>
-          <div class="col-sm-10">
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" ng-model="newShift.is_mandatory">
-              </label>
-            </div>
+      <form class="form-horizontal">
+        <div class="control-group">
+          <label class="control-label" for="Mandatory">Mandatory</label>
+          <div class="controls">
+            <input type="checkbox" ng-model="newShift.is_mandatory">
           </div>
         </div>
-        <div class="form-group">
-          <label for="location" class="col-sm-2 control-label">Location</label>
-          <div class="col-sm-10">
+        <div class="control-group">
+          <label class="control-label" for="Location">Location</label>
+          <div class="controls">
             <input type="number" class="form-control" id="location" placeholder="Location" ng-model="newShift.location_id">
           </div>
         </div>
-        <div class="form-group">
-          <label for="skill" class="col-sm-2 control-label">Skill</label>
-          <div class="col-sm-10">
+        <div class="control-group">
+          <label class="control-label" for="Mandatory">Skill</label>
+          <div class="controls">
             <input type="number" class="form-control" id="skill" placeholder="Skill" ng-model="newShift.skill_id">
           </div>
         </div>
       </form>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="dismissModal()">Close</button>
-      <button type="button" class="btn btn-primary" ng-click="createShift()">Save changes</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">Close</button>
+      <button type="button" class="btn btn-primary" ng-click="save()">Save changes</button>
     </div>
   </div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
