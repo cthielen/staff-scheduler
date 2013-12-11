@@ -36,7 +36,6 @@ class Schedule < ActiveRecord::Base
 
   # Schedule start date has been reached
   ACTIVE = 5
-  # Action: An Availability changed - email managers a notification
   # Action: Shift_assignment Absence generated - email all employees a link to the schedule
   # Action: Unfilled Shift_exception in schedule tomorrow - email managers a notification
   # Action: Shift_exception absence created - email employee (In both cases, when created by manager or employee)
@@ -93,9 +92,6 @@ class Schedule < ActiveRecord::Base
   def notify_schedule_complete
   end
   
-  def notify_availability_change
-  end
-  
   def notify_absence
   end
   
@@ -105,7 +101,10 @@ class Schedule < ActiveRecord::Base
   def notify_schedule_conflict
   end
 
-  def notify_all_availabilities_received
+  def notify_availability_confirmations_complete
+  end
+  
+  def notify_schedule_ready
   end
   
   # Exit state checks
