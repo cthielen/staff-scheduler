@@ -115,4 +115,15 @@ class Schedule < ActiveRecord::Base
   
   def check_shift_assignment_confirmations
   end
+
+  def active_schedule
+    Schedule.find_by(state:6)
+  end
+  
+  def previous_schedule
+    schedules = Schedule.where(state:7)
+    schedules.max_by do |s|
+      s.end_date
+    end
+  end
 end
