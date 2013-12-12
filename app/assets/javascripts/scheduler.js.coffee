@@ -1,7 +1,6 @@
 //= require ui-bootstrap-custom-tpls-0.7.0
 //= require fullcalendar
 //= require underscore
-//= require typeahead
 //= require calendar
 //= require services
 //= require ./routers/scheduler
