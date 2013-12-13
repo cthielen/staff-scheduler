@@ -6,7 +6,8 @@ class Schedule < ActiveRecord::Base
   validates :start_date, :end_date, presence: true
 
   # State Machine
-  # Notes: Transition Actions go on 'exits' not 'beginnings'
+  # ASSUMPTION: Transition Actions go on 'exits' not 'beginnings'
+  # ASSUMPTION: schedules cannot overlap
   
   # Schedule in progress (shifts being created)
   INCOMPLETE_SCHEDULE = 1
@@ -52,15 +53,23 @@ class Schedule < ActiveRecord::Base
     case current_state
     
     when INCOMPLETE_SCHEDULE
-    
+      
     when PENDING_AVAILABILITIES
-    
+      if check_availabilities == 0
+        notify_availability_confirmations_complete
+        this.state = 3
+      end
     when PENDING_ASSIGNMENTS
     
     when PENDING_CONFIRMATION
-    
+      if check_shift_assignment_confirmations == 0
+        notify_schedule_ready
+        this.state = 5
+      end
     when READY
-    
+      if Time.now > this.start_date
+        this.state = 6
+      end
     when ACTIVE
     
     when INACTIVE
@@ -72,9 +81,13 @@ class Schedule < ActiveRecord::Base
     
   # Triggers: Human actions that directly trigger state changes
   def trigger_schedule_created
+    this.state = 2
+    this.save
   end
   
   def trigger_shift_assignments_created
+    this.state = 4
+    this.save
   end
       
   # Action requests: Email links to forms to trigger human action
@@ -110,10 +123,14 @@ class Schedule < ActiveRecord::Base
   
   # Exit state checks
 
+  # Employee availability needs to be associated to a schedule as well, as users may have multiple
   def check_availabilities
+    remaining = this.EmployeeAvailability.where(is_disabled: false, confirmed: false)
+    remaining.length
   end
   
   def check_shift_assignment_confirmations
+    awaiting
   end
 
   def active_schedule
