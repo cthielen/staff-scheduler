@@ -10,6 +10,7 @@ StaffScheduler::Application.routes.draw do
   # resources :shift_assignments
   resources :shifts
   resources :employees
+  get '/employee-lookup', to: 'employees#lookup'
   # resources :wages
   # resources :users
 

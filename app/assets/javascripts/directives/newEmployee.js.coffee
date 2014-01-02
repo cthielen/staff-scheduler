@@ -1,6 +1,17 @@
-StaffScheduler.directive "newEmployee", @newEmployee = (Employees) ->
+StaffScheduler.directive "newEmployee", @newEmployee = (Employees, EmpLookup) ->
   templateUrl: '/assets/partials/newEmployee.html'
   link: (scope, element, attrs) ->
+    scope.names = []
+    
+    scope.$watch "newEmp.name", (value) ->
+      EmpLookup.query
+        q: value
+      , (response) ->
+        scope.names = []
+        angular.forEach response, (item) ->
+          scope.names.push item.name  if item.id
+      
+    
     scope.initFields = ->
       # Reset fields
       angular.forEach scope.newEmp, (value,key) =>

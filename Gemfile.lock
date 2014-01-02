@@ -71,6 +71,8 @@ GEM
     rake (10.1.0)
     rdoc (3.12.2)
       json (~> 1.4)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
     rubycas-client (2.3.9)
       activesupport
     sass (3.2.12)
@@ -115,6 +117,7 @@ DEPENDENCIES
   jbuilder (~> 1.2)
   phantomjs
   rails (= 4.0.1)
+  rest-client
   rubycas-client
   sass-rails (~> 4.0.0)
   sdoc
