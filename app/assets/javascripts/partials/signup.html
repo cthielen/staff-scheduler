@@ -1,3 +1,6 @@
+<div class="alert alert-{{alertClass}}" ng-show="sendStatus">
+  <button type="button" class="close" ng-click="clearStatus()">&times;</button>{{sendStatus}}
+</div>
 <form class="form-horizontal">
   <div class="control-group">
     <label class="control-label" for="name">Name</label>
