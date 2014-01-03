@@ -9,5 +9,4 @@
 //= require ./controllers/schedules
 //= require ./controllers/NewShift
 //= require ./directives/newEmployee
-//= require ./directives/employee
 //= require ./directives/onEnter

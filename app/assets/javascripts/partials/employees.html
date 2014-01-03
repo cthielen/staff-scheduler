@@ -8,7 +8,22 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="employee in employees" employee="employee" ng-mouseover="showOptions()" ng-mouseleave="hideOptions()">
+    <tr ng-repeat="employee in employees" ng-mouseover="showOptions(employee)" ng-mouseleave="hideOptions(employee)">
+      <td>
+        <input ng-model="employee.name" name="employee-name" placeholder="Name" class="form-control" type="text" ng-show="editing == employee.id" on-enter="applyChanges(employee)">
+        <span ng-hide="editing == employee.id" ng-click="editEmployee(employee)">{{ employee.name }}</span>
+      </td>
+      <td>
+        <input ng-model="employee.email" name="employee-email" placeholder="Email" class="form-control" type="text" ng-show="editing == employee.id" on-enter="applyChanges(employee)">
+        <span ng-hide="editing == employee.id" ng-click="editEmployee(employee)">{{ employee.email }}</span>
+      </td>
+      <td>
+        <input ng-model="employee.max_hours" name="employee-max-hours" ng-init="newEmp.max_hours = 10" placeholder="Max hours" class="form-control" type="number" min="0" max="20" step="0.5" ng-show="editing == employee.id" on-enter="applyChanges(employee)">
+        <span ng-hide="editing == employee.id" ng-click="editEmployee(employee)">{{ employee.max_hours }}</span>
+      </td>
+      <td ng-show="showDelete == employee.id" class="employee-options">
+        <button type="button" class="close" aria-hidden="true" ng-click="deleteEmployee(employee)">&times;</button>
+      </td>
     </tr>
     <tr new-employee>
     </tr>
