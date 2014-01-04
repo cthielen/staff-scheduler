@@ -1,4 +1,4 @@
-StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, Employees) ->
+StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, Employees, EmpLookup) ->
   $(".navbar-nav li").removeClass "active"
   $("li#employees").addClass "active"
 
@@ -25,3 +25,41 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
     employee.is_disabled = true
     Employees.update employee, (data) ->
       $scope.employees.splice(index,1)
+
+
+  # New employee row
+  $scope.names = []
+  $scope.rowClass = ''
+  $scope.newEmp = {name: ''}
+  
+  $scope.$watch "newEmp.name", (value) ->
+    if value.length > 1
+      EmpLookup.query
+        q: value
+      , (response) ->
+        $scope.names = []
+        angular.forEach response, (item) ->
+          $scope.names.push item.name  if item.id
+    
+  
+  $scope.initFields = ->
+    # Reset fields
+    angular.forEach $scope.newEmp, (value,key) =>
+      $scope.newEmp[key] = ''
+    $scope.newEmp['max_hours'] = 10
+    $("input[name='new-name']").focus()
+
+  $scope.submit = ->
+    # Submit only if all fields are filled
+    unless ($scope.newEmp['name'] is '' or $scope.newEmp['email'] is '' or $scope.newEmp['max_hours'] is '')
+      Employees.save $scope.newEmp,
+        (data) ->
+          # Success
+          $scope.employees.push(data);
+          $scope.initFields()
+          $scope.rowClass = ''
+      , (data) ->
+          # Error
+          $scope.rowClass = 'error'
+  
+  $scope.initFields()
