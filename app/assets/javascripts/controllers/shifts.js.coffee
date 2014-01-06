@@ -3,15 +3,29 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
   # Set the hours array
   minHr = 7
   macHr = 18
+  step = 1
   $scope.hours = []
   while minHr <= macHr
     hour = new Date()
     hour.setHours(minHr)
     hour.setMinutes(minHr%1*60) 
     $scope.hours.push hour
-    minHr++
+    minHr+=step
 
-  console.log $scope.hours
+  currentCol = undefined
+  $("#selectable").selectable
+    filter: "td"
+    stop: (event, ui) ->
+      currentCol = undefined
+      console.log _.map( $('#selectable td.ui-selected'), (i) ->
+        $(i).closest('tr').attr('data-row') )
+
+    selecting: (event, ui) ->
+      currentCol = $(ui.selecting).attr("data-col") if currentCol is undefined
+      # Prevent highlighting the cell if it is in a different column
+      $(ui.selecting).removeClass('ui-selecting') unless $(ui.selecting).attr("data-col") is currentCol
+
+
   $scope.modalTemplate = null
   $scope.modalVisible = false
   $(".navbar-nav li").removeClass "active"

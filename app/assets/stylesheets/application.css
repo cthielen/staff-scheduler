@@ -22,3 +22,10 @@ body {
 .employee-options {
   position:absolute;
 }
+
+td.ui-selecting {
+  background-color: #aaa;
+}
+td.ui-selected {
+  background-color: #ccc;
+}
