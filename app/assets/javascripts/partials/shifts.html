@@ -5,4 +5,29 @@
   </div>
 </div>
 
-<div ui-calendar="uiConfig.calendar" class="calendar" ng-model="shiftSources" calendar="shiftsCalendar"></div> 
+<table class="table table-condensed">
+  <caption>
+    <span>Jan 6 - Jan 10</span>
+    <h3>SSH Helpdesk</h3>
+  </caption>
+  <thead>
+    <tr>
+      <th></th>
+      <th>Mon 1/6</th>
+      <th>Tue 1/7</th>
+      <th>Wed 1/8</th>
+      <th>Thu 1/9</th>
+      <th>Fri 1/10</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr  ng-repeat="hour in hours">
+      <td style="font-size:9pt;"> {{hour | date:'shortTime'}}</td>
+      <td><div></div></td>
+      <td><div></div></td>
+      <td><div></div></td>
+      <td><div></div></td>
+      <td><div></div></td>
+    </tr>
+  </tbody>
+</table>

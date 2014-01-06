@@ -1,4 +1,17 @@
 StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Shifts, Schedules) ->
+
+  # Set the hours array
+  minHr = 7
+  macHr = 18
+  $scope.hours = []
+  while minHr <= macHr
+    hour = new Date()
+    hour.setHours(minHr)
+    hour.setMinutes(minHr%1*60) 
+    $scope.hours.push hour
+    minHr++
+
+  console.log $scope.hours
   $scope.modalTemplate = null
   $scope.modalVisible = false
   $(".navbar-nav li").removeClass "active"
