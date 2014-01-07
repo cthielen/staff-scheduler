@@ -5,7 +5,7 @@
   </div>
 </div>
 
-<table class="table table-condensed" id="selectable">
+<table class="table table-condensed table-bordered" id="selectable">
   <caption>
     <span>Jan 6 - Jan 10</span>
     <h3>SSH Helpdesk</h3>
@@ -22,12 +22,13 @@
   </thead>
   <tbody>
     <tr  ng-repeat="hour in hours" data-row="{{hour | date:'shortTime'}}">
-      <td style="font-size:9pt;"> {{hour | date:'shortTime'}}</td>
-      <td data-col="0"><div></div></td>
-      <td data-col="1"><div></div></td>
-      <td data-col="2"><div></div></td>
-      <td data-col="3"><div></div></td>
-      <td data-col="4"><div></div></td>
+      <td style="font-size:9pt;" rowspan="{{1/step}}"
+        ng-show="hour.getMinutes() == 0"> {{hour | date:'shortTime'}}</td>
+      <td data-col="0" class="time-cell"></td>
+      <td data-col="1" class="time-cell"></td>
+      <td data-col="2" class="time-cell"></td>
+      <td data-col="3" class="time-cell"></td>
+      <td data-col="4" class="time-cell"></td>
     </tr>
   </tbody>
 </table>

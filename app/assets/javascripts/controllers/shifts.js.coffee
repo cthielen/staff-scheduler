@@ -3,14 +3,14 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
   # Set the hours array
   minHr = 7
   macHr = 18
-  step = 1
+  $scope.step = 0.5
   $scope.hours = []
-  while minHr <= macHr
+  while minHr < macHr
     hour = new Date()
     hour.setHours(minHr)
     hour.setMinutes(minHr%1*60) 
     $scope.hours.push hour
-    minHr+=step
+    minHr+=$scope.step
 
   currentCol = undefined
   $("#selectable").selectable
@@ -22,6 +22,8 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
 
     selecting: (event, ui) ->
       currentCol = $(ui.selecting).attr("data-col") if currentCol is undefined
+      # Exclude columns with no data-col attribute
+      $(ui.selecting).removeClass('ui-selecting') if $(ui.selecting).attr("data-col") is undefined
       # Prevent highlighting the cell if it is in a different column
       $(ui.selecting).removeClass('ui-selecting') unless $(ui.selecting).attr("data-col") is currentCol
 

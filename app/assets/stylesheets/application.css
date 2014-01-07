@@ -26,6 +26,11 @@ body {
 td.ui-selecting {
   background-color: #aaa;
 }
+
 td.ui-selected {
   background-color: #ccc;
+}
+
+td.time-cell {
+  height: 9px;
 }
