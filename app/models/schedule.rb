@@ -81,13 +81,13 @@ class Schedule < ActiveRecord::Base
     
   # Triggers: Human actions that directly trigger state changes
   def trigger_schedule_created
-    this.state = 2
-    this.save
+    self.state = 2
+    self.save
   end
   
   def trigger_shift_assignments_created
-    this.state = 4
-    this.save
+    self.state = 4
+    self.save
   end
       
   # Action requests: Email links to forms to trigger human action
@@ -107,6 +107,9 @@ class Schedule < ActiveRecord::Base
   end
   
   def notify_absence
+    message = "A shift assignment has been dropped."
+    recipients = Employee.active_employees
+    StaffMailer.send_email(message, recipients).deliver
   end
   
   def notify_unfilled_absence
@@ -123,7 +126,7 @@ class Schedule < ActiveRecord::Base
   
   # Exit state checks
 
-  # Employee availability needs to be associated to a schedule as well, as users may have multiple
+  # Employee availability needs to be associated to a schedule as well
   def check_availabilities
     remaining = this.EmployeeAvailability.where(is_disabled: false, confirmed: false)
     remaining.length
