@@ -1,17 +1,38 @@
 StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Shifts, Schedules) ->
 
+  $scope.viewDate = new Date()
+  $scope.viewWeek = []
+  $scope.getWeek = (d) ->
+    $scope.viewWeek = []
+    d = new Date(d)
+    day = d.getDay()
+    diff = d.getDate() - day + ((if day is 0 then -6 else 1)) # Mon = 1
+    $scope.viewWeek.push new Date(d.setDate(i)) for i in [diff .. diff+4]
+    $scope.viewWeek
+  
+  $scope.getWeek($scope.viewDate)
+  $scope.$watch "viewDate", (value, old) ->
+    $scope.getWeek(value)
+  , true
+    
   # Set the hours array
   minHr = 7
-  macHr = 18
+  maxHr = 18
   $scope.step = 0.5
   $scope.hours = []
-  while minHr < macHr
+  while minHr < maxHr
     hour = new Date()
     hour.setHours(minHr)
     hour.setMinutes(minHr%1*60) 
     $scope.hours.push hour
     minHr+=$scope.step
 
+  $scope.previousWeek = ->
+    $scope.viewDate.setDate($scope.viewDate.getDate() - 7)
+  
+  $scope.nextWeek = ->
+    $scope.viewDate.setDate($scope.viewDate.getDate() + 7)
+  
   currentCol = undefined
   $("#selectable").selectable
     filter: "td"

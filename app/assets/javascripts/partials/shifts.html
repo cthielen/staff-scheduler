@@ -7,17 +7,17 @@
 
 <table class="table table-condensed table-bordered" id="selectable">
   <caption>
-    <span>Jan 6 - Jan 10</span>
     <h3>SSH Helpdesk</h3>
+    <ul class="inline">
+      <li><a ng-click="previousWeek()" class="icon-chevron-left"></a></li>
+      <li><span>{{viewWeek[0]  | date:'MMM d'}} - {{viewWeek[4] | date:'MMM d'}}</span></li>
+      <li><a ng-click="nextWeek()" class="icon-chevron-right"></a></li>
+    </ul>
   </caption>
   <thead>
     <tr>
       <th></th>
-      <th>Mon 1/6</th>
-      <th>Tue 1/7</th>
-      <th>Wed 1/8</th>
-      <th>Thu 1/9</th>
-      <th>Fri 1/10</th>
+      <th ng-repeat="day in viewWeek">{{day | date:'EEE M/d'}}</th>
     </tr>
   </thead>
   <tbody>
