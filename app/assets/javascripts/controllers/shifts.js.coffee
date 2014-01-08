@@ -23,7 +23,6 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
     # TODO: Change to 'name' of the schedule after adding a new column, and fall back to above if name is empty
 
   $scope.createShift = (startDate, endDate) ->
-    console.log startDate, endDate
     $scope.newShift.start_datetime = startDate
     $scope.newShift.end_datetime = endDate
 
@@ -36,4 +35,5 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
 
     modalInstance.result.then (shift) ->
       # Add the shift to the array
+      $scope.newShift = {is_mandatory: true}
       $scope.shifts.push shift
