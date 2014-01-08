@@ -98,5 +98,3 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
     modalInstance.result.then (shift) ->
       # Add the shift to the array
       $scope.shifts.push shift
-      # Render the shift on the calendar
-      $scope.shiftsCalendar.fullCalendar "renderEvent", shift, true

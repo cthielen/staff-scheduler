@@ -1,4 +1,6 @@
 StaffScheduler::Application.routes.draw do
+  resources :shift_assignment_statuses
+
   resources :schedules
 
   # resources :skill_assignments
