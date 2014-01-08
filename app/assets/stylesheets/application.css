@@ -23,6 +23,10 @@ body {
   position:absolute;
 }
 
+.cal-title {
+  width: 15em;
+}
+
 td.ui-selecting {
   background-color: #aaa;
 }
@@ -32,5 +36,5 @@ td.ui-selected {
 }
 
 td.time-cell {
-  height: 9px;
+  height: 10px;
 }

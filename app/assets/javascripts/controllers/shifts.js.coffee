@@ -16,16 +16,21 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
   , true
     
   # Set the hours array
-  minHr = 7
-  maxHr = 18
-  $scope.step = 0.5
-  $scope.hours = []
-  while minHr < maxHr
-    hour = new Date()
-    hour.setHours(minHr)
-    hour.setMinutes(minHr%1*60) 
-    $scope.hours.push hour
-    minHr+=$scope.step
+  $scope.$watch "viewDate", (value, old) ->
+    minHr = 7
+    maxHr = 18
+    $scope.step = 0.5
+    $scope.hours = []
+    while minHr < maxHr
+      hour = new Date($scope.viewDate)
+      diff = hour.getDate() - hour.getDay() + ((if hour.getDay() is 0 then -6 else 1)) # Mon = 1
+      hour =  new Date(hour.setDate(diff))
+      hour.setSeconds(0)
+      hour.setHours(minHr)
+      hour.setMinutes(minHr%1*60)
+      $scope.hours.push hour
+      minHr+=$scope.step
+  , true
 
   $scope.previousWeek = ->
     $scope.viewDate.setDate($scope.viewDate.getDate() - 7)
@@ -38,8 +43,14 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
     filter: "td"
     stop: (event, ui) ->
       currentCol = undefined
-      console.log _.map( $('#selectable td.ui-selected'), (i) ->
-        $(i).closest('tr').attr('data-row') )
+      selection = _.map( $('#selectable td.ui-selected'), (i) ->
+        [$(i).closest('tr').attr('data-row'),$(i).closest('td').attr('data-col')] )
+      if selection.length > 0
+        startDateSelected = new Date(selection[0][0])
+        startDateSelected.setDate(startDateSelected .getDate() + parseInt(selection[0][1]))
+        endDateSelected = new Date(selection[selection.length-1][0])
+        endDateSelected.setDate(endDateSelected  .getDate() + parseInt(selection[0][1]))
+        $scope.createShift(startDateSelected,endDateSelected)
 
     selecting: (event, ui) ->
       currentCol = $(ui.selecting).attr("data-col") if currentCol is undefined
@@ -73,7 +84,7 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
     $filter('date')(sched.start_date, 'MM/dd/yyyy') + ' - ' + $filter('date')(sched.end_date, 'MM/dd/yyyy')
     # TODO: Change to 'name' of the schedule after adding a new column, and fall back to above if name is empty
 
-  $scope.createShift = (startDate, endDate, allDay, jsEvent, view) ->
+  $scope.createShift = (startDate, endDate) ->
     $scope.newShift.start_datetime = startDate
     $scope.newShift.end_datetime = endDate
 
@@ -89,19 +100,3 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       $scope.shifts.push shift
       # Render the shift on the calendar
       $scope.shiftsCalendar.fullCalendar "renderEvent", shift, true
-  
-  # config calendar 
-  $scope.uiConfig = calendar:
-    weekends: false
-    contentHeight: 600
-    defaultView: "agendaWeek"
-    selectable: true
-    allDayDefault: false
-    minTime: 7
-    maxTime: 19
-    header:
-      left: "prev,next"
-      center: "title"
-      right: "today agendaWeek,agendaDay"
-      ignoreTimezone: false
-    select: $scope.createShift

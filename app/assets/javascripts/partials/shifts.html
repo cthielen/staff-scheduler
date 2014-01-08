@@ -7,10 +7,10 @@
 
 <table class="table table-condensed table-bordered" id="selectable">
   <caption>
-    <h3>SSH Helpdesk</h3>
+    <h3 class="cal-title">SSH Helpdesk</h3>
     <ul class="inline">
       <li><a ng-click="previousWeek()" class="icon-chevron-left"></a></li>
-      <li><span>{{viewWeek[0]  | date:'MMM d'}} - {{viewWeek[4] | date:'MMM d'}}</span></li>
+      <li class="cal-title">{{viewWeek[0]  | date:'MMM d'}} - {{viewWeek[4] | date:'MMM d'}}</li>
       <li><a ng-click="nextWeek()" class="icon-chevron-right"></a></li>
     </ul>
   </caption>
@@ -21,7 +21,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr  ng-repeat="hour in hours" data-row="{{hour | date:'shortTime'}}">
+    <tr  ng-repeat="hour in hours" data-row="{{hour | date:'medium'}}">
       <td style="font-size:9pt;" rowspan="{{1/step}}"
         ng-show="hour.getMinutes() == 0"> {{hour | date:'shortTime'}}</td>
       <td data-col="0" class="time-cell"></td>
