@@ -10,3 +10,4 @@
 //= require ./controllers/schedules
 //= require ./controllers/NewShift
 //= require ./directives/onEnter
+//= require ./directives/calendar
