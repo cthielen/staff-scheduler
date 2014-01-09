@@ -35,6 +35,16 @@ td.ui-selected {
   background-color: #ccc;
 }
 
+table.calendar {
+  z-index: 1;
+}
+
+table.calendar.table-bordered {
+  border-collapse: collapse;
+}
+
 td.time-cell {
+  position: relative;
+  z-index: 2;
   height: 10px;
 }

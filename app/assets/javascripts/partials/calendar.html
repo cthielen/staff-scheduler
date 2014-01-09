@@ -1,4 +1,4 @@
-<table class="table table-condensed table-bordered" id="selectable">
+<table class="table table-condensed table-bordered calendar" id="selectable">
   <caption>
     <h3 class="cal-title">SSH Helpdesk</h3>
     <ul class="inline">
@@ -14,14 +14,11 @@
     </tr>
   </thead>
   <tbody>
-    <tr  ng-repeat="hour in hours" data-row="{{hour | date:'medium'}}">
+    <tr  ng-repeat="hour in hours" data-hour="{{hour | date:'medium'}}">
       <td style="font-size:9pt;" rowspan="{{1/step}}"
         ng-show="hour.getMinutes() == 0"> {{hour | date:'shortTime'}}</td>
-      <td data-col="0" class="time-cell"></td>
-      <td data-col="1" class="time-cell"></td>
-      <td data-col="2" class="time-cell"></td>
-      <td data-col="3" class="time-cell"></td>
-      <td data-col="4" class="time-cell"></td>
+      <td time-cell class="time-cell" ng-repeat="day in [0,1,2,3,4]"
+        data-day="{{day}}" data-hour="{{hour | date:'medium'}}" events="events"></td>
     </tr>
   </tbody>
 </table>

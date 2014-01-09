@@ -11,3 +11,4 @@
 //= require ./controllers/NewShift
 //= require ./directives/onEnter
 //= require ./directives/calendar
+//= require ./directives/timeCell

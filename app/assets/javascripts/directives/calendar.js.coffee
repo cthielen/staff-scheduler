@@ -43,13 +43,13 @@ StaffScheduler.directive "calendar", @calendar = () ->
     scope.nextWeek = ->
       scope.viewDate.setDate(scope.viewDate.getDate() + 7)
 
-    currentCol = undefined
+    selectedDay = undefined
     element.selectable
       filter: "td"
       stop: (event, ui) ->
-        currentCol = undefined
+        selectedDay = undefined
         selection = _.map( $('#selectable td.ui-selected'), (i) ->
-          [$(i).closest('tr').attr('data-row'),$(i).closest('td').attr('data-col')] )
+          [$(i).closest('tr').attr('data-hour'),$(i).closest('td').attr('data-day')] )
         if selection.length > 0
           startDateSelected = new Date(selection[0][0])
           startDateSelected.setDate(startDateSelected.getDate() + parseInt(selection[0][1]))
@@ -58,13 +58,13 @@ StaffScheduler.directive "calendar", @calendar = () ->
           scope.create({startDate: startDateSelected, endDate: endDateSelected})
 
       selecting: (event, ui) ->
-        # Exclude columns with no data-col attribute
-        $(ui.selecting).removeClass('ui-selecting') if $(ui.selecting).attr("data-col") is undefined
+        # Exclude columns with no data-day attribute
+        $(ui.selecting).removeClass('ui-selecting') if $(ui.selecting).attr("data-day") is undefined
         # Prevent highlighting the cell if it is in a different column
-        currentCol = $(ui.selecting).attr("data-col") if currentCol is undefined
-        $(ui.selecting).removeClass('ui-selecting') unless $(ui.selecting).attr("data-col") is currentCol
+        selectedDay = $(ui.selecting).attr("data-day") if selectedDay is undefined
+        $(ui.selecting).removeClass('ui-selecting') unless $(ui.selecting).attr("data-day") is selectedDay
 
     # TODO: Render the events on calendar
-    scope.$watch "events", (newVal, oldVal) ->
-      console.log newVal.length
+    scope.$watch "events", (events) ->
+      console.log events.length
     , true
