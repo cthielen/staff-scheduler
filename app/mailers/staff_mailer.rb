@@ -1,8 +1,8 @@
 class StaffMailer < ActionMailer::Base
   default from: "no-reply@dss.ucdavis.edu"
   
-  def send_email(message, recipient, subject)
+  def send_email(message, recipients, subject)
     @message = message
-    mail(:to => "#{recipient.name} <#{recipient.email}>", :subject => subject)
+    mail(:subject => subject, :bcc => recipients)
   end
 end
