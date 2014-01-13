@@ -1,4 +1,4 @@
-StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Shifts, Schedules) ->
+StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Schedules) ->
   $scope.modalTemplate = null
   $scope.modalVisible = false
   $(".navbar-nav li").removeClass "active"
@@ -6,12 +6,12 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
 
   $scope.newShift = {is_mandatory: true}
   
-  $scope.shifts = []
+  $scope.shifts =
+    color: "#7AB"
+    textColor: "yellow"
+    url: "/shifts.json"
+  $scope.shiftSources = [$scope.shifts]
   
-  Shifts.query (response) ->
-    angular.forEach response, (shift) ->
-      $scope.shifts.push shift if shift.id
-
   $scope.schedules = []
   Schedules.query (response) ->
     angular.forEach response, (item) ->
@@ -37,3 +37,24 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       # Add the shift to the array
       $scope.newShift = {is_mandatory: true}
       $scope.shifts.push shift
+
+  # config calendar 
+  $scope.uiConfig = calendar:
+    weekends: false
+    contentHeight: 450
+    defaultView: "agendaWeek"
+    selectable: true
+    allDayDefault: false
+    allDaySlot: false
+    slotEventOverlap: false
+    minTime: 7
+    maxTime: 18
+    header:
+      left: "prev,next"
+      center: "title"
+      right: "today agendaWeek,agendaDay"
+      ignoreTimezone: false
+    select: $scope.createShift
+    eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
+      element.css('background-color','#333') if event.location_id is 2
+      element.find('.fc-event-title').text('Custom title or content') if event.location_id is 3
