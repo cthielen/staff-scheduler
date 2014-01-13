@@ -34,9 +34,9 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
           $scope.newShift
 
     modalInstance.result.then (shift) ->
-      # Add the shift to the array
+      # Reset $scope.newShift and refetch events
       $scope.newShift = {is_mandatory: true}
-      $scope.shifts.push shift
+      $scope.shiftsCalendar.fullCalendar 'refetchEvents'
 
   # config calendar 
   $scope.uiConfig = calendar:
@@ -56,5 +56,8 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       ignoreTimezone: false
     select: $scope.createShift
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
-      element.css('background-color','#333') if event.location_id is 2
+      element.css('background-color','rgba(0,0,0,0.5)') if event.location_id is 2
       element.find('.fc-event-title').text('Custom title or content') if event.location_id is 3
+
+  $scope.$watch "shiftsCalendar", (value) ->
+    value.fullCalendar 'rerenderEvents'

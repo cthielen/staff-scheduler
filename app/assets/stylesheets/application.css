@@ -48,3 +48,12 @@ td.time-cell {
   z-index: 2;
   height: 10px;
 }
+
+.fc-agenda-slots td div {
+  height: 18px !important;
+}
+
+.fc-agenda .fc-agenda-axis {
+  font-size:9pt;
+  line-height:18px;
+}
