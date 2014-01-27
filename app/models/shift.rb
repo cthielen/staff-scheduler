@@ -7,5 +7,6 @@ class Shift < ActiveRecord::Base
   has_many :shift_assignments, dependent: :destroy
   has_many :shift_exceptions, dependent: :destroy
   
-  validates :start_datetime, :end_datetime, :is_mandatory, :location_id, :skill_id, :schedule_id, presence: true  
+  validates :start_datetime, :end_datetime, :location_id, :skill_id, :schedule_id, presence: true  
+  validates :is_mandatory, :inclusion => {:in => [true, false]}
 end
