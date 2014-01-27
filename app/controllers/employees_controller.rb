@@ -52,6 +52,13 @@ class EmployeesController < ApplicationController
     end
   end
 
+  def lookup
+    req = RestClient::Resource.new "https://roles.dss.ucdavis.edu/api/entities.json?q=#{params[:q]}", 'Staff Scheduler', '376d988a44b395ace5b6d3a4ae206e9b'
+    @employees = req.get if params[:q].length > 1
+    
+    respond_with @employees
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_employee

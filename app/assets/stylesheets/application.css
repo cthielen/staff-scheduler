@@ -10,8 +10,8 @@
  *
  *= require_self
  *= require bootstrap
+ *= require bootstrap-responsive
  *= require fullcalendar
- *= require typeahead.js-bootstrap
  */
 
 
@@ -21,4 +21,39 @@ body {
 
 .employee-options {
   position:absolute;
+}
+
+.cal-title {
+  width: 15em;
+}
+
+td.ui-selecting {
+  background-color: #aaa;
+}
+
+td.ui-selected {
+  background-color: #ccc;
+}
+
+table.calendar {
+  z-index: 1;
+}
+
+table.calendar.table-bordered {
+  border-collapse: collapse;
+}
+
+td.time-cell {
+  position: relative;
+  z-index: 2;
+  height: 10px;
+}
+
+.fc-agenda-slots td div {
+  height: 18px !important;
+}
+
+.fc-agenda .fc-agenda-axis {
+  font-size:9pt;
+  line-height:18px;
 }

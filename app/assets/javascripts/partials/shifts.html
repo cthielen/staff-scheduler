@@ -1,0 +1,8 @@
+<div class="panel panel-default">
+  <div class="panel-body">
+    <select ng-model="newShift.schedule_id" ng-options="schedule.id as scheduleName(schedule) for schedule in schedules" class="form-control">
+    </select>
+  </div>
+</div>
+
+<div ui-calendar="uiConfig.calendar" class="calendar" ng-model="shiftSources" calendar="shiftsCalendar"></div> 

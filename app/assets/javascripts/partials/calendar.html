@@ -1,0 +1,24 @@
+<table class="table table-condensed table-bordered calendar" id="selectable">
+  <caption>
+    <h3 class="cal-title">SSH Helpdesk</h3>
+    <ul class="inline">
+      <li><a ng-click="previousWeek()" class="icon-chevron-left"></a></li>
+      <li class="cal-title">{{viewWeek[0]  | date:'MMM d'}} - {{viewWeek[4] | date:'MMM d'}}</li>
+      <li><a ng-click="nextWeek()" class="icon-chevron-right"></a></li>
+    </ul>
+  </caption>
+  <thead>
+    <tr>
+      <th></th>
+      <th ng-repeat="day in viewWeek">{{day | date:'EEE M/d'}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr  ng-repeat="hour in hours" data-hour="{{hour | date:'medium'}}">
+      <td style="font-size:9pt;" rowspan="{{1/step}}"
+        ng-show="hour.getMinutes() == 0"> {{hour | date:'shortTime'}}</td>
+      <td time-cell class="time-cell" ng-repeat="day in [0,1,2,3,4]"
+        data-day="{{day}}" data-hour="{{hour | date:'medium'}}" events="events"></td>
+    </tr>
+  </tbody>
+</table>

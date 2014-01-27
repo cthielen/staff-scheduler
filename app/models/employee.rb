@@ -14,4 +14,13 @@ class Employee < ActiveRecord::Base
   
   validates :max_hours, :email, :name, presence: true
   validates :is_disabled, inclusion: { in: [true, false] }
+  
+  def self.active_managers
+    Employee.joins(:user).where(:users => {:is_manager => false, :disabled => false})
+  end
+  
+  def self.active_employees
+    Employee.joins(:user).where(:users => {:is_manager => true, :disabled => false})  
+  end
+  
 end

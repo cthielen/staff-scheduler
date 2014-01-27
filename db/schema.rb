@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131204161229) do
+ActiveRecord::Schema.define(version: 20140108214339) do
 
   create_table "employee_availabilities", force: true do |t|
     t.datetime "start_datetime"
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20131204161229) do
     t.integer  "employee_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "schedule_id"
   end
 
   create_table "employees", force: true do |t|
@@ -52,6 +53,12 @@ ActiveRecord::Schema.define(version: 20131204161229) do
     t.integer  "state",      default: 1
   end
 
+  create_table "shift_assignment_statuses", force: true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "shift_assignments", force: true do |t|
     t.datetime "start_datetime"
     t.datetime "end_datetime"
@@ -60,16 +67,7 @@ ActiveRecord::Schema.define(version: 20131204161229) do
     t.integer  "shift_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "shift_exceptions", force: true do |t|
-    t.datetime "start_datetime"
-    t.datetime "end_datetime"
-    t.integer  "employee_id"
-    t.boolean  "is_absence"
-    t.integer  "shift_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.integer  "status_id",      default: 1
   end
 
   create_table "shifts", force: true do |t|

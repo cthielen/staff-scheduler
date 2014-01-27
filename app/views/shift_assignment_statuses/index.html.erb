@@ -1,0 +1,27 @@
+<h1>Listing shift_assignment_statuses</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @shift_assignment_statuses.each do |shift_assignment_status| %>
+      <tr>
+        <td><%= shift_assignment_status.name %></td>
+        <td><%= link_to 'Show', shift_assignment_status %></td>
+        <td><%= link_to 'Edit', edit_shift_assignment_status_path(shift_assignment_status) %></td>
+        <td><%= link_to 'Destroy', shift_assignment_status, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Shift assignment status', new_shift_assignment_status_path %>
