@@ -4,4 +4,12 @@ class ShiftAssignmentStatus < ActiveRecord::Base
   has_many :shift_assignments
   
   validates :name, presence: true
+  # Suggest Statuses:
+  
+  # Scheduled
+  # Sick
+  # Absent
+  # Vacation
+  # Worked
+  
 end
