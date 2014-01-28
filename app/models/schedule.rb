@@ -161,27 +161,79 @@ class Schedule < ActiveRecord::Base
     remaining = total - current
   end
 
+  # Triggered by Whenever schedule
   def check_upcoming_shortages  
-    schedule = Schedule.active_schedule
-  
-    # Whenever will only trigger a calendar check and send notification if a schedule is active  
+    schedule = Schedule.active_schedule  
+    # will only run if there is a currently active schedule
     if !schedule.blank? 
-      shortages = staff_shortages(Schedule.next_working_day(Time.now.tomorrow.to_date))
+      shortages = staff_shortages(Schedule.next_working_day(Time.now.tomorrow.to_date, Time.now.tomorrow.to_date))
       if !shortages.blank?
-        notify_unfilled_absence
+        notify_unfilled_absence() # needs to be expanded to accept shortages array and output results in email
       end
     end
   end
-
+  
+  # accepts a date range (to check a single day you can set the same day to startdate and enddate)
+  # returns an array of hashes {start_datetime, end_datetime, shift_id} where shifts were not covered by a (planned or completed) shift_assignment
   def staff_shortages(startdate, enddate)
-    # for each shift on the specified day in the active schedule'
+    
+    shortages = []
     shifts = Schedule.active_schedule.shifts.all
+    
     shifts.each do |shift|
-      if shift.start_datetime.to_date == day.to_date
-        # look through the attached shift assignments and ensure they match end to end 
-        # beginning with a 'planned' and 'confirmed' shift that starts at the start time, and ending with a shift that ends at the end time      
+      # Only interested in shifts that fall wtihin the specified date range
+      if (shift.start_datetime.to_date >= startdate) && (shift.start_datetime.to_date <= enddate)
+      
+        # time_marker starts at start_datetime        
+        time_marker = shift.start_datetime      
+        shortage = {"start_datetime" => nil, "end_datetime" => nil, "shift_id" => nil}
+        
+        # loop ends when time_marker reaches end_datetime
+        # if no valid shift_assignment is found, time marker increments by 30 minutes and
+        # if no valid shift assignment is found,  a start time and shift_id is recorded for shortage   
+        # when a valid shift_assignment is found, time_marker jumps to that assignments end_datetime
+        # when a valid shift_assignment is found, an end_datetime is recorded for shortage, its pushed to the shortages array, and shortage is reset to nil
+        while time_marker < shift.end_datetime
+
+          assignments = ShiftAssignment.where(shift_id: shift.id, is_confirmed: true, start_datetime: shift.time_mark).all
+
+          if assignments.count == 0
+            # No valid shift_assignments found
+            # start a new shortage or continue existing shortage
+            if shortage['start_datetime'].blank?
+              shortage['start_datetime'] = time_marker
+            end
+            time_marker += 30.minutes
+          else
+            old_time_marker = time_marker
+            # check shift_assignment_statuses
+            
+            assignments.each do |assignment|
+              if (assignment.shift_assignment_status.name == "planned") || (assignment.shift_assignment_status.name == "completed")
+                # Valid shift_assignment found 
+                # end and record an existing shortage?
+                if shortage['start_datetime'].present?
+                  shortage['end_datetime'] = time_marker
+                  shortages.push(shortage)
+                  shortage = {"start_datetime" => nil, "end_datetime" => nil, "shift_id" => nil}
+                end
+                time_marker = assignment.end_datetime
+                break
+              end
+            end
+            # was a valid assignment found in assignments?
+            if time_marker == old_time_marker
+              # start a new shortage or continue existing shortage
+              if shortage['start_datetime'].blank?
+                shortage['start_datetime'] = time_marker
+              end
+              time_marker += 30.minutes
+            end
+          end 
+        end            
       end
     end
+    return shortages
   end
   
   def self.active_schedule
@@ -196,7 +248,6 @@ class Schedule < ActiveRecord::Base
   end
   
   def self.check_working_day(day)
-    # are there any shift assignments on the active schedule, scheduled for tomorrow? next day? next day? stop when you reach the end date of schedule
     schedule = Schedule.active_schedule
     if !schedule.blank?
       schedule.shifts.each do |shift|
