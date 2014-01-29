@@ -11,10 +11,8 @@ class ShiftAssignment < ActiveRecord::Base
   
   def notify_absence
     if self.shift_assignment_status.name == "absence"
-      message = "You have been recorded as absent from your shift assignment at Location: <location>, Skill: <skill>, start time: <start_time>, duration: <duration>. " 
-      recipient = self.employee
-      subject = "Shift Absence Notification"
-      StaffMailer.send_email(message, recipient, subject).deliver
+      recipients = self.employee.pluck(:email)
+      StaffMailer.notify_absence(recipients).deliver
     end
   end
 end

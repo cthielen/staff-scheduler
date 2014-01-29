@@ -58,14 +58,14 @@ class Schedule < ActiveRecord::Base
       # waiting on manager trigger
     when PENDING_AVAILABILITIES
       if check_availabilities == 0
-        notify_availability_confirmations_complete
+        StaffMailer.notify_availability_confirmations_complete.deliver
         this.state = 3
       end
     when PENDING_ASSIGNMENTS
       # waiting on manager trigger
     when PENDING_CONFIRMATION
       if check_shift_assignment_confirmations == 0
-        notify_schedule_ready
+        StaffMailer.notify_schedule_ready.deliver
         this.state = 5
       end
     when READY
@@ -94,60 +94,7 @@ class Schedule < ActiveRecord::Base
     self.state = 4
     self.save
   end
-      
-  # Action requests: Email links to forms to trigger human action
-        
-  def request_availability_form
-    message = "Your hours of availability are needed to begin planning the next schedule. You can submit this information on Staff-Scheduler <link>" 
-    subject = "Request for availability"
-    recipients = Employee.active_employees.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-  
-  def request_assignment_confirmation_form
-    subject = "Shifts assigned to you are awaiting confirmation"
-    message = "Shifts have been assigned to you and are awaiting your confirmation. You can confirm your shifts on Staff-scheduler <link>" 
-    recipients = Employee.active_employees.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-  
-  def request_shift_exception_fill
-     subject = "A shift has become available"
-     message = "A shift assignment has been dropped and is available to be claimed. Location: <location>, Skill: <skill>, start time: <start_time>, duration: <duration>. " 
-    recipients = Employee.active_employees.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-
-  # Action notifications: Emails status update  
-  
-  def notify_unfilled_absence
-    subject = "Unfilled shift tomorrow"
-    message = "There is an unfilled absence on tomorrows schedule. You can find more information on Staff-Scheduler <link>" 
-    recipients = Employee.active_managers.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-
-  def notify_unconfirmed_assignment
-    message = "There is an unconfirmed shift assignment on tomorrows schedule. You can find more information on Staff-Scheduler <link>" 
-    recipients = Employee.active_managers.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-
-  
-  def notify_availability_confirmations_complete
-    subject = "Schedule is awaiting shift assignments"
-    message = "All employee availabilities have been completed. The Schedule is now ready to have shift assignments filled. <link to schedule>"
-    recipients = Employee.active_managers.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-  
-  def notify_schedule_ready
-    subject = "Schedule planning is complete"
-    message = "All shift assignments have been confirmed by employees. The schedule is ready and will begin on <startdate>"
-    recipients = Employee.active_managers.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-  
+   
   # checks
   def check_availabilities
     total = Employee.active_employees.length
@@ -168,7 +115,7 @@ class Schedule < ActiveRecord::Base
     if !schedule.blank? 
       shortages = staff_shortages(Schedule.next_working_day(Time.now.tomorrow.to_date, Time.now.tomorrow.to_date))
       if !shortages.blank?
-        notify_unfilled_absence() # needs to be expanded to accept shortages array and output results in email
+        StaffMailer.notify_unfilled_absence.deliver # needs to be expanded to accept shortages array and output results in email
       end
     end
   end
@@ -244,10 +191,12 @@ class Schedule < ActiveRecord::Base
     return shortages
   end
 
+  # returns the current active schedule
   def self.active_schedule
     Schedule.find_by(state:6)
   end
   
+  # returns the last completed schedule
   def self.previous_schedule
     schedules = Schedule.where(state:7)
     schedules.max_by do |s|
@@ -255,6 +204,7 @@ class Schedule < ActiveRecord::Base
     end
   end
   
+  # returns true if the specified day has shifts associated to it, might be deprecated with current design
   def self.check_working_day(day)
     schedule = Schedule.active_schedule
     if !schedule.blank?
