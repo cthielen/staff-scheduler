@@ -5,7 +5,9 @@ class Schedule < ActiveRecord::Base
   has_many :shift_assignments, through: :shifts
   has_many :employee_availabilities
   
+  validate :schedule_dates_cannot_overlap_existing, :end_date_must_be_later_than_start_date
   validates :start_date, :end_date, presence: true
+
 
   # State Machine
   # ASSUMPTION: Transition Actions go on 'exits' not 'beginnings'
@@ -216,5 +218,21 @@ class Schedule < ActiveRecord::Base
     end
     return false
   end
+ 
+  # Validation
+  def schedule_dates_cannot_overlap_existing
+    Schedule.all.each do |schedule|
+      if (self.start_date >= schedule.start_date) && (self.start_date <= schedule.end_date)
+        errors.add(:start_date, "schedule can't start in the middle of an existing")
+      elsif (self.end_date >= schedule.start_date) && (self.end_date <= schedule.end_date)
+        errors.add(:end_date, "schedule can't end in the middle of an existing schedule")
+      end
+    end
+  end 
   
+  def end_date_must_be_later_than_start_date
+    if self.end_date < self.start_date
+      errors.add(:end_date, "End date must come after start date")
+    end
+  end
 end
