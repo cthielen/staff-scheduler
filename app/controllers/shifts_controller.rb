@@ -4,7 +4,7 @@ class ShiftsController < ApplicationController
   # GET /shifts
   # GET /shifts.json
   def index
-    @shifts = Shift.all
+    @shifts = Shift.with_permissions_to(:read).by_schedule(params[:schedule]).by_skill(params[:skill]).by_location(params[:location])
   end
 
   # GET /shifts/1
