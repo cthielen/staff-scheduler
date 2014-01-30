@@ -6,7 +6,7 @@ class ShiftAssignment < ActiveRecord::Base
   belongs_to :shift
   belongs_to :shift_assignment_status, :foreign_key => 'status_id'
 
-  validate :shift_assignment_must_fit_inside_shift, :end_date_must_be_later_than_start_date
+  validate :shift_assignment_must_fit_inside_shift, :end_date_must_be_later_than_start_date, :planned_or_completed_shift_assignments_cannot_overlap
   validates :start_datetime, :end_datetime, :employee_id, :status_id, :shift_id, presence: true
   validates :is_confirmed, :inclusion => {:in => [true, false]}
   
@@ -26,8 +26,22 @@ class ShiftAssignment < ActiveRecord::Base
   def shift_assignment_must_fit_inside_shift
     if self.start_datetime < self.shift.start_datetime
       errors.add(:start_datetime, "shift_assignment start_datetime must fall wtihin its shift")
-    elsif self.end_datetime > self.shift.end_dateime
+    elsif self.end_datetime > self.shift.end_datetime
       errors.add(:end_datetime, "shift_assignment end_datetime must fall wtihin its shift")    
+    end
+  end
+  
+  # ensure that an assignment cannot be made if it overlaps with an existing shift_assignment of status 'planned' or 'completed'
+  def planned_or_completed_shift_assignments_cannot_overlap
+    self.shift.shift_assignments.each do |assignment|
+      if assignment.shift_assignment_status.name == "planned" || assignment.shift_assignment_status.name == "completed"
+        unless (self.start_datetime < assignment.start_datetime) && (self.end_datetime <= assignment.end_datetime)
+          errors.add(:start_datetime, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")       
+        end
+        unless (self.start_datetime >= assignment.end_datetime) && (self.end_datetime > assignment.end_datetime)
+          errors.add(:end_datetime, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")               
+        end        
+      end
     end
   end
 end
