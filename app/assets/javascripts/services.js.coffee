@@ -17,6 +17,18 @@ angular.module("schedulerServices", ["ngResource"])
     ,
       update:
         method: "PUT"
+  .factory "Skills", ($resource) ->
+    $resource "/skills/:id.json",
+      id: "@id"
+    ,
+      update:
+        method: "PUT"
+  .factory "Locations", ($resource) ->
+    $resource "/locations/:id.json",
+      id: "@id"
+    ,
+      update:
+        method: "PUT"
   .factory "EmpLookup", ($resource) ->
     $resource "/employee-lookup.json?q=:q",
       q: "@q"

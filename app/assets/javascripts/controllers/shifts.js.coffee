@@ -1,4 +1,4 @@
-StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Schedules) ->
+StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Schedules, Skills, Locations) ->
   $scope.modalTemplate = null
   $scope.modalVisible = false
   $(".navbar-nav li").removeClass "active"
@@ -17,6 +17,21 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
     angular.forEach response, (item) ->
       $scope.schedules.push item if item.id
     $scope.newShift.schedule_id = response[0].id
+    $scope.$apply
+
+  $scope.skills = []
+  Skills.query (response) ->
+    angular.forEach response, (item) ->
+      $scope.skills.push item if item.id
+    $scope.newShift.skill_id = response[0].id
+    $scope.$apply
+
+  $scope.locations = []
+  Locations.query (response) ->
+    angular.forEach response, (item) ->
+      $scope.locations.push item if item.id
+    $scope.newShift.location_id = response[0].id
+    $scope.$apply
 
   $scope.scheduleName = (sched) ->
     $filter('date')(sched.start_date, 'MM/dd/yyyy') + ' - ' + $filter('date')(sched.end_date, 'MM/dd/yyyy')

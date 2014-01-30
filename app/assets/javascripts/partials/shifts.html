@@ -3,6 +3,14 @@
     <select ng-model="newShift.schedule_id" ng-options="schedule.id as scheduleName(schedule) for schedule in schedules" class="form-control">
     </select>
   </div>
+  <div class="col-md-4 col-md-offset-4">
+    <select ng-model="newShift.skill_id" ng-options="skill.id as skill.title for skill in skills" class="form-control">
+    </select>
+  </div>
+  <div class="col-md-4 col-md-offset-4">
+    <select ng-model="newShift.location_id" ng-options="location.id as location.name for location in locations" class="form-control">
+    </select>
+  </div>
 </div>
 
 <div ui-calendar="uiConfig.calendar" class="calendar" ng-model="shiftSources" calendar="shiftsCalendar"></div> 
