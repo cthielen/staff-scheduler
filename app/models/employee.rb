@@ -23,4 +23,17 @@ class Employee < ActiveRecord::Base
     Employee.joins(:user).where(:users => {:is_manager => true, :disabled => false})  
   end
   
+  # will return an array of eligable employees that could take the shift
+  def.self.available_employees(shift)
+  end
+  
+  # returns the number of hours the specified employee is scheduled to work this week
+  def hours_this_week(employee)
+    total_hours = 0
+    self.shift_assignments.each do |assignment|
+      if (assignment.shift_assignment_status.name == "planned") || (assignment.shift_assignment_status.name == "schedule")
+      total_hours += (assignment.end_datetime - assignment.start_atetime) / 3600
+    end
+    total_hours
+  end
 end
