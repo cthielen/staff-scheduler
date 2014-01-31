@@ -24,7 +24,10 @@ class Employee < ActiveRecord::Base
   end
   
   # will return an array of eligable employees that could take the shift
-  def.self.available_employees(shift)
+  def self.available_employees(shift)
+    Employee.all.each do |employee|
+      
+    end
   end
   
   # returns the number of hours the specified employee is scheduled to work this week
@@ -32,7 +35,8 @@ class Employee < ActiveRecord::Base
     total_hours = 0
     self.shift_assignments.each do |assignment|
       if (assignment.shift_assignment_status.name == "planned") || (assignment.shift_assignment_status.name == "schedule")
-      total_hours += (assignment.end_datetime - assignment.start_atetime) / 3600
+        total_hours += (assignment.end_datetime - assignment.start_atetime) / 3600
+      end
     end
     total_hours
   end
