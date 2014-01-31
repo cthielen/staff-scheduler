@@ -1,4 +1,4 @@
-StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Schedules, Skills, Locations) ->
+StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Shifts, Schedules, Skills, Locations) ->
   $scope.modalTemplate = null
   $scope.modalVisible = false
   $(".navbar-nav li").removeClass "active"
@@ -6,33 +6,15 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
 
   $scope.newShift = {is_mandatory: true}
   
-  $scope.shifts =
-    color: "#7AB"
-    textColor: "yellow"
-    url: "/shifts.json"
-  $scope.shiftSources = [$scope.shifts]
+  $scope.fetchShifts = ->
+    unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
+      $scope.shifts = Shifts.query({
+        schedule: $scope.newShift.schedule_id,
+        skill: $scope.newShift.skill_id,
+        location: $scope.newShift.location_id})
+      #TODO: rerender the calendar
   
-  $scope.schedules = []
-  Schedules.query (response) ->
-    angular.forEach response, (item) ->
-      $scope.schedules.push item if item.id
-    $scope.newShift.schedule_id = response[0].id
-    $scope.$apply
-
-  $scope.skills = []
-  Skills.query (response) ->
-    angular.forEach response, (item) ->
-      $scope.skills.push item if item.id
-    $scope.newShift.skill_id = response[0].id
-    $scope.$apply
-
-  $scope.locations = []
-  Locations.query (response) ->
-    angular.forEach response, (item) ->
-      $scope.locations.push item if item.id
-    $scope.newShift.location_id = response[0].id
-    $scope.$apply
-
+  
   $scope.scheduleName = (sched) ->
     $filter('date')(sched.start_date, 'MM/dd/yyyy') + ' - ' + $filter('date')(sched.end_date, 'MM/dd/yyyy')
     # TODO: Change to 'name' of the schedule after adding a new column, and fall back to above if name is empty
@@ -53,6 +35,29 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       $scope.newShift = {is_mandatory: true}
       $scope.shiftsCalendar.fullCalendar 'refetchEvents'
 
+
+  $scope.schedules = Schedules.query (response) ->
+    $scope.newShift.schedule_id = response[0].id
+    $scope.$apply
+
+  $scope.skills = Skills.query (response) ->
+    $scope.newShift.skill_id = response[0].id
+    $scope.$apply
+
+  $scope.locations = Locations.query (response) ->
+    $scope.newShift.location_id = response[0].id
+
+  $scope.shifts = []
+  $scope.shiftSources = [{
+      color: "#7AB"
+      textColor: "yellow"
+      events: $scope.shifts
+    }]
+  
+  $scope.$watch "newShift", (value) ->
+    $scope.fetchShifts()
+  , true
+  
   # config calendar 
   $scope.uiConfig = calendar:
     weekends: false
