@@ -25,8 +25,19 @@ class Employee < ActiveRecord::Base
   
   # will return an array of eligable employees that could take the shift
   def self.available_employees(shift)
+  employees = []
+    shift_hours = shift.end_datetime - shift.start_datetime / 3600
     Employee.all.each do |employee|
-      
+      #Ensure employee is not working those hours already
+      if true
+        # Ensure employee does not exceed weekly hours
+        if (employee.hours_this_week + shift_hours) < employee.max_hours
+          # Ensure employee has necessary skills
+          if self.skill_ids.include?(shift.skill_id)
+            employees.push(employee)
+          end
+        end
+      end
     end
   end
   
