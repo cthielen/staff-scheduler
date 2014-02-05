@@ -50,6 +50,7 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       ]
 
   $scope.fetchShifts = ->
+    console.log 'Fetching shifts...'
     unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
       Shifts.query {
         schedule: $scope.newShift.schedule_id,
@@ -81,26 +82,35 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
           $scope.newShift
 
     modalInstance.result.then (shift) ->
-      # Reset $scope.newShift and refetch events
-      $scope.newShift = {is_mandatory: true}
+      $scope.shifts.push shift
       $scope.shiftsCalendar.fullCalendar 'refetchEvents'
-
+      # Reset $scope.newShift
+      $scope.newShift = {
+        is_mandatory: true,
+        schedule_id: $scope.newShift.schedule_id,
+        skill_id: $scope.newShift.skill_id,
+        location_id: $scope.newShift.location_id
+      }
 
   $scope.schedules = Schedules.query (response) ->
     $scope.newShift.schedule_id = response[0].id
     $scope.$apply
+    $scope.init()
 
   $scope.skills = Skills.query (response) ->
     $scope.newShift.skill_id = response[0].id
     $scope.$apply
+    $scope.init()
 
   $scope.locations = Locations.query (response) ->
     $scope.newShift.location_id = response[0].id
     $scope.$apply
+    $scope.init()
 
-  $scope.$watch "newShift", (value) ->
-    $scope.fetchShifts()
-  , true
+  # Initial fetch
+  $scope.init = ->
+    unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
+      $scope.fetchShifts()
   
   # config calendar 
   $scope.uiConfig = calendar:
