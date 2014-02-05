@@ -12,6 +12,43 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       events: $scope.shifts
     }]
 
+  date = new Date()
+  d = date.getDate()
+  m = date.getMonth()
+  y = date.getFullYear()
+
+  $scope.annotations = [
+        {
+          start: new Date(y, m, d, 13, 0)
+          end: new Date(y, m, d, 15, 30)
+          title: "My 1st annotation"
+          cls: "open"
+          color: "#777777" # optional
+          background: "#eeeeff" # optional
+        }
+        {
+          start: new Date(y, m, d + 1, 15, 0)
+          end: new Date(y, m, d + 1, 16, 45)
+          title: "On vacations"
+          cls: "vacation"
+          color: "#777777"
+          background: "#eeeef0" # optional
+        }
+        {
+          start: new Date(y, m, d + 1, 16, 0)
+          end: new Date(y, m, d + 1, 18, 30)
+          title: "Overlapping annotation"
+          cls: "open"
+          color: "#777777" # optional
+          background: "#eeeedd" # optional
+        }
+        {
+          # just minimal fields for annotation
+          start: new Date(y, m, d - 1, 12, 0)
+          end: new Date(y, m, d - 1, 14, 0)
+        }
+      ]
+
   $scope.fetchShifts = ->
     unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
       Shifts.query {
@@ -82,6 +119,7 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       right: "today agendaWeek,agendaDay"
       ignoreTimezone: false
     select: $scope.createShift
+    annotations: $scope.annotations
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
       element.css('background-color','rgba(0,0,0,0.5)') if event.location_id is 2
       element.find('.fc-event-title').text('Custom title or content') if event.location_id is 3
