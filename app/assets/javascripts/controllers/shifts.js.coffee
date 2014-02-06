@@ -1,22 +1,70 @@
-StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Schedules) ->
+StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Shifts, Schedules, Skills, Locations) ->
   $scope.modalTemplate = null
   $scope.modalVisible = false
   $(".navbar-nav li").removeClass "active"
   $("li#shifts").addClass "active"
 
   $scope.newShift = {is_mandatory: true}
-  
-  $scope.shifts =
-    color: "#7AB"
-    textColor: "yellow"
-    url: "/shifts.json"
-  $scope.shiftSources = [$scope.shifts]
-  
-  $scope.schedules = []
-  Schedules.query (response) ->
-    angular.forEach response, (item) ->
-      $scope.schedules.push item if item.id
-    $scope.newShift.schedule_id = response[0].id
+  $scope.shifts = []
+  $scope.shiftSources = [{
+      color: "#7AB"
+      textColor: "yellow"
+      events: $scope.shifts
+    }]
+
+  date = new Date()
+  d = date.getDate()
+  m = date.getMonth()
+  y = date.getFullYear()
+
+  $scope.annotations = [
+        {
+          start: new Date(y, m, d, 13, 0)
+          end: new Date(y, m, d, 15, 30)
+          title: "My 1st annotation"
+          cls: "open"
+          color: "#777777" # optional
+          background: "#eeeeff" # optional
+        }
+        {
+          start: new Date(y, m, d + 1, 15, 0)
+          end: new Date(y, m, d + 1, 16, 45)
+          title: "On vacations"
+          cls: "vacation"
+          color: "#777777"
+          background: "#eeeef0" # optional
+        }
+        {
+          start: new Date(y, m, d + 1, 16, 0)
+          end: new Date(y, m, d + 1, 18, 30)
+          title: "Overlapping annotation"
+          cls: "open"
+          color: "#777777" # optional
+          background: "#eeeedd" # optional
+        }
+        {
+          # just minimal fields for annotation
+          start: new Date(y, m, d - 1, 12, 0)
+          end: new Date(y, m, d - 1, 14, 0)
+        }
+      ]
+
+  $scope.fetchShifts = ->
+    console.log 'Fetching shifts...'
+    unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
+      Shifts.query {
+        schedule: $scope.newShift.schedule_id,
+        skill: $scope.newShift.skill_id,
+        location: $scope.newShift.location_id
+      }, (result) ->
+        # Success
+        $scope.shifts.length = 0 # Preferred way of emptying a JS array
+        $scope.annotations.length = 0
+        angular.forEach result, (item) ->
+          $scope.shifts.push item if item.id
+
+        $scope.$apply
+        $scope.shiftsCalendar.fullCalendar 'refetchEvents'
 
   $scope.scheduleName = (sched) ->
     $filter('date')(sched.start_date, 'MM/dd/yyyy') + ' - ' + $filter('date')(sched.end_date, 'MM/dd/yyyy')
@@ -34,10 +82,35 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
           $scope.newShift
 
     modalInstance.result.then (shift) ->
-      # Reset $scope.newShift and refetch events
-      $scope.newShift = {is_mandatory: true}
-      $scope.shiftsCalendar.fullCalendar 'refetchEvents'
+      $scope.init()
+      # Reset $scope.newShift
+      $scope.newShift = {
+        is_mandatory: true,
+        schedule_id: $scope.newShift.schedule_id,
+        skill_id: $scope.newShift.skill_id,
+        location_id: $scope.newShift.location_id
+      }
 
+  $scope.schedules = Schedules.query (response) ->
+    $scope.newShift.schedule_id = response[0].id
+    $scope.$apply
+    $scope.init()
+
+  $scope.skills = Skills.query (response) ->
+    $scope.newShift.skill_id = response[0].id
+    $scope.$apply
+    $scope.init()
+
+  $scope.locations = Locations.query (response) ->
+    $scope.newShift.location_id = response[0].id
+    $scope.$apply
+    $scope.init()
+
+  # Initial fetch
+  $scope.init = ->
+    unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
+      $scope.fetchShifts()
+  
   # config calendar 
   $scope.uiConfig = calendar:
     weekends: false
@@ -55,9 +128,7 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       right: "today agendaWeek,agendaDay"
       ignoreTimezone: false
     select: $scope.createShift
+    annotations: $scope.annotations
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
       element.css('background-color','rgba(0,0,0,0.5)') if event.location_id is 2
       element.find('.fc-event-title').text('Custom title or content') if event.location_id is 3
-
-  $scope.$watch "shiftsCalendar", (value) ->
-    value.fullCalendar 'rerenderEvents'

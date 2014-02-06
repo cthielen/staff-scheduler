@@ -10,13 +10,12 @@
  *
  *= require_self
  *= require bootstrap
- *= require bootstrap-responsive
  *= require fullcalendar
  */
 
 
-body {
-  padding-top: 70px;
+.navbar-static-top {
+  margin-bottom: 19px;
 }
 
 .employee-options {
@@ -56,4 +55,12 @@ td.time-cell {
 .fc-agenda .fc-agenda-axis {
   font-size:9pt;
   line-height:18px;
+}
+
+li.shift-list-item {
+  border: 1px dotted #ccc;
+  border-radius: 3px;
+  padding: 5px;
+  margin: 3px 0px;
+  background: #eee;
 }

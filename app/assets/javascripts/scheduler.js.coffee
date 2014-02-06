@@ -1,4 +1,4 @@
-//= require ui-bootstrap-custom-tpls-0.7.0
+//= require ui-bootstrap
 //= require fullcalendar
 //= require underscore
 //= require jquery-ui

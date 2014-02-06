@@ -5,7 +5,196 @@ class Schedule < ActiveRecord::Base
   has_many :shift_assignments, through: :shifts
   has_many :employee_availabilities
   
+  validate :schedules_cannot_overlap, :end_date_must_be_later_than_start_date
   validates :start_date, :end_date, presence: true
+
+  # Runs state machine 'loop' of currently active schedule
+  def process_state
+    case current_state
+    
+    when ScheduleStatus::INCOMPLETE_SCHEDULE
+      # waiting on manager trigger
+    when ScheduleStatus::PENDING_AVAILABILITIES
+      if check_availabilities == 0
+        StaffMailer.notify_availability_confirmations_complete.deliver
+        this.state = 3
+      end
+    when ScheduleStatus::PENDING_ASSIGNMENTS
+      # waiting on manager trigger
+    when ScheduleStatus::PENDING_CONFIRMATION
+      if check_shift_assignment_confirmations == 0
+        StaffMailer.notify_schedule_ready.deliver
+        this.state = 5
+      end
+    when ScheduleStatus::READY
+      if Time.now > this.start_date
+        this.state = 6
+      end
+    when ScheduleStatus::ACTIVE
+      if Time.now > this.end_date
+        this.state = 7
+      end
+      
+    when ScheduleStatus::INACTIVE
+      
+    else
+      logger.info "Schedule has been put into an invalid state"
+    end
+  end
+    
+  # Triggers: Human actions that directly trigger state changes
+  def trigger_schedule_created
+    self.state = 2
+    self.save
+  end
+  
+  def trigger_shift_assignments_created
+    self.state = 4
+    self.save
+  end
+   
+  # checks
+  def check_availabilities
+    total = Employee.active_employees.length
+    current = self.employee_availabilities.length
+    remaining = total - current
+  end
+  
+  def check_shift_assignment_confirmations
+    total = self.shift_assignments.length
+    current = self.shift_assignments.where(confirmed: true).length
+    remaining = total - current
+  end
+
+  # Triggered by Whenever schedule
+  def self.check_upcoming_shortages  
+    schedule = Schedule.active_schedule  
+ 
+    # Will only run if there is a currently active schedule
+    if !schedule.blank? 
+      shortages = staff_shortages(Schedule.next_working_day(Time.now.tomorrow.to_date, Time.now.tomorrow.to_date))
+      if !shortages.blank?
+        StaffMailer.notify_unfilled_absence.deliver # Needs to be expanded to accept shortages array and output results in email
+      end
+    end
+  end
+  
+  # Accepts a date range (to check a single day you can set the same day to startdate and enddate)
+  # Returns an array of hashes {start_datetime, end_datetime, shift_id} where shifts were not covered by a (planned or completed) shift_assignment
+  def self.staff_shortages(startdate, enddate)
+    
+    shortages = []
+    shifts = Schedule.active_schedule.shifts.all
+    
+    shifts.each do |shift|
+      # Only interested in shifts that fall wtihin the specified date range
+      if (shift.start_datetime.to_date >= startdate) && (shift.start_datetime.to_date <= enddate)
+        shortages.push( Schedule.shortages_on_shift(shift) )
+      end
+    end
+    
+    return shortages
+  end
+  
+  # Accepts a shift, 
+  # Returns an array of hashes {start_datetime, end_datetime, shift_id} where there was no coverage (planned or completed) shift_assignment
+  def self.shortages_on_shift(shift)
+ 
+    shortages = []
+    shortage = {"start_datetime" => nil, "end_datetime" => nil, "shift_id" => shift.id}
+    time_marker = shift.start_datetime
+    # If no valid shift_assignment is found, time marker increments by 30 minutes and a start time and shift_id is recorded for shortage
+    # When a valid shift_assignment is found, time_marker jumps to that assignments end_datetime
+    # When a valid shift_assignment is found and a shortage has begun, an end_datetime is recorded, its pushed to the shortages array, and shortage is reset to nil
+    
+    # Loop ends when all time for the shift has been accounted for
+    while time_marker < shift.end_datetime
+
+      assignments = ShiftAssignment.where(shift_id: shift.id, is_confirmed: true, start_datetime: time_marker, shift_assignment_status:{name: ["planned", "completed"]}).all
+
+      # No valid shift_assignments found?
+      if assignments.count == 0
+        # Start a new shortage or continue existing shortage
+        if shortage['start_datetime'].blank?
+          shortage['start_datetime'] = time_marker
+        end
+        time_marker += 30.minutes
+      else
+        old_time_marker = time_marker
+
+        # Check assignments at this time block to see if any have the right status
+        assignments.each do |assignment|
+          if (assignment.shift_assignment_status.name == "planned") || (assignment.shift_assignment_status.name == "completed")
+            # Valid shift_assignment found 
+            
+            # End and record an existing shortage?
+            if shortage['start_datetime'].present?
+              shortage['end_datetime'] = time_marker
+              shortages.push(shortage)
+              shortage = {"start_datetime" => nil, "end_datetime" => nil, "shift_id" => shift.id}
+            end
+            time_marker = assignment.end_datetime
+            break
+          end
+        end
+        # No valid shift_assignments found in assignments for this time?
+        if time_marker == old_time_marker
+          # Start a new shortage or continue existing shortage
+          if shortage['start_datetime'].blank?
+            shortage['start_datetime'] = time_marker
+          end
+          time_marker += 30.minutes
+        end
+      end              
+    end
+    return shortages
+  end
+
+  # Returns the current active schedule
+  def self.active_schedule
+    Schedule.find_by(state:6)
+  end
+  
+  # Returns the last completed schedule
+  def self.previous_schedule
+    schedules = Schedule.where(state:7)
+    schedules.max_by do |s|
+      s.end_date
+    end
+  end
+  
+  # Returns true if the specified day has shifts associated to it, might be deprecated with current design
+  def self.check_working_day(day)
+    schedule = Schedule.active_schedule
+    if !schedule.blank?
+      schedule.shifts.each do |shift|
+        if shift.start_datetime.to_date == day
+          return true
+        end
+      end
+    end
+    return false
+  end
+ 
+  # Validation
+  def schedules_cannot_overlap
+    Schedule.all.each do |schedule|
+      if (self.start_date >= schedule.start_date) && (self.start_date <= schedule.end_date)
+        errors.add(:start_date, "schedule can't start in the middle of an existing")
+      elsif (self.end_date >= schedule.start_date) && (self.end_date <= schedule.end_date)
+        errors.add(:end_date, "schedule can't end in the middle of an existing schedule")
+      end
+    end
+  end 
+  
+  def end_date_must_be_later_than_start_date
+    if self.end_date < self.start_date
+      errors.add(:end_date, "End date must come after start date")
+    end
+  end
+end
+
+module ScheduleStatus
 
   # State Machine
   # ASSUMPTION: Transition Actions go on 'exits' not 'beginnings'
@@ -49,163 +238,4 @@ class Schedule < ActiveRecord::Base
 
   # Schedule no longer in use
   INACTIVE = 7
-  
-  # Runs state machine 'loop' of currently active schedule
-  def process_state
-    case current_state
-    
-    when INCOMPLETE_SCHEDULE
-      # waiting on manager trigger
-    when PENDING_AVAILABILITIES
-      if check_availabilities == 0
-        notify_availability_confirmations_complete
-        this.state = 3
-      end
-    when PENDING_ASSIGNMENTS
-      # waiting on manager trigger
-    when PENDING_CONFIRMATION
-      if check_shift_assignment_confirmations == 0
-        notify_schedule_ready
-        this.state = 5
-      end
-    when READY
-      if Time.now > this.start_date
-        this.state = 6
-      end
-    when ACTIVE
-      if Time.now > this.end_date
-        this.state = 7
-      end
-      
-    when INACTIVE
-      
-    else
-      logger.info "Schedule has been put into an invalid state"
-    end
-  end
-    
-  # Triggers: Human actions that directly trigger state changes
-  def trigger_schedule_created
-    self.state = 2
-    self.save
-  end
-  
-  def trigger_shift_assignments_created
-    self.state = 4
-    self.save
-  end
-      
-  # Action requests: Email links to forms to trigger human action
-        
-  def request_availability_form
-    message = "Your hours of availability are needed to begin planning the next schedule. You can submit this information on Staff-Scheduler <link>" 
-    subject = "Request for availability"
-    recipients = Employee.active_employees.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-  
-  def request_assignment_confirmation_form
-    subject = "Shifts assigned to you are awaiting confirmation"
-    message = "Shifts have been assigned to you and are awaiting your confirmation. You can confirm your shifts on Staff-scheduler <link>" 
-    recipients = Employee.active_employees.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-  
-  def request_shift_exception_fill
-     subject = "A shift has become available"
-     message = "A shift assignment has been dropped and is available to be claimed. Location: <location>, Skill: <skill>, start time: <start_time>, duration: <duration>. " 
-    recipients = Employee.active_employees.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-
-  # Action notifications: Emails status update  
-  
-  def notify_unfilled_absence
-    subject = "Unfilled shift tomorrow"
-    message = "There is an unfilled absence on tomorrows schedule. You can find more information on Staff-Scheduler <link>" 
-    recipients = Employee.active_managers.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-
-  def notify_unconfirmed_assignment
-    message = "There is an unconfirmed shift assignment on tomorrows schedule. You can find more information on Staff-Scheduler <link>" 
-    recipients = Employee.active_managers.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-
-  
-  def notify_availability_confirmations_complete
-    subject = "Schedule is awaiting shift assignments"
-    message = "All employee availabilities have been completed. The Schedule is now ready to have shift assignments filled. <link to schedule>"
-    recipients = Employee.active_managers.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-  
-  def notify_schedule_ready
-    subject = "Schedule planning is complete"
-    message = "All shift assignments have been confirmed by employees. The schedule is ready and will begin on <startdate>"
-    recipients = Employee.active_managers.pluck(:email)
-    StaffMailer.send_email(message, recipients, subject).deliver
-  end
-  
-  # checks
-  def check_availabilities
-    total = Employee.active_employees.length
-    current = self.employee_availabilities.length
-    remaining = total - current
-  end
-  
-  def check_shift_assignment_confirmations
-    total = self.shift_assignments.length
-    current = self.shift_assignments.where(confirmed: true).length
-    remaining = total - current
-  end
-
-  def check_upcoming_shortages  
-    schedule = Schedule.active_schedule
-  
-    # Whenever will only trigger a calendar check and send notification if a schedule is active  
-    if !schedule.blank? 
-      shortages = staff_shortages(Schedule.next_working_day(Time.now.tomorrow.to_date))
-      if !shortages.blank?
-        notify_unfilled_absence
-      end
-    end
-  end
-
-  def staff_shortages(startdate, enddate)
-    # for each shift on the specified day in the active schedule'
-    shifts = Schedule.active_schedule.shifts.all
-    shifts.each do |shift|
-      if shift.start_datetime.to_date == day.to_date
-        # look through the attached shift assignments and ensure they match end to end 
-        # beginning with a 'planned' and 'confirmed' shift that starts at the start time, and ending with a shift that ends at the end time      
-      end
-    end
-  end
-  
-  def self.active_schedule
-    Schedule.find_by(state:6)
-  end
-  
-  def self.previous_schedule
-    schedules = Schedule.where(state:7)
-    schedules.max_by do |s|
-      s.end_date
-    end
-  end
-  
-  def self.check_working_day(day)
-    # are there any shift assignments on the active schedule, scheduled for tomorrow? next day? next day? stop when you reach the end date of schedule
-    schedule = Schedule.active_schedule
-    if !schedule.blank?
-      schedule.shifts.each do |shift|
-        if shift.start_datetime.to_date == day
-          return true
-        end
-      end
-    end
-    return false
-  end
-  
 end
