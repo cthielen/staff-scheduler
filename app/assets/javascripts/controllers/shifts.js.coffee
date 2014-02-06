@@ -1,5 +1,6 @@
 StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Shifts, Schedules, Skills, Locations) ->
   $scope.modalTemplate = null
+  $scope.error = null
   $scope.modalVisible = false
   $(".navbar-nav li").removeClass "active"
   $("li#shifts").addClass "active"
@@ -134,6 +135,9 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
     , (data) ->
         # Error
         $scope.error = "Error deleting shift '#{shift.start_datetime} - #{shift.end_datetime}'"
+
+  $scope.clearError = ->
+    $scope.error = null
 
   # config calendar 
   $scope.uiConfig = calendar:
