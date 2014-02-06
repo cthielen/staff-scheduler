@@ -111,6 +111,30 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
     unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
       $scope.fetchShifts()
   
+  $scope.confirmDeleteShift = (shift) ->
+    modalInstance = $modal.open
+      templateUrl: '/assets/partials/delete.html'
+      controller: DeleteCtrl
+      resolve:
+        itemName: ->
+          "#{shift.start_datetime} - #{shift.end_datetime}"
+        itemType: ->
+          'Shift'
+
+    modalInstance.result.then () ->
+      $scope.deleteShift(shift)
+
+  $scope.deleteShift = (shift) ->
+    Shifts.delete {id: shift.id},
+      (data) ->
+        # Success
+        index = $scope.shifts.indexOf(shift)
+        $scope.shifts.splice(index,1)
+        $scope.init()
+    , (data) ->
+        # Error
+        $scope.error = "Error deleting shift '#{shift.start_datetime} - #{shift.end_datetime}'"
+
   # config calendar 
   $scope.uiConfig = calendar:
     weekends: false
@@ -132,3 +156,5 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
       element.css('background-color','rgba(0,0,0,0.5)') if event.location_id is 2
       element.find('.fc-event-title').text('Custom title or content') if event.location_id is 3
+    eventClick: (calEvent, jsEvent, view) ->
+      $scope.confirmDeleteShift(calEvent)
