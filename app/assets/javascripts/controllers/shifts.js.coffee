@@ -82,8 +82,7 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
           $scope.newShift
 
     modalInstance.result.then (shift) ->
-      $scope.shifts.push shift
-      $scope.shiftsCalendar.fullCalendar 'refetchEvents'
+      $scope.init()
       # Reset $scope.newShift
       $scope.newShift = {
         is_mandatory: true,
