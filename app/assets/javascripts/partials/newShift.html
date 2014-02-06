@@ -3,6 +3,10 @@
   <h4 class="modal-title" id="myModalLabel">New Shift</h4>
 </div>
 <div class="modal-body">
+  <div class="alert alert-danger" ng-show="error">
+    <button type="button" class="close" ng-click="clearError()">&times;</button>
+    <div ng-bind-html="error"></div>
+  </div>
   <ul class="nav nav-pills nav-stacked">
     <li class="shift-list-item" ng-repeat="shift in newShifts track by $index">
       <span>{{ shift.start_datetime | date:'short' }} - {{ shift.end_datetime | date:'short' }}</span>
@@ -13,5 +17,6 @@
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">Close</button>
-  <button type="button" class="btn btn-primary" ng-click="save()">Create Shift</button>
+  <button type="button" class="btn btn-primary" ng-click="save()"
+    ng-disabled="submitText == 'Saving...'">{{submitText}}</button>
 </div>
