@@ -14,7 +14,18 @@ class Shift < ActiveRecord::Base
   scope :by_schedule, lambda { |schedule| where(schedule_id: schedule) unless schedule.nil? }
   scope :by_skill, lambda { |skill| where(skill_id: skill) unless skill.nil? }
   scope :by_location, lambda { |location| where(location_id: location) unless location.nil? }
-  
+ 
+  # will return an array of eligible employees that could take the shift
+  def available_employees
+    employees = []
+    # Only active employees
+    Employee.where(is_disabled: false).each do |employee|
+      if employee.eligible_to_work(self)
+        employees.push(employee)
+      end
+    end
+    employees
+  end  
   
   def end_date_must_be_later_than_start_date
     if self.end_datetime < self.start_datetime
@@ -23,10 +34,12 @@ class Shift < ActiveRecord::Base
   end
   
   def shift_must_fit_inside_schedule
-    if self.start_datetime.to_date < self.schedule.start_date
-      errors.add(:start_datetime, "shift_assignment start_datetime must fall wtihin its schedule")
-    elsif self.end_datetime.to_date > self.schedule.end_date
-      errors.add(:end_datetime, "shift_assignment end_datetime must fall wtihin its schedule")    
-    end
+    if self.schedule.present?
+      if self.start_datetime.to_date < self.schedule.start_date
+        errors.add(:start_datetime, "shift_assignment start_datetime must fall wtihin its schedule")
+      elsif self.end_datetime.to_date > self.schedule.end_date
+        errors.add(:end_datetime, "shift_assignment end_datetime must fall wtihin its schedule")    
+      end
+    end  
   end
 end
