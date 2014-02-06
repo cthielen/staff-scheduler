@@ -38,13 +38,16 @@ class Employee < ActiveRecord::Base
     total_hours
   end
   
-  # accepts a shift, returns true or false if employee is eligible to work. Accounts for skills, locations, weekly hour cap and existing shift assignment conflicts.
+  # accepts a shift, returns true or false if employee is eligible to work. Accounts for skills, locations, availability, max hours, and existing shift assignment conflicts.
   # Note: unconfirmed and planned shift_assignments at the same time as 'shift' will make the employee ineligible to work shift.
   def eligible_to_work(shift)
     shift_hours = (shift.end_datetime - shift.start_datetime) / 3600 # converts seconds to hours
+
     # Ensure availability overlaps completely with shift
-    if true
+    unless self.available_to_work(shift)
+      return false
     end
+
     # Ensure employee is not working those hours already 
     self.shift_assignments.each do |assignment|
       if (assignment.shift_assignment_status.name == "planned") || (assignment.shift_assignment_status.name == "completed")
@@ -68,5 +71,15 @@ class Employee < ActiveRecord::Base
       end
     end
     return false
-  end  
+  end
+  
+  # Checks only against employee availability, not eligibility
+  def available_to_work(shift)  
+    self.employee_availabilities.each do |availability|
+      if (availability.start_datetime <= shift.start_datetime) && (availability.end_datetime >= shift.end_datetime)
+        return true
+      end
+    end
+    return false
+  end
 end
