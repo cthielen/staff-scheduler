@@ -75,7 +75,7 @@ class Employee < ActiveRecord::Base
   
   # Checks only against employee availability, not eligibility
   def available_to_work(shift)  
-    self.employee_availabilities.each do |availability|
+    self.employee_availabilities.where(schedule_id: shift.schedule_id).each do |availability|
       if (availability.start_datetime <= shift.start_datetime) && (availability.end_datetime >= shift.end_datetime)
         return true
       end
