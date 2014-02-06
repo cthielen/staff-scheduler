@@ -188,7 +188,7 @@ class Schedule < ActiveRecord::Base
   end 
   
   def end_date_must_be_later_than_start_date
-    if self.end_date < self.start_date
+    if self.end_date and (self.end_date < self.start_date)
       errors.add(:end_date, "End date must come after start date")
     end
   end
