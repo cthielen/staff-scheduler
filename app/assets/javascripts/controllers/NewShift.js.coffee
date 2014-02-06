@@ -30,22 +30,23 @@ StaffScheduler.controller "NewShiftCtrl", @NewShiftCtrl = ($scope, $modalInstanc
 
   $scope.save = ->
     $scope.error = null
-    _.each($scope.newShifts, (shift) ->
+    shiftsCount = $scope.newShifts.length
+    _.each($scope.newShifts, (shift, index) ->
       $scope.submitText = 'Saving...'
       Shifts.save shift,
         (data) ->
           # Success
-          index = $scope.newShifts.indexOf(shift)
-          $scope.newShifts.splice(index,1)
+          i = $scope.newShifts.indexOf(shift)
+          $scope.newShifts.splice(i,1)
           # If this is the last shift, close the modal
           if $scope.newShifts.length == 0
             $modalInstance.close newShift
-          else if shift is $scope.newShifts[$scope.newShifts.length - 1] # Last shift in array
+          else if index == shiftsCount - 1 # Last shift in array
             $scope.error = 'Could not save some shifts, please try saving again'
             $scope.submitText = 'Try Again'
         (data) ->
           # Failure
-          if shift is $scope.newShifts[$scope.newShifts.length - 1] # Last shift in array
+          if index == shiftsCount - 1 # Last shift in array
             $scope.error = 'Could not save some shifts, please try saving again'
             $scope.submitText = 'Try Again'
     )
