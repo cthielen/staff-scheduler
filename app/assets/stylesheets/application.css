@@ -64,3 +64,9 @@ li.shift-list-item {
   margin: 3px 0px;
   background: #eee;
 }
+
+.nav.selection-dropdowns > li > a {
+  border: 0px;
+  font-size: 20px;
+  padding: 0px;
+}
