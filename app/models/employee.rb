@@ -23,7 +23,7 @@ class Employee < ActiveRecord::Base
     Employee.joins(:user).where(:users => {:is_manager => true, :disabled => false})  
   end
  
-  # accepts a date, returns the number of hours the employee will work or has worked on the week of that date
+  # Accepts a date, returns the number of hours the employee will work or has worked on the week of that date
   def hours_working(date)
     total_hours = 0
     week_start = date.at_beginning_of_week
@@ -38,7 +38,7 @@ class Employee < ActiveRecord::Base
     total_hours
   end
   
-  # accepts a shift, returns true or false if employee is eligible to work. Accounts for skills, locations, availability, max hours, and existing shift assignment conflicts.
+  # Accepts a shift, returns true or false if employee is eligible to work. Accounts for skills, locations, availability, max hours, and existing shift assignment conflicts.
   # Note: unconfirmed and planned shift_assignments at the same time as 'shift' will make the employee ineligible to work shift.
   def eligible_to_work(shift)
     shift_hours = (shift.end_datetime - shift.start_datetime) / 3600 # converts seconds to hours
@@ -75,7 +75,7 @@ class Employee < ActiveRecord::Base
   
   # Checks only against employee availability, not eligibility
   def available_to_work(shift)  
-    self.employee_availabilities.where(schedule_id: shift.schedule_id).each do |availability|
+    employee_availabilities.where(schedule_id: shift.schedule_id).each do |availability|
       if (availability.start_datetime <= shift.start_datetime) && (availability.end_datetime >= shift.end_datetime)
         return true
       end
