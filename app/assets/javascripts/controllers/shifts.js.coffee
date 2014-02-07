@@ -111,6 +111,7 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
   $scope.init = ->
     unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
       $scope.fetchShifts()
+      $scope.currentSelectionsNames()
   
   $scope.confirmDeleteShift = (shift) ->
     modalInstance = $modal.open
@@ -136,6 +137,24 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
         # Error
         $scope.error = "Error deleting shift '#{shift.start_datetime} - #{shift.end_datetime}'"
 
+  $scope.currentSelectionsNames = ->
+    skill = _.findWhere($scope.skills, { id: $scope.newShift.skill_id }).title
+    location = _.findWhere($scope.locations, { id: $scope.newShift.location_id }).name
+    schedule = $scope.scheduleName(_.findWhere($scope.schedules, { id: $scope.newShift.schedule_id }))
+    $scope.selectionsNames = {skill: skill, location: location, schedule: schedule}
+
+  $scope.setSchedule = (schedule) ->
+    $scope.newShift.schedule_id = schedule.id
+    $scope.init()
+
+  $scope.setSkill = (skill) ->
+    $scope.newShift.skill_id = skill.id
+    $scope.init()
+
+  $scope.setLocation = (location) ->
+    $scope.newShift.location_id = location.id
+    $scope.init()
+
   $scope.clearError = ->
     $scope.error = null
 
@@ -156,7 +175,7 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       right: "today agendaWeek,agendaDay"
       ignoreTimezone: false
     select: $scope.createShift
-    annotations: $scope.annotations
+    # annotations: $scope.annotations
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
       element.css('background-color','rgba(0,0,0,0.5)') if event.location_id is 2
       element.find('.fc-event-title').text('Custom title or content') if event.location_id is 3
