@@ -38,30 +38,32 @@ class Employee < ActiveRecord::Base
     total_hours
   end
   
-  # Accepts a shift, returns true or false if employee is eligible to work. Accounts for skills, locations, availability, max hours, and existing shift assignment conflicts.
+  # Accepts a shift, start_timedate, and end_timedate that denote a fragment of that shift, 
+  # Returns true if the employee is eligible to work on that shift fragment. 
+  # Accounts for skills, locations, availability, max hours, and existing shift assignment conflicts.
   # Note: unconfirmed and planned shift_assignments at the same time as 'shift' will make the employee ineligible to work shift.
-  def eligible_to_work(shift)
-    shift_hours = (shift.end_datetime - shift.start_datetime) / 3600 # converts seconds to hours
-
+  def eligible_to_work(shift, fragment_start, fragment_end)
+    shift_hours = (fragment_end - fragment_start) / 3600 # converts seconds to hours
+    
     # Ensure availability overlaps completely with shift
-    unless self.available_to_work(shift)
+    unless self.available_to_work(shift, fragment_start, fragment_end)
       return false
     end
 
     # Ensure employee is not working those hours already 
     self.shift_assignments.each do |assignment|
       if (assignment.shift_assignment_status.name == "planned") || (assignment.shift_assignment_status.name == "completed")
-        unless (shift.start_datetime < assignment.start_datetime) && (shift.end_datetime <= assignment.start_datetime)
+        unless (fragment_start < assignment.start_datetime) && (fragment_end <= assignment.start_datetime)
           return false
         end
-        unless (shift.start_datetime >= assignment.end_datetime) && (shift.end_datetime > assignment.end_datetime)
+        unless (fragment_start >= assignment.end_datetime) && (fragment_end > assignment.end_datetime)
           return false
         end        
       end
     end
 
     # Ensure employee does not exceed weekly hours
-    if (self.hours_working(shift.start_datetime.to_date) + shift_hours) < self.max_hours
+    if (self.hours_working(fragment_start.to_date) + shift_hours) < self.max_hours
       # Ensure employee has necessary skill
       if self.skills.where(id: shift.skill_id).count
         # Ensure employee has necessary location
@@ -73,10 +75,11 @@ class Employee < ActiveRecord::Base
     return false
   end
   
-  # Checks only against employee availability, not eligibility
-  def available_to_work(shift)  
+  # Accepts a shift, shift fragment start, and shift fragmnet end, returns true if employee is avaialble to work
+  # NOTE: Checks only against employee availability, not other eligibility criteria
+  def available_to_work(shift, fragment_start, fragment_end)  
     employee_availabilities.where(schedule_id: shift.schedule_id).each do |availability|
-      if (availability.start_datetime <= shift.start_datetime) && (availability.end_datetime >= shift.end_datetime)
+      if (availability.start_datetime <= fragment_start) && (availability.end_datetime >= fragment_end)
         return true
       end
     end
