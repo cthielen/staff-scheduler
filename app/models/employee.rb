@@ -82,4 +82,18 @@ class Employee < ActiveRecord::Base
     end
     return false
   end
+  
+  # Returns true if there is a gravatar for the employee's email
+  def gravatar?
+    gravatar_check = "http://gravatar.com/avatar/#{Digest::MD5.hexdigest(email.downcase)}.png?d=404"
+    uri = URI.parse(gravatar_check)
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Get.new(uri.request_uri)
+    response = http.request(request)
+    if (response.code.to_i == 404)
+        return false
+    else
+        return true
+    end 
+  end
 end
