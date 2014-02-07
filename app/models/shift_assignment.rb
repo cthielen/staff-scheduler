@@ -36,7 +36,7 @@ class ShiftAssignment < ActiveRecord::Base
   # ensure that an assignment cannot be made if it overlaps with an existing shift_assignment of status 'planned' or 'completed'
   def planned_or_completed_shift_assignments_cannot_overlap
     self.shift.shift_assignments.each do |assignment|
-      if assignment.shift_assignment_status.name == "planned" || assignment.shift_assignment_status.name == "completed"
+      if scheduled?
         unless (self.start_datetime < assignment.start_datetime) && (self.end_datetime <= assignment.end_datetime)
           errors.add(:start_datetime, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")       
         end
