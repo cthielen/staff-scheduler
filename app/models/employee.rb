@@ -83,17 +83,17 @@ class Employee < ActiveRecord::Base
     return false
   end
   
-  # Returns true if there is a gravatar for the employee's email
-  def gravatar?
-    gravatar_check = "http://gravatar.com/avatar/#{Digest::MD5.hexdigest(email.downcase)}.png?d=404"
-    uri = URI.parse(gravatar_check)
+  # Returns gravatar URL if it exists for the employee's email, otherwise returns nil
+  def gravatar
+    gravatar = "http://gravatar.com/avatar/#{Digest::MD5.hexdigest(email.strip.downcase)}.png?d=404"
+    uri = URI.parse(gravatar)
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Get.new(uri.request_uri)
     response = http.request(request)
     if (response.code.to_i == 404)
-        return false
+        return nil
     else
-        return true
+        return gravatar
     end 
   end
 end
