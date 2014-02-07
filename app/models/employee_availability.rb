@@ -10,16 +10,16 @@ class EmployeeAvailability < ActiveRecord::Base
 
   def compact_availabilities
     EmployeeAvailability.where(schedule_id: self.schedule_id, employee_id: self.employee_id).each do |availability|
-      if (availability.start_datetime == self.end_datetime) 
-        availability.start_datetime = self.start_datetime
+      if (availability.start_datetime == end_datetime) 
+        availability.start_datetime = start_datetime
+        availability.save!        
         self.destroy
-        availability.save!   
-        break     
+        break
       end
-      if (availability.end_datetime == self.start_datetime)
-        availability.end_datetime = self.end_datetime
-        self.destroy 
+      if (availability.end_datetime == start_datetime)
+        availability.end_datetime = end_datetime
         availability.save!
+        self.destroy 
         break
       end
     end
