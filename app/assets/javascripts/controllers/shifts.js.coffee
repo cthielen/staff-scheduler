@@ -175,7 +175,7 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       right: "today agendaWeek,agendaDay"
       ignoreTimezone: false
     select: $scope.createShift
-    # annotations: $scope.annotations
+    annotations: $scope.annotations
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
       element.css('background-color','rgba(0,0,0,0.5)') if event.location_id is 2
       element.find('.fc-event-title').text('Custom title or content') if event.location_id is 3

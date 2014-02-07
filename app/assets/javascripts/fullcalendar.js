@@ -3470,7 +3470,7 @@ function AgendaView(element, calendar, viewName) {
 		var html = '';
 		for (var i=0; i < annotations.length; i++) {
 			var ann = annotations[i];
-			if (ann.start >= this.start && ann.end <= this.end) {
+			if (ann.start >= this.visStart && ann.end <= this.visEnd) {
 				var top = timePosition(ann.start, ann.start);
 				var bottom = timePosition(ann.end, ann.end);
 				var height = bottom - top;
