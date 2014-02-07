@@ -13,4 +13,11 @@
   </div>
 </div>
 
-<div ui-calendar="uiConfig.calendar" class="calendar" ng-model="shiftSources" calendar="shiftsCalendar"></div> 
+<div class="row" style="margin-top: 25px;">
+  <div class="alert alert-danger" ng-show="error">
+    <button type="button" class="close" ng-click="clearError()">&times;</button>
+    <div ng-bind-html="error"></div>
+  </div>
+
+  <div ui-calendar="uiConfig.calendar" class="calendar" ng-model="shiftSources" calendar="shiftsCalendar"></div> 
+</div>

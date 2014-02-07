@@ -2921,7 +2921,8 @@ setDefaults({
 		agenda: .5
 	},
 	minTime: 0,
-	maxTime: 24
+	maxTime: 24,
+	slotEventOverlap: true
 });
 
 
@@ -3987,18 +3988,23 @@ function AgendaEventRenderer() {
 			leftmost = colContentLeft(colI*dis + dit);
 			availWidth = colContentRight(colI*dis + dit) - leftmost;
 			availWidth = Math.min(availWidth-6, availWidth*.95); // TODO: move this to CSS
-			if (levelI) {
-				// indented and thin
-				outerWidth = availWidth / (levelI + forward + 1);
-			}else{
-				if (forward) {
-					// moderately wide, aligned left still
-					outerWidth = ((availWidth / (forward + 1)) - (12/2)) * 2; // 12 is the predicted width of resizer =
-				}else{
-					// can be entire width, aligned left
-					outerWidth = availWidth;
-				}
-			}
+
+			outerWidth = availWidth / (levelI + forward + 1);
+      // outerWidth = availWidth * ;
+      if (opt('slotEventOverlap')) {
+  			if (levelI) {
+  				// indented and thin
+  				outerWidth = availWidth / (levelI + forward + 1);
+  			}else{
+  				if (forward) {
+  					// moderately wide, aligned left still
+  					outerWidth = ((availWidth / (forward + 1)) - (12/2)) * 2; // 12 is the predicted width of resizer =
+  				}else{
+  					// can be entire width, aligned left
+  					outerWidth = availWidth;
+  				}
+  			}
+      }
 			left = leftmost +                                  // leftmost possible
 				(availWidth / (levelI + forward + 1) * levelI) // indentation
 				* dis + (rtl ? availWidth - outerWidth : 0);   // rtl

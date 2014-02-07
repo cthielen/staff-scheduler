@@ -5,10 +5,9 @@ class Shift < ActiveRecord::Base
   belongs_to :location
   belongs_to :schedule, touch: true
   has_many :shift_assignments, dependent: :destroy
-  has_many :shift_exceptions, dependent: :destroy
 
-  validate :shift_must_fit_inside_schedule, :end_date_must_be_later_than_start_date  
-  validates :start_datetime, :end_datetime, :location_id, :skill_id, :schedule_id, presence: true  
+  validate :shift_must_fit_inside_schedule, :end_date_must_be_later_than_start_date
+  validates :start_datetime, :end_datetime, :location_id, :skill_id, :schedule_id, presence: true
   validates :is_mandatory, :inclusion => {:in => [true, false]}
   
   scope :by_schedule, lambda { |schedule| where(schedule_id: schedule) unless schedule.nil? }
@@ -28,7 +27,7 @@ class Shift < ActiveRecord::Base
   end  
   
   def end_date_must_be_later_than_start_date
-    if self.end_datetime < self.start_datetime
+    if self.end_datetime and (self.end_datetime < self.start_datetime)
       errors.add(:end_datetime, "End date must come after start date")
     end
   end
