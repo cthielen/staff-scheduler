@@ -11,9 +11,11 @@ class ShiftAssignment < ActiveRecord::Base
   validates :is_confirmed, :inclusion => {:in => [true, false]}
   
   def notify_absence
-    if self.shift_assignment_status.name == "absence"
-      recipients = self.employee.pluck(:email)
-      StaffMailer.notify_absence(recipients).deliver
+    if self.shift_assignment_status.present?    
+      if self.shift_assignment_status.name == "absence"
+        recipients = self.employee.pluck(:email)
+        StaffMailer.notify_absence(recipients).deliver
+      end
     end
   end
   
@@ -42,6 +44,29 @@ class ShiftAssignment < ActiveRecord::Base
           errors.add(:end_datetime, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")               
         end        
       end
+    end
+  end
+  
+  # Combines commonly paired checks for 'planned' and 'completed'
+  def scheduled?
+    if completed? || planned?
+      true
+    else
+      false
+    end
+  end
+  def completed?
+    if shift_assignment_status.name == "completed"
+      true
+    else
+      false
+    end
+  end
+  def planned?
+    if shift_assignment_status.name == "planned"
+      true
+    else
+      false
     end
   end
 end
