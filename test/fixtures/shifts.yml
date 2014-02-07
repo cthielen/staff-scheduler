@@ -2,8 +2,8 @@
 
 one:
   id: 1
-  start_datetime: 2013-11-04 13:54:14
-  end_datetime: 2013-11-04 13:54:14
+  start_datetime: 2013-11-10 01:00:00
+  end_datetime: 2013-11-10 03:00:00
   is_mandatory: false
   location_id: 1
   skill_id: 1
