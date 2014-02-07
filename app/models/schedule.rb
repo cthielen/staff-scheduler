@@ -124,7 +124,7 @@ class Schedule < ActiveRecord::Base
 
         # Check assignments at this time block to see if any have the right status
         assignments.each do |assignment|
-          if (assignment.shift_assignment_status.name == "planned") || (assignment.shift_assignment_status.name == "completed")
+          if scheduled?
             # Valid shift_assignment found 
             
             # End and record an existing shortage?
