@@ -6,12 +6,13 @@ StaffScheduler.controller "NewShiftCtrl", @NewShiftCtrl = ($scope, $modalInstanc
   Schedules.get {id: newShift.schedule_id},
     (schedule) ->
       # Success
+      console.log schedule
+      $scope.schedule = schedule
       this_start_date = new Date(Date.parse(newShift.start_datetime))
       this_end_date = new Date(Date.parse(newShift.end_datetime))
       while this_end_date <= Date.parse(schedule.end_date)
         $scope.newShifts.push {
           is_mandatory: newShift.is_mandatory,
-          schedule_id: newShift.schedule_id,
           location_id: newShift.location_id,
           skill_id: newShift.skill_id,
           start_datetime: new Date(this_start_date),
@@ -30,26 +31,16 @@ StaffScheduler.controller "NewShiftCtrl", @NewShiftCtrl = ($scope, $modalInstanc
 
   $scope.save = ->
     $scope.error = null
-    shiftsCount = $scope.newShifts.length
-    _.each($scope.newShifts, (shift, index) ->
-      $scope.submitText = 'Saving...'
-      Shifts.save shift,
-        (data) ->
-          # Success
-          i = $scope.newShifts.indexOf(shift)
-          $scope.newShifts.splice(i,1)
-          # If this is the last shift, close the modal
-          if $scope.newShifts.length == 0
-            $modalInstance.close newShift
-          else if index == shiftsCount - 1 # Last shift in array
-            $scope.error = 'Could not save some shifts, please try saving again'
-            $scope.submitText = 'Try Again'
-        (data) ->
-          # Failure
-          if index == shiftsCount - 1 # Last shift in array
-            $scope.error = 'Could not save some shifts, please try saving again'
-            $scope.submitText = 'Try Again'
-    )
+    $scope.submitText = 'Saving...'
+    $scope.schedule.shifts_attributes = $scope.schedule.shifts.concat($scope.newShifts)
+    Schedules.update $scope.schedule,
+      (data) ->
+        # Success
+        $modalInstance.close newShift
+      (data) ->
+        # Failure
+        $scope.error = 'Could not save shifts, please try saving again'
+        $scope.submitText = 'Try Again'
 
   $scope.close = ->
     $modalInstance.dismiss "cancel"

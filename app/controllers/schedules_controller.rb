@@ -1,5 +1,6 @@
 class SchedulesController < ApplicationController
   before_action :set_schedule, only: [:show, :edit, :update, :destroy]
+  wrap_parameters :schedule, include: [:start_date, :end_date, :shifts_attributes]
 
   # GET /schedules
   # GET /schedules.json
@@ -69,6 +70,6 @@ class SchedulesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def schedule_params
-      params.require(:schedule).permit(:start_date, :end_date)
+      params.require(:schedule).permit(:start_date, :end_date, shifts_attributes: [:id, :start_datetime, :end_datetime, :is_mandatory, :location_id, :skill_id])
     end
 end

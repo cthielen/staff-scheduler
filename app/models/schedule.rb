@@ -1,12 +1,14 @@
 class Schedule < ActiveRecord::Base
   using_access_control
   
-  has_many :shifts
+  has_many :shifts, :dependent => :destroy
   has_many :shift_assignments, through: :shifts
   has_many :employee_availabilities
   
   validate :schedules_cannot_overlap, :end_date_must_be_later_than_start_date
   validates :start_date, :end_date, presence: true
+  
+  accepts_nested_attributes_for :shifts
 
   # Runs state machine 'loop' of currently active schedule
   def process_state
