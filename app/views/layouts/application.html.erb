@@ -39,6 +39,9 @@
             <% permitted_to? :read, :shifts do %>
             <li class="active" id="shifts"><a href="#/">Shifts</a></li>
             <% end %>
+            <% permitted_to? :read, :shift_assignments do %>
+            <li id="planning"><a href="#/planning">Planning</a></li>
+            <% end %>
             <% permitted_to? :read, :employees do %>
             <li id="employees"><a href="#/employees">Employees</a></li>
             <% end %>
