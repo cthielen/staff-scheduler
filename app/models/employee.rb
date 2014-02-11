@@ -92,6 +92,7 @@ class Employee < ActiveRecord::Base
   
   # Returns gravatar URL if it exists for the employee's email, otherwise returns nil
   def gravatar
+    logger.debug "entering gravatar"
     gravatar = "http://gravatar.com/avatar/#{Digest::MD5.hexdigest(email.strip.downcase)}.png?d=404"
     uri = URI.parse(gravatar)
     http = Net::HTTP.new(uri.host, uri.port)
@@ -105,7 +106,8 @@ class Employee < ActiveRecord::Base
   end
   
   def set_gravatar
-    if image_url = gravatar && profile.blank?
+    image_url = gravatar
+    if image_url && profile.blank?
       self.profile = download_remote_image(image_url)
     end
   end
