@@ -26,4 +26,14 @@ class ScheduleTest < ActiveSupport::TestCase
       assert s.save, "Validation should not compare schedule against itself after a change, #{s.inspect}"
     end
   end
+  
+  test "end_date_must_be_later_than_start_date" do
+    without_access_control do
+      s = Schedule.find(1)
+      end_date = s.end_date
+      s.end_date = s.start_date
+      s.start_date = end_date
+      assert !s.save, "Validation should stop a schedule save that has a start_date later than the end_date"
+    end
+  end
 end
