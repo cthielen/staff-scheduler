@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140127223244) do
+ActiveRecord::Schema.define(version: 20140211014349) do
 
   create_table "employee_availabilities", force: true do |t|
     t.datetime "start_datetime"
@@ -26,9 +26,13 @@ ActiveRecord::Schema.define(version: 20140127223244) do
     t.integer  "max_hours"
     t.string   "email"
     t.string   "name"
-    t.boolean  "is_disabled", default: false
+    t.boolean  "is_disabled",          default: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "profile_file_name"
+    t.string   "profile_content_type"
+    t.integer  "profile_file_size"
+    t.datetime "profile_updated_at"
   end
 
   create_table "location_assignments", force: true do |t|
