@@ -5,7 +5,7 @@
 //= require calendar
 //= require services
 //= require ./routers/scheduler
-//= require ./controllers/delete
+//= require ./controllers/confirm
 //= require ./controllers/shifts
 //= require ./controllers/planning
 //= require ./controllers/employees

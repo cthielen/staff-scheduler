@@ -1,4 +1,4 @@
-StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, Shifts, Schedules, Skills, Locations) ->
+StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, $location, Shifts, Schedules, Skills, Locations) ->
   $scope.modalTemplate = null
   $scope.error = null
   $scope.modalVisible = false
@@ -13,43 +13,6 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       events: $scope.shifts
     }]
 
-  date = new Date()
-  d = date.getDate()
-  m = date.getMonth()
-  y = date.getFullYear()
-
-  $scope.annotations = [
-        {
-          start: new Date(y, m, d, 13, 0)
-          end: new Date(y, m, d, 15, 30)
-          title: "My 1st annotation"
-          cls: "open"
-          color: "#777777" # optional
-          background: "#eeeeff" # optional
-        }
-        {
-          start: new Date(y, m, d + 1, 15, 0)
-          end: new Date(y, m, d + 1, 16, 45)
-          title: "On vacations"
-          cls: "vacation"
-          color: "#777777"
-          background: "#eeeef0" # optional
-        }
-        {
-          start: new Date(y, m, d + 1, 16, 0)
-          end: new Date(y, m, d + 1, 18, 30)
-          title: "Overlapping annotation"
-          cls: "open"
-          color: "#777777" # optional
-          background: "#eeeedd" # optional
-        }
-        {
-          # just minimal fields for annotation
-          start: new Date(y, m, d - 1, 12, 0)
-          end: new Date(y, m, d - 1, 14, 0)
-        }
-      ]
-
   $scope.fetchShifts = ->
     console.log 'Fetching shifts...'
     unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
@@ -60,7 +23,6 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       }, (result) ->
         # Success
         $scope.shifts.length = 0 # Preferred way of emptying a JS array
-        $scope.annotations.length = 0
         angular.forEach result, (item) ->
           $scope.shifts.push item if item.id
 
@@ -93,19 +55,41 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       }
 
   $scope.schedules = Schedules.query (response) ->
-    $scope.newShift.schedule_id = response[0].id
-    $scope.$apply
-    $scope.init()
+    if response.length
+      $scope.newShift.schedule_id = response[0].id
+      $scope.$apply
+      $scope.init()
+    else
+      $scope.redirectTo('schedule','/schedules')
 
   $scope.skills = Skills.query (response) ->
-    $scope.newShift.skill_id = response[0].id
-    $scope.$apply
-    $scope.init()
+    if response.length
+      $scope.newShift.skill_id = response[0].id
+      $scope.$apply
+      $scope.init()
 
   $scope.locations = Locations.query (response) ->
-    $scope.newShift.location_id = response[0].id
-    $scope.$apply
-    $scope.init()
+    if response.length
+      $scope.newShift.location_id = response[0].id
+      $scope.$apply
+      $scope.init()
+
+  $scope.redirectTo = (type, path) ->
+    modalInstance = $modal.open
+      templateUrl: '/assets/partials/confirm.html'
+      controller: ConfirmCtrl
+      resolve:
+        title: ->
+          "No #{type} defined"
+        body: ->
+          "You are being redirected to create a #{type}"
+        okButton: ->
+          "OK"
+        showCancel: ->
+          false
+
+    modalInstance.result.then () ->
+      $location.path path
 
   # Initial fetch
   $scope.init = ->
@@ -115,13 +99,17 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
   
   $scope.confirmDeleteShift = (shift) ->
     modalInstance = $modal.open
-      templateUrl: '/assets/partials/delete.html'
-      controller: DeleteCtrl
+      templateUrl: '/assets/partials/confirm.html'
+      controller: ConfirmCtrl
       resolve:
-        itemName: ->
+        title: ->
+          "Delete this shift?"
+        body: ->
           "#{shift.start_datetime} - #{shift.end_datetime}"
-        itemType: ->
-          'Shift'
+        okButton: ->
+          "Delete"
+        showCancel: ->
+          true
 
     modalInstance.result.then () ->
       $scope.deleteShift(shift)
@@ -175,7 +163,6 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
       right: "today agendaWeek,agendaDay"
       ignoreTimezone: false
     select: $scope.createShift
-    annotations: $scope.annotations
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
       element.css('background-color','rgba(0,0,0,0.5)') if event.location_id is 2
       element.find('.fc-event-title').text('Custom title or content') if event.location_id is 3
