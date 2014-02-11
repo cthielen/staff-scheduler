@@ -14,7 +14,8 @@ class Employee < ActiveRecord::Base
   has_many :wages, dependent: :destroy
   has_many :employee_availabilities, dependent: :destroy
   has_one :user
-  has_attached_file :profile, :url => "/system/:class/:attachment/:id/:style/:basename.:extension",
+  has_attached_file :profile, :styles => {:medium => "300x300>", :thumb => "100x100>"},
+  :url => "/system/:class/:attachment/:id/:style/:basename.:extension",
   :path => ":rails_root/public/system/:class/:attachment/:id/:style/:basename.:extension"
 
   validates :max_hours, :email, :name, presence: true
