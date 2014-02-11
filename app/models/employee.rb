@@ -1,5 +1,9 @@
+require 'open-uri'
+  
 class Employee < ActiveRecord::Base
   using_access_control
+  
+  before_save :set_gravatar
   
   has_many :shift_assignments, dependent: :destroy
   has_many :location_assignments, dependent: :destroy
@@ -99,4 +103,18 @@ class Employee < ActiveRecord::Base
       return gravatar
     end 
   end
+  
+  def set_gravatar
+    if image_url = gravatar && profile.blank?
+      self.profile = download_remote_image(image_url)
+    end
+  end
+  
+  def download_remote_image(image_url)
+    io = open(URI.parse(image_url))
+    def io.original_filename; base_uri.path.split('/').last; end
+    io.original_filename.blank? ? nil : io
+  end
+
+  
 end
