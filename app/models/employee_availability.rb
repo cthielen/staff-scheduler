@@ -1,8 +1,8 @@
 class EmployeeAvailability < ActiveRecord::Base
-  after_save :compact_availabilities
-  
   using_access_control
   
+  after_save :compact_availabilities
+    
   belongs_to :employee
   belongs_to :schedule
 
