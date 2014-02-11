@@ -96,6 +96,11 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
     unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
       $scope.fetchShifts()
       $scope.currentSelectionsNames()
+
+      # Change calendar date to the beginning of the schedule
+      schedule = _.findWhere($scope.schedules, { id: $scope.newShift.schedule_id })
+      scheduleStart = new Date(Date.parse(schedule.start_date))
+      $scope.shiftsCalendar.fullCalendar 'gotoDate', scheduleStart.getFullYear(), scheduleStart.getMonth(), scheduleStart.getDate()
   
   $scope.confirmDeleteShift = (shift) ->
     modalInstance = $modal.open
