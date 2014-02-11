@@ -1,20 +1,43 @@
-<a ng-click="newSchedule()" class="btn btn-default pull-right">New Schedule</a>
+<div class="row">
+  <a ng-click="newSchedule()" class="btn btn-default pull-right">New Schedule</a>
+</div>
 
-<table class="table table-hover table-striped" id="schedules">
-  <thead>
-    <tr>
-      <th>Start Date</th>
-      <th>End Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr ng-show="addNew">
-      <td><input ng-model="newSched.start_date" name="new-start" placeholder="Start Date" class="form-control" type="text" on-enter="createSchedule()"></td>
-      <td><input ng-model="newSched.end_date" name="new-end" placeholder="End Date" class="form-control" type="text" on-enter="createSchedule()"></td>
-    </tr>
-    <tr ng-repeat="schedule in schedules">
-      <td>{{schedule.start_date}}</td>
-      <td>{{schedule.end_date}}</td>
-    </tr>
-  </tbody>
-</table>
+<div class="row" style="margin-top: 15px;">
+  <div class="alert alert-danger" ng-show="error">
+    <button type="button" class="close" ng-click="clearError()">&times;</button>
+    <div ng-bind-html="error"></div>
+  </div>
+
+  <table class="table table-hover table-striped" id="schedules">
+    <thead>
+      <tr>
+        <th>Start Date</th>
+        <th>End Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-show="addNew">
+        <td>
+          <p class="input-group">
+            <input type="text" class="form-control" datepicker-popup="yyyy/MM/dd" ng-model="newSched.start_date" ng-required="true" placeholder="Start Date" ng-change="createSchedule()" />
+            <span class="input-group-btn">
+              <button class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+            </span>
+          </p>
+        </td>
+        <td>
+          <p class="input-group">
+            <input type="text" class="form-control" datepicker-popup="yyyy/MM/dd" ng-model="newSched.end_date" ng-required="true" placeholder="Start Date" ng-change="createSchedule()" />
+            <span class="input-group-btn">
+              <button class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+            </span>
+          </p>
+        </td>
+      </tr>
+      <tr ng-repeat="schedule in schedules">
+        <td>{{schedule.start_date}}</td>
+        <td>{{schedule.end_date}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
