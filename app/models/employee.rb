@@ -14,7 +14,8 @@ class Employee < ActiveRecord::Base
   has_many :wages, dependent: :destroy
   has_many :employee_availabilities, dependent: :destroy
   has_one :user
-  has_attached_file :profile
+  has_attached_file :profile, :url => "/system/:class/:attachment/:id/:style/:basename.:extension",
+  :path => ":rails_root/public/system/:class/:attachment/:id/:style/:basename.:extension"
 
   validates :max_hours, :email, :name, presence: true
   validates :is_disabled, inclusion: { in: [true, false] }
@@ -92,7 +93,6 @@ class Employee < ActiveRecord::Base
   
   # Returns gravatar URL if it exists for the employee's email, otherwise returns nil
   def gravatar
-    logger.debug "entering gravatar"
     gravatar = "http://gravatar.com/avatar/#{Digest::MD5.hexdigest(email.strip.downcase)}.png?d=404"
     uri = URI.parse(gravatar)
     http = Net::HTTP.new(uri.host, uri.port)
