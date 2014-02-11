@@ -2,10 +2,12 @@
 
 one:
   id: 1
-  start_date: 2013-11-12
-  end_date: 2013-11-12
+  start_date: 2014-1-1
+  end_date: 2014-2-1
+  state: 1
 
 two:
   id: 2
   start_date: 2013-11-12
   end_date: 2013-11-12
+  state: 1
