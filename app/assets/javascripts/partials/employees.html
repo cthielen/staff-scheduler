@@ -1,35 +1,27 @@
 <tabset justified="true">
   <tab heading="List">
-    <table class="table table-hover table-striped" id="employees">
+    <table class="table table-hover table-striped" id="employees" style="margin-top: 15px;">
       <thead>
         <tr>
           <th>Name</th>
           <th>E-Mail</th>
           <th>Max Hours</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="employee in employees" ng-mouseover="showOptions(employee)" ng-mouseleave="hideOptions(employee)">
+        <tr ng-repeat="employee in employees" ng-mouseover="showOptions(employee)" ng-mouseleave="hideOptions(employee)" ng-click="editEmployee(employee)">
+          <td><span>{{ employee.name }}</span></td>
+          <td><span>{{ employee.email }}</span></td>
+          <td><span>{{ employee.max_hours }}</span></td>
           <td>
-            <input ng-model="employee.name" name="employee-name" placeholder="Name" class="form-control" type="text" ng-show="editing == employee.id" on-enter="applyChanges(employee)">
-            <span ng-hide="editing == employee.id" ng-click="editEmployee(employee)">{{ employee.name }}</span>
-          </td>
-          <td>
-            <input ng-model="employee.email" name="employee-email" placeholder="Email" class="form-control" type="text" ng-show="editing == employee.id" on-enter="applyChanges(employee)">
-            <span ng-hide="editing == employee.id" ng-click="editEmployee(employee)">{{ employee.email }}</span>
-          </td>
-          <td>
-            <input ng-model="employee.max_hours" name="employee-max-hours" ng-init="newEmp.max_hours = 10" placeholder="Max hours" class="form-control" type="number" min="0" max="20" step="0.5" ng-show="editing == employee.id" on-enter="applyChanges(employee)">
-            <span ng-hide="editing == employee.id" ng-click="editEmployee(employee)">{{ employee.max_hours }}</span>
-          </td>
-          <td ng-show="showDelete == employee.id" class="employee-options">
-            <button type="button" class="close" aria-hidden="true" ng-click="deleteEmployee(employee)">&times;</button>
+            <i ng-show="showDelete == employee.id" ng-click="deleteEmployee(employee)" class="employee-options close">&times;</i>
           </td>
         </tr>
         <tr ng-class="rowClass">
           <td><input ng-model="newEmp.name" name="new-name" placeholder="Name" class="form-control" type="text" on-enter="submit()" typeahead="name for name in names | filter:$viewValue | limitTo:8"></td>
           <td><input ng-model="newEmp.email" name="new-email" placeholder="Email" class="form-control" type="text" on-enter="submit()"></td>
-          <td><input ng-model="newEmp.max_hours" name="new-max-hours" ng-init="newEmp.max_hours = 10" placeholder="Max hours" class="form-control" type="number" min="0" max="20" step="0.5" on-enter="submit()"></td>
+          <td colspan="2"><input ng-model="newEmp.max_hours" name="new-max-hours" ng-init="newEmp.max_hours = 10" placeholder="Max hours" class="form-control" type="number" min="0" max="20" step="0.5" on-enter="submit()"></td>
         </tr>
       </tbody>
     </table>
