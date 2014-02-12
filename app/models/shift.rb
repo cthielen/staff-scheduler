@@ -6,6 +6,7 @@ class Shift < ActiveRecord::Base
   belongs_to :schedule, touch: true
   has_many :shift_assignments, dependent: :destroy
 
+  validates :schedule, :location, :skill, presence: true 
   validate :shift_must_fit_inside_schedule, :end_date_must_be_later_than_start_date
   validates :start_datetime, :end_datetime, :location_id, :skill_id, :schedule_id, presence: true
   validates :is_mandatory, :inclusion => {:in => [true, false]}

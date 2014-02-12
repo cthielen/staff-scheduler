@@ -6,6 +6,7 @@ class ShiftAssignment < ActiveRecord::Base
   belongs_to :shift
   belongs_to :shift_assignment_status, :foreign_key => 'status_id'
 
+  validates :employee, :shift, :shift_assignment_status, presence: true
   validate :shift_assignment_must_fit_inside_shift, :end_date_must_be_later_than_start_date, :planned_or_completed_shift_assignments_cannot_overlap
   validates :start_datetime, :end_datetime, :employee_id, :status_id, :shift_id, presence: true
   validates :is_confirmed, :inclusion => {:in => [true, false]}
@@ -26,10 +27,12 @@ class ShiftAssignment < ActiveRecord::Base
   end
   
   def shift_assignment_must_fit_inside_shift
-    if self.start_datetime < self.shift.start_datetime
-      errors.add(:start_datetime, "shift_assignment start_datetime must fall wtihin its shift")
-    elsif self.end_datetime > self.shift.end_datetime
-      errors.add(:end_datetime, "shift_assignment end_datetime must fall wtihin its shift")    
+    if self.shift.present?
+      if self.start_datetime < self.shift.start_datetime
+        errors.add(:start_datetime, "shift_assignment start_datetime must fall wtihin its shift")
+      elsif self.end_datetime > self.shift.end_datetime
+        errors.add(:end_datetime, "shift_assignment end_datetime must fall wtihin its shift")    
+      end
     end
   end
   
