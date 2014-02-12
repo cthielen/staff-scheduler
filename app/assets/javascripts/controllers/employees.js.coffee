@@ -1,4 +1,4 @@
-StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, $modal, Employees, EmpLookup, Skills) ->
+StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, $modal, Employees, EmpLookup, Skills, Locations) ->
   $(".navbar-nav li").removeClass "active"
   $("li#employees").addClass "active"
   $scope.error = null
@@ -6,7 +6,6 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
   $scope.showDelete = null
 
   $scope.employees = Employees.query()
-  $scope.skills = Skills.query()
   
   $scope.showOptions = (employee) ->
     $scope.showDelete = employee.id
@@ -92,16 +91,19 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
   # Skills
   $scope.newSkill = {}
 
+  $scope.fetchSkills = () ->
+    $scope.skills = Skills.query()
+
   $scope.createSkill = () ->
-      Skills.save $scope.newSkill,
-        (data) ->
-          # Success
-          $scope.skills = Skills.query()
-          $scope.newSkill = {}
-          $scope.error= 'Error creating new skill'
-      , (data) ->
-          # Error
-          $scope.error= 'Error creating new skill'
+    Skills.save $scope.newSkill,
+      (data) ->
+        # Success
+        $scope.skills = Skills.query()
+        $scope.newSkill = {}
+        $scope.error= null
+    , (data) ->
+        # Error
+        $scope.error= 'Error creating new skill'
 
   $scope.editSkill = (skill) ->
     modalInstance = $modal.open
@@ -112,14 +114,40 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
           skill
 
     modalInstance.result.then (skill) ->
-      if skill is 'deleted'
-        $scope.deleteSkill skill
-      else
-        $scope.updateSkill skill
+      $scope.deleteSkill skill if skill is 'deleted'
 
   $scope.deleteSkill = (skill) ->
     index = $scope.skills.indexOf(skill)
     $scope.skills.splice(index,1)
 
-  $scope.updateSkill = (skill) ->
-    $scope.skills = Skills.query()
+  # Locations
+  $scope.newLocation = {}
+
+  $scope.fetchLocations = () ->
+    $scope.locations = Locations.query()
+
+  $scope.createLocation = () ->
+    Locations.save $scope.newLocation,
+      (data) ->
+        # Success
+        $scope.locations = Locations.query()
+        $scope.newLocation = {}
+        $scope.error= null
+    , (data) ->
+        # Error
+        $scope.error= 'Error creating new location'
+
+  $scope.editLocation = (location) ->
+    modalInstance = $modal.open
+      templateUrl: "/assets/partials/editLocation.html"
+      controller: EditLocationCtrl
+      resolve:
+        location: ->
+          location
+
+    modalInstance.result.then (location) ->
+      $scope.deleteLocation location if location is 'deleted'
+
+  $scope.deleteLocation = (location) ->
+    index = $scope.locations.indexOf(location)
+    $scope.locations.splice(index,1)

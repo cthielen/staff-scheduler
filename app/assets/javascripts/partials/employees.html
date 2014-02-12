@@ -26,8 +26,8 @@
       </tbody>
     </table>
   </tab>
-  <tab heading="Manage Skills">
-    <table class="table table-hover table-striped" id="employees" style="margin-top: 15px;">
+  <tab heading="Manage Skills" select="fetchSkills()">
+    <table class="table table-hover table-striped" id="skills" style="margin-top: 15px;">
       <thead>
         <tr>
           <th>Skill</th>
@@ -43,5 +43,21 @@
       </tbody>
     </table>
   </tab>
-  <tab heading="Manage Locations">Manage Locations here</tab>
+  <tab heading="Manage Locations" select="fetchLocations()">
+    <table class="table table-hover table-striped" id="locations" style="margin-top: 15px;">
+      <thead>
+        <tr>
+          <th>Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="location in locations" ng-click="editLocation(location)">
+          <td><span>{{ location.name }}</span></td>
+        </tr>
+        <tr ng-class="rowClass">
+          <td><input ng-model="newLocation.name" name="new-location" placeholder="New Location" class="form-control" type="text" on-enter="createLocation()"></td>
+        </tr>
+      </tbody>
+    </table>
+  </tab>
 </tabset>
