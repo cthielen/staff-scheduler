@@ -1,5 +1,5 @@
 <div class="row">
-  <a ng-click="newSchedule()" class="btn btn-default pull-right">New Schedule</a>
+  <a ng-click="toggleNewSchedule()" class="btn btn-default pull-right" ng-class="{active: addNew}">New Schedule</a>
 </div>
 
 <div class="row" style="margin-top: 15px;">
@@ -34,7 +34,7 @@
           </p>
         </td>
       </tr>
-      <tr ng-repeat="schedule in schedules">
+      <tr ng-repeat="schedule in schedules" ng-click="editSchedule(schedule)">
         <td>{{schedule.start_date}}</td>
         <td>{{schedule.end_date}}</td>
       </tr>

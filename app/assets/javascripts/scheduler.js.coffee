@@ -12,6 +12,7 @@
 //= require ./controllers/EditEmployee
 //= require ./controllers/EditSkill
 //= require ./controllers/EditLocation
+//= require ./controllers/EditSchedule
 //= require ./controllers/schedules
 //= require ./controllers/NewShift
 //= require ./directives/onEnter
