@@ -41,6 +41,10 @@ StaffScheduler.controller "NewShiftCtrl", @NewShiftCtrl = ($scope, $modalInstanc
         # Failure
         $scope.error = 'Could not save shifts, please try saving again'
         $scope.submitText = 'Try Again'
+        # Display specific errors
+        _.each(data.data , (e,i) ->
+            $scope.error = $scope.error + "<li>#{e}</li>"
+          )
 
   $scope.close = ->
     $modalInstance.dismiss "cancel"
