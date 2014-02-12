@@ -9,6 +9,8 @@
 //= require ./controllers/shifts
 //= require ./controllers/planning
 //= require ./controllers/employees
+//= require ./controllers/EditEmployee
 //= require ./controllers/schedules
 //= require ./controllers/NewShift
 //= require ./directives/onEnter
+//= require ./directives/stopEvent

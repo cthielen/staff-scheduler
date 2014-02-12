@@ -1,9 +1,8 @@
-StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, Employees, EmpLookup) ->
+StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, $modal, Employees, EmpLookup) ->
   $(".navbar-nav li").removeClass "active"
   $("li#employees").addClass "active"
 
   $scope.showDelete = null
-  $scope.editing = null
 
   $scope.employees = Employees.query()
   
@@ -14,11 +13,35 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
     $scope.showDelete = null
 
   $scope.editEmployee = (employee) ->
-    $scope.editing = employee.id
+    modalInstance = $modal.open
+      templateUrl: "/assets/partials/editEmployee.html"
+      controller: EditEmployeeCtrl
+      resolve:
+        employee: ->
+          employee
+
+    modalInstance.result.then (employee) ->
+      $scope.applyChanges employee
 
   $scope.applyChanges = (employee) ->
-    $scope.editing = null
     Employees.update employee
+
+  $scope.confirmDeleteEmployee = (employee) ->
+    modalInstance = $modal.open
+      templateUrl: '/assets/partials/confirm.html'
+      controller: ConfirmCtrl
+      resolve:
+        title: ->
+          "Delete this employee?"
+        body: ->
+          "#{employee.name}"
+        okButton: ->
+          "Delete"
+        showCancel: ->
+          true
+
+    modalInstance.result.then () ->
+      $scope.deleteEmployee(employee)
 
   $scope.deleteEmployee = (employee) ->
     index = $scope.employees.indexOf(employee)
