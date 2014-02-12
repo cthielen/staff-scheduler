@@ -10,6 +10,7 @@
 //= require ./controllers/planning
 //= require ./controllers/employees
 //= require ./controllers/EditEmployee
+//= require ./controllers/EditSkill
 //= require ./controllers/schedules
 //= require ./controllers/NewShift
 //= require ./directives/onEnter

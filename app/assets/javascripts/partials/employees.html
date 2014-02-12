@@ -26,6 +26,22 @@
       </tbody>
     </table>
   </tab>
-  <tab heading="Manage Skills">Manage Skills here</tab>
+  <tab heading="Manage Skills">
+    <table class="table table-hover table-striped" id="employees" style="margin-top: 15px;">
+      <thead>
+        <tr>
+          <th>Skill</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="skill in skills" ng-click="editSkill(skill)">
+          <td><span>{{ skill.title }}</span></td>
+        </tr>
+        <tr ng-class="rowClass">
+          <td><input ng-model="newSkill.title" name="new-skill" placeholder="New Skill" class="form-control" type="text" on-enter="createSkill()"></td>
+        </tr>
+      </tbody>
+    </table>
+  </tab>
   <tab heading="Manage Locations">Manage Locations here</tab>
 </tabset>

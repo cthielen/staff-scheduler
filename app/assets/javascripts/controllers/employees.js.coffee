@@ -1,10 +1,12 @@
-StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, $modal, Employees, EmpLookup) ->
+StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, $modal, Employees, EmpLookup, Skills) ->
   $(".navbar-nav li").removeClass "active"
   $("li#employees").addClass "active"
+  $scope.error = null
 
   $scope.showDelete = null
 
   $scope.employees = Employees.query()
+  $scope.skills = Skills.query()
   
   $scope.showOptions = (employee) ->
     $scope.showDelete = employee.id
@@ -86,3 +88,38 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
           $scope.rowClass = 'error'
   
   $scope.initFields()
+
+  # Skills
+  $scope.newSkill = {}
+
+  $scope.createSkill = () ->
+      Skills.save $scope.newSkill,
+        (data) ->
+          # Success
+          $scope.skills = Skills.query()
+          $scope.newSkill = {}
+          $scope.error= 'Error creating new skill'
+      , (data) ->
+          # Error
+          $scope.error= 'Error creating new skill'
+
+  $scope.editSkill = (skill) ->
+    modalInstance = $modal.open
+      templateUrl: "/assets/partials/editSkill.html"
+      controller: EditSkillCtrl
+      resolve:
+        skill: ->
+          skill
+
+    modalInstance.result.then (skill) ->
+      if skill is 'deleted'
+        $scope.deleteSkill skill
+      else
+        $scope.updateSkill skill
+
+  $scope.deleteSkill = (skill) ->
+    index = $scope.skills.indexOf(skill)
+    $scope.skills.splice(index,1)
+
+  $scope.updateSkill = (skill) ->
+    $scope.skills = Skills.query()
