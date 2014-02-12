@@ -29,10 +29,6 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
         $scope.$apply
         $scope.shiftsCalendar.fullCalendar 'refetchEvents'
 
-  $scope.scheduleName = (sched) ->
-    $filter('date')(sched.start_date, 'MM/dd/yyyy') + ' - ' + $filter('date')(sched.end_date, 'MM/dd/yyyy')
-    # TODO: Change to 'name' of the schedule after adding a new column, and fall back to above if name is empty
-
   $scope.createShift = (startDate, endDate) ->
     $scope.newShift.start_datetime = startDate
     $scope.newShift.end_datetime = endDate
@@ -133,7 +129,7 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
   $scope.currentSelectionsNames = ->
     skill = _.findWhere($scope.skills, { id: $scope.newShift.skill_id }).title
     location = _.findWhere($scope.locations, { id: $scope.newShift.location_id }).name
-    schedule = $scope.scheduleName(_.findWhere($scope.schedules, { id: $scope.newShift.schedule_id }))
+    schedule = _.findWhere($scope.schedules, { id: $scope.newShift.schedule_id }).name
     $scope.selectionsNames = {skill: skill, location: location, schedule: schedule}
 
   $scope.setSchedule = (schedule) ->

@@ -1,12 +1,12 @@
-StaffScheduler.controller "SchedulesCtrl", @SchedulesCtrl = ($scope, $routeParams, Schedules) ->
+StaffScheduler.controller "SchedulesCtrl", @SchedulesCtrl = ($scope, $routeParams, $modal, Schedules) ->
   $(".navbar-nav li").removeClass "active"
   $("li#schedules").addClass "active"
   $scope.error = null
     
   $scope.schedules = Schedules.query()
 
-  $scope.newSchedule = ->
-    $scope.addNew = true
+  $scope.toggleNewSchedule = ->
+    $scope.addNew = (if $scope.addNew then false else true)
 
   $scope.createSchedule = ->
     # Submit only if all fields are filled
@@ -26,6 +26,24 @@ StaffScheduler.controller "SchedulesCtrl", @SchedulesCtrl = ($scope, $routeParam
           _.each(data.data , (e,i) ->
               $scope.error = $scope.error + "<li>#{i}: #{e}</li>"
             )
+
+  $scope.editSchedule = (schedule) ->
+    modalInstance = $modal.open
+      templateUrl: "/assets/partials/editSchedule.html"
+      controller: EditScheduleCtrl
+      resolve:
+        schedule: ->
+          schedule
+
+    modalInstance.result.then (state) ->
+      if state is 'deleted'
+        $scope.deleteSchedule schedule
+      else
+        $scope.schedules = Schedules.query()
+
+  $scope.deleteSchedule = (schedule) ->
+    index = $scope.schedules.indexOf(schedule)
+    $scope.schedules.splice(index,1)
 
   $scope.clearError = ->
     $scope.error = null
