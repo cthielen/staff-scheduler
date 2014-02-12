@@ -26,6 +26,23 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
   $scope.applyChanges = (employee) ->
     Employees.update employee
 
+  $scope.confirmDeleteEmployee = (employee) ->
+    modalInstance = $modal.open
+      templateUrl: '/assets/partials/confirm.html'
+      controller: ConfirmCtrl
+      resolve:
+        title: ->
+          "Delete this employee?"
+        body: ->
+          "#{employee.name}"
+        okButton: ->
+          "Delete"
+        showCancel: ->
+          true
+
+    modalInstance.result.then () ->
+      $scope.deleteEmployee(employee)
+
   $scope.deleteEmployee = (employee) ->
     index = $scope.employees.indexOf(employee)
     employee.is_disabled = true

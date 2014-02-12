@@ -15,7 +15,7 @@
           <td><span>{{ employee.email }}</span></td>
           <td><span>{{ employee.max_hours }}</span></td>
           <td>
-            <i ng-show="showDelete == employee.id" ng-click="deleteEmployee(employee)" class="employee-options close">&times;</i>
+            <i class="employee-options close" tooltip="Delete this employee" ng-show="showDelete == employee.id" ng-click="confirmDeleteEmployee(employee)" stop-event="click">&times;</i>
           </td>
         </tr>
         <tr ng-class="rowClass">
