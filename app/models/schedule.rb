@@ -1,5 +1,6 @@
 class Schedule < ActiveRecord::Base
   using_access_control
+  before_save :set_schedule_name  
   
   has_many :shifts, :dependent => :destroy
   has_many :shift_assignments, through: :shifts
@@ -192,6 +193,12 @@ class Schedule < ActiveRecord::Base
   def end_date_must_be_later_than_start_date
     if self.end_date and (self.end_date < self.start_date)
       errors.add(:end_date, "End date must come after start date")
+    end
+  end
+  
+  def set_schedule_name
+    if self.name.blank?
+      self.name = "#{start_date.strftime('%b %d, %Y')} - #{end_date.strftime('%b %d, %Y')}"
     end
   end
 end
