@@ -2,10 +2,10 @@
 
 one:
   id: 1
-  title: MyString
+  title: "junior student"
   is_disabled: false
 
 two:
   id: 2
-  title: MyString
+  title: "senior student"
   is_disabled: false

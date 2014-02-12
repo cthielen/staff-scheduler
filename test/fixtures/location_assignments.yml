@@ -8,4 +8,8 @@ one:
 two:
   id: 2
   location_id: 1
+  employee_id: 2
+three:
+  id: 3
+  location_id: 2
   employee_id: 1

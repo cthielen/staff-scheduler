@@ -2,16 +2,18 @@
 
 one:
   id: 1
-  start_datetime: 2013-11-10 01:00:00
-  end_datetime: 2013-11-10 02:00:00
+  start_datetime: 2014-11-10 01:00:00
+  end_datetime: 2014-11-10 02:00:00
   employee_id: 1
   is_confirmed: false
   shift_id: 1
-
+  status_id: 1
+  
 two:
   id: 2
-  start_datetime: 2013-11-04 02:00:00
-  end_datetime: 2013-11-04 03:00:00
+  start_datetime: 2014-11-10 02:00:00
+  end_datetime: 2014-11-10 03:00:00
   employee_id: 1
   is_confirmed: false
   shift_id: 1
+  status_id: 1
