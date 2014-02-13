@@ -11,12 +11,16 @@
   <table class="table table-hover table-striped" id="schedules">
     <thead>
       <tr>
-        <th>Start Date</th>
-        <th>End Date</th>
+        <th class="col-sm-6">Name</th>
+        <th class="col-sm-3">Start Date</th>
+        <th class="col-sm-3">End Date</th>
       </tr>
     </thead>
     <tbody>
       <tr ng-show="addNew">
+        <td>
+          <input type="text" class="form-control" ng-model="newSched.name" placeholder="Schedules Name" on-enter="createSchedule()" />
+        </td>
         <td>
           <p class="input-group">
             <input type="text" class="form-control" datepicker-popup="yyyy/MM/dd" ng-model="newSched.start_date" ng-required="true" placeholder="Start Date" ng-change="createSchedule()" />
@@ -35,6 +39,7 @@
         </td>
       </tr>
       <tr ng-repeat="schedule in schedules" ng-click="editSchedule(schedule)">
+        <td>{{schedule.name}}</td>
         <td>{{schedule.start_date}}</td>
         <td>{{schedule.end_date}}</td>
       </tr>
