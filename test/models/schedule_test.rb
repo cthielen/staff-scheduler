@@ -17,7 +17,19 @@ class ScheduleTest < ActiveSupport::TestCase
       assert !sh.exists?, "shifts still exist after schedule was destroyed"
     end
   end
-    
+  
+  test "schedules_cannot_overlap should properly identify schedules that overlap" do
+    without_access_control do
+      s = Schedule.find(1)
+      s2 = Schedule.new
+      s2.start_date = s.start_date - 1.months
+      s2.end_date = s.end_date - 1.months
+      assert !s2.save, "should not save schedule when it overlaps with end_date of an existing schedule"
+      s2.start_date = s.start_date + 1.months
+      s2.end_date = s.end_date + 1.months
+      assert !s2.save, "Should not save schedule when it overlaps with start_date of an existing schedule"
+    end
+  end  
   test "schedules_cannot_overlap should exclude comparing the saved schedule against itself" do
     without_access_control do
       s = Schedule.find(1)

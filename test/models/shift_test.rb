@@ -20,4 +20,10 @@ class ShiftTest < ActiveSupport::TestCase
       assert !a.exists?, "shift_assignments still exist after shift was destroyed"
     end
   end
+#  test "shortages_on_shift should detect shortages"
+#    without_access_control do
+#      s = Shift.find(2)
+#     # assert s.shortages_on_shift.blank?
+#    end
+#  end
 end
