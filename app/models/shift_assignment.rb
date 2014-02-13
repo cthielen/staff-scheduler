@@ -21,8 +21,10 @@ class ShiftAssignment < ActiveRecord::Base
   end
   
   def end_date_must_be_later_than_start_date
-    if self.end_datetime < self.start_datetime
-      errors.add(:end_date, "End date must come after start date")
+    if self.end_datetime.present?
+      if self.end_datetime < self.start_datetime
+        errors.add(:end_date, "End date must come after start date")
+      end
     end
   end
   
@@ -38,14 +40,16 @@ class ShiftAssignment < ActiveRecord::Base
   
   # ensure that an assignment cannot be made if it overlaps with an existing shift_assignment of status 'planned' or 'completed'
   def planned_or_completed_shift_assignments_cannot_overlap
-    self.shift.shift_assignments.each do |assignment|
-      if scheduled?
-        unless (self.start_datetime < assignment.start_datetime) && (self.end_datetime <= assignment.end_datetime)
-          errors.add(:start_datetime, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")       
+    if self.shift.present? && self.shift.shift_assignments.present?
+      self.shift.shift_assignments.each do |assignment|
+        if scheduled?
+          unless (self.start_datetime < assignment.start_datetime) && (self.end_datetime <= assignment.end_datetime)
+            errors.add(:start_datetime, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")       
+          end
+          unless (self.start_datetime >= assignment.end_datetime) && (self.end_datetime > assignment.end_datetime)
+            errors.add(:end_datetime, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")               
+          end        
         end
-        unless (self.start_datetime >= assignment.end_datetime) && (self.end_datetime > assignment.end_datetime)
-          errors.add(:end_datetime, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")               
-        end        
       end
     end
   end

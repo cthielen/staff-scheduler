@@ -128,10 +128,12 @@ class Schedule < ActiveRecord::Base
   # Validation
   def schedules_cannot_overlap
     Schedule.all.each do |schedule|
-      if (self.start_date >= schedule.start_date) && (self.start_date <= schedule.end_date) && (schedule.id != self.id)
-        errors.add(:start_date, "schedule can't start in the middle of an existing")
-      elsif (self.end_date >= schedule.start_date) && (self.end_date <= schedule.end_date) && (schedule.id != self.id)
-        errors.add(:end_date, "schedule can't end in the middle of an existing schedule") 
+      if self.start_date.present? && self.end_date.present? && self.id.present?
+        if (self.start_date >= schedule.start_date) && (self.start_date <= schedule.end_date) && (schedule.id != self.id)
+          errors.add(:start_date, "schedule can't start in the middle of an existing")
+        elsif (self.end_date >= schedule.start_date) && (self.end_date <= schedule.end_date) && (schedule.id != self.id)
+          errors.add(:end_date, "schedule can't end in the middle of an existing schedule") 
+        end
       end
     end
   end 
