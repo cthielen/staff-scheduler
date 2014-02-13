@@ -3,6 +3,9 @@ schedulerRouter = ($routeProvider) ->
     .when "/",
       templateUrl: "/assets/partials/shifts.html"
       controller: "ShiftsCtrl"
+    .when "/availability",
+      templateUrl: "/assets/partials/availability.html"
+      controller: "AvailabilityCtrl"
     .when "/planning",
       templateUrl: "/assets/partials/planning.html"
       controller: "PlanningCtrl"

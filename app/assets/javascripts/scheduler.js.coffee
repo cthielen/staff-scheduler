@@ -8,6 +8,7 @@
 //= require ./controllers/confirm
 //= require ./controllers/shifts
 //= require ./controllers/planning
+//= require ./controllers/availability
 //= require ./controllers/employees
 //= require ./controllers/EditEmployee
 //= require ./controllers/EditSkill

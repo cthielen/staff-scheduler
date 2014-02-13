@@ -9,6 +9,10 @@ authorization do
   end
   role :employee do
     has_permission_on :shifts, :to => :read
+    has_permission_on :employee_availability, :to => :index
+    has_permission_on :employee_availability, :to => :manage do
+      if_attribute :employee => is { user }
+    end
   end
 end
 
