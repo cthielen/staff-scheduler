@@ -6,7 +6,7 @@
       </a>
       <ul class="dropdown-menu col-md-12">
         <li ng-repeat="schedule in schedules">
-          <a ng-click="setSchedule(schedule)">{{ scheduleName(schedule) }}</a>
+          <a ng-click="setSchedule(schedule)">{{ schedule.name }}</a>
         </li>
       </ul>
     </li>

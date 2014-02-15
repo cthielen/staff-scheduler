@@ -20,7 +20,9 @@ class Employee < ActiveRecord::Base
 
   validates :max_hours, :email, :name, presence: true
   validates :is_disabled, inclusion: { in: [true, false] }
-  
+
+  accepts_nested_attributes_for :employee_availabilities
+
   def self.active_managers
     Employee.joins(:user).where(:users => {:is_manager => true, :disabled => false})
   end

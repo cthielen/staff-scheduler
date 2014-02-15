@@ -1,74 +1,70 @@
-StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filter, $modal, $location, Shifts, Schedules, Skills, Locations) ->
+StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filter, $modal, $location, Shifts, Schedules, Skills, Locations, Employees, Availabilities) ->
   $scope.modalTemplate = null
   $scope.error = null
   $scope.modalVisible = false
   $(".navbar-nav li").removeClass "active"
   $("li#availability").addClass "active"
 
-  $scope.newShift = {is_mandatory: true}
+  $scope.newAvailability = {}
+  $scope.newAvailabilities = []
+  $scope.availabilities = []
   $scope.shifts = []
-  $scope.shiftSources = [{
+  $scope.calSources = [{
       color: "#7AB"
-      textColor: "yellow"
+      events: $scope.availabilities
+    },{
+      color: "#CCC"
       events: $scope.shifts
-    }]
-
-  $scope.fetchShifts = ->
-    console.log 'Fetching shifts...'
-    unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
-      Shifts.query {
-        schedule: $scope.newShift.schedule_id,
-        skill: $scope.newShift.skill_id,
-        location: $scope.newShift.location_id
-      }, (result) ->
-        # Success
-        $scope.shifts.length = 0 # Preferred way of emptying a JS array
-        angular.forEach result, (item) ->
-          $scope.shifts.push item if item.id
-
-        $scope.$apply
-        $scope.shiftsCalendar.fullCalendar 'refetchEvents'
-
-  $scope.createShift = (startDate, endDate) ->
-    $scope.newShift.start_datetime = startDate
-    $scope.newShift.end_datetime = endDate
-
-    modalInstance = $modal.open
-      templateUrl: "/assets/partials/newShift.html"
-      controller: NewShiftCtrl
-      resolve:
-        newShift: ->
-          $scope.newShift
-
-    modalInstance.result.then (shift) ->
-      $scope.init()
-      # Reset $scope.newShift
-      $scope.newShift = {
-        is_mandatory: true,
-        schedule_id: $scope.newShift.schedule_id,
-        skill_id: $scope.newShift.skill_id,
-        location_id: $scope.newShift.location_id
-      }
+    }
+  ]
 
   $scope.schedules = Schedules.query (response) ->
     if response.length
-      $scope.newShift.schedule_id = response[0].id
+      $scope.newAvailability.schedule_id = response[0].id
       $scope.$apply
       $scope.init()
     else
       $scope.redirectTo('schedule','/schedules')
 
-  $scope.skills = Skills.query (response) ->
-    if response.length
-      $scope.newShift.skill_id = response[0].id
-      $scope.$apply
-      $scope.init()
+  # Get the logged in employee
+  $scope.error = null
+  Employees.get {id: 45}, # FIX ME: this needs to be a service that grabs current logged in employee (Employees.current)
+    (data) ->
+      # Success
+      $scope.employee = data
+  , (data) ->
+      # Error
+      $scope.error = 'Could not query current user'
 
-  $scope.locations = Locations.query (response) ->
-    if response.length
-      $scope.newShift.location_id = response[0].id
-      $scope.$apply
-      $scope.init()
+  $scope.fetchAvailabilities = ->
+    unless $scope.newAvailability.schedule_id is undefined
+      console.log 'Fetching availabilities...'
+      Availabilities.query {
+        schedule: $scope.newAvailability.schedule_id
+      }, (result) ->
+        # Success
+        $scope.availabilities.length = 0 # Preferred way of emptying a JS array
+        angular.forEach result, (item) ->
+          $scope.availabilities.push item if item.id
+
+        console.log $scope.availabilities
+        $scope.$apply
+        $scope.availabilityCalendar.fullCalendar 'refetchEvents'
+
+  $scope.fetchShifts = ->
+    unless $scope.newAvailability.schedule_id is undefined
+      console.log 'Fetching shifts...'
+      Shifts.query {
+        schedule: $scope.newAvailability.schedule_id
+      }, (result) ->
+        # Success
+        $scope.shifts.length = 0 # Preferred way of emptying a JS array
+        angular.forEach result, (item) ->
+          item.isBackground = true
+          $scope.shifts.push item if item.id
+
+        $scope.$apply
+        $scope.availabilityCalendar.fullCalendar 'refetchEvents'
 
   $scope.redirectTo = (type, path) ->
     modalInstance = $modal.open
@@ -89,24 +85,60 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
 
   # Initial fetch
   $scope.init = ->
-    unless $scope.newShift.schedule_id is undefined or $scope.newShift.skill_id is undefined or $scope.newShift.location_id is undefined
+    unless $scope.newAvailability.schedule_id is undefined
+      $scope.fetchAvailabilities()
       $scope.fetchShifts()
-      $scope.currentSelectionsNames()
+      $scope.setScheduleName()
 
       # Change calendar date to the beginning of the schedule
-      schedule = _.findWhere($scope.schedules, { id: $scope.newShift.schedule_id })
+      schedule = _.findWhere($scope.schedules, { id: $scope.newAvailability.schedule_id })
       scheduleStart = new Date(Date.parse(schedule.start_date))
-      $scope.shiftsCalendar.fullCalendar 'gotoDate', scheduleStart.getFullYear(), scheduleStart.getMonth(), scheduleStart.getDate()
   
-  $scope.confirmDeleteShift = (shift) ->
+  $scope.createAvailability = (startDate, endDate) ->
+    $scope.newAvailability.start_datetime = startDate
+    $scope.newAvailability.end_datetime = endDate
+
+    # Calculate the repeated times within selected schedule
+    this_start_date = new Date(Date.parse($scope.newAvailability.start_datetime))
+    this_end_date = new Date(Date.parse($scope.newAvailability.end_datetime))
+    while this_end_date <= Date.parse($scope.schedule.end_date)
+      $scope.newAvailabilities.push {
+        start_datetime: new Date(this_start_date),
+        end_datetime: new Date(this_end_date),
+        schedule_id: $scope.newAvailability.schedule_id
+      }
+      this_start_date.setDate(this_start_date.getDate()+7)
+      this_end_date.setDate(this_end_date.getDate()+7)
+
+    # Save the calculated availabilities
+    $scope.error = null
+    availabilities = $scope.employee.employee_availabilities || []
+    $scope.employee.employee_availabilities_attributes = availabilities.concat($scope.newAvailabilities)
+    Employees.update $scope.employee,
+      (data) ->
+        # Success
+        $scope.init()
+        # Reset $scope.newAvailability
+        $scope.newAvailability = {
+          schedule_id: $scope.newAvailability.schedule_id
+        }
+    , (data) ->
+        # Failure
+        $scope.error = 'Could not save availabilities, please try again'
+        # Display specific errors
+        _.each(data.data , (e,i) ->
+            $scope.error = $scope.error + "<li>#{i}: #{e}</li>"
+          )
+
+  $scope.confirmDeleteAvailability = (availability) ->
     modalInstance = $modal.open
       templateUrl: '/assets/partials/confirm.html'
       controller: ConfirmCtrl
       resolve:
         title: ->
-          "Delete this shift?"
+          "Delete this availability?"
         body: ->
-          "#{shift.start_datetime} - #{shift.end_datetime}"
+          "#{availability.start_datetime} - #{availability.end_datetime}"
         okButton: ->
           "Delete"
         showCancel: ->
@@ -115,7 +147,7 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
     modalInstance.result.then () ->
       $scope.deleteShift(shift)
 
-  $scope.deleteShift = (shift) ->
+  $scope.deleteAvailability = (availability) ->
     Shifts.delete {id: shift.id},
       (data) ->
         # Success
@@ -126,22 +158,11 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
         # Error
         $scope.error = "Error deleting shift '#{shift.start_datetime} - #{shift.end_datetime}'"
 
-  $scope.currentSelectionsNames = ->
-    skill = _.findWhere($scope.skills, { id: $scope.newShift.skill_id }).title
-    location = _.findWhere($scope.locations, { id: $scope.newShift.location_id }).name
-    schedule = _.findWhere($scope.schedules, { id: $scope.newShift.schedule_id }).name
-    $scope.selectionsNames = {skill: skill, location: location, schedule: schedule}
+  $scope.setScheduleName = ->
+    $scope.schedule = _.findWhere($scope.schedules, { id: $scope.newAvailability.schedule_id })
 
   $scope.setSchedule = (schedule) ->
-    $scope.newShift.schedule_id = schedule.id
-    $scope.init()
-
-  $scope.setSkill = (skill) ->
-    $scope.newShift.skill_id = skill.id
-    $scope.init()
-
-  $scope.setLocation = (location) ->
-    $scope.newShift.location_id = location.id
+    $scope.newAvailability.schedule_id = schedule.id
     $scope.init()
 
   $scope.clearError = ->
@@ -163,9 +184,8 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
       center: "title"
       right: "today agendaWeek,agendaDay"
       ignoreTimezone: false
-    select: $scope.createShift
+    select: $scope.createAvailability
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
-      element.css('background-color','rgba(0,0,0,0.5)') if event.location_id is 2
-      element.find('.fc-event-title').text('Custom title or content') if event.location_id is 3
+      element.find('.fc-event-inner').css('display','none') if event.isBackground
     eventClick: (calEvent, jsEvent, view) ->
       $scope.confirmDeleteShift(calEvent)

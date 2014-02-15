@@ -1,5 +1,6 @@
 class EmployeesController < ApplicationController
   before_action :set_employee, only: [:show, :edit, :update, :destroy]
+  wrap_parameters :employee, include: [:max_hours, :email, :name, :is_disabled, :profile, :employee_availabilities_attributes]
   respond_to :json
 
   # GET /employees
