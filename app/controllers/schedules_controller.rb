@@ -1,6 +1,6 @@
 class SchedulesController < ApplicationController
   before_action :set_schedule, only: [:show, :edit, :update, :destroy]
-  wrap_parameters :schedule, include: [:start_date, :end_date, :shifts_attributes]
+  wrap_parameters :schedule, include: [:name, :start_date, :end_date, :shifts_attributes]
 
   # GET /schedules
   # GET /schedules.json
