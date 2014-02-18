@@ -108,6 +108,30 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
     modalInstance.result.then (skill) ->
       $scope.deleteSkill skill if skill is 'deleted'
 
+  $scope.confirmDeleteSkill = (skill) ->
+    modalInstance = $modal.open
+      templateUrl: '/assets/partials/confirm.html'
+      controller: ConfirmCtrl
+      resolve:
+        title: ->
+          "Delete this skill?"
+        body: ->
+          "#{skill.title}"
+        okButton: ->
+          "Delete"
+        showCancel: ->
+          true
+
+    modalInstance.result.then () ->
+      skill.is_disabled = true
+      Skills.update skill,
+        (data) ->
+          # Success
+          $scope.deleteSkill(skill)
+        (data) ->
+          # Failure
+          $scope.error = 'Could not delete skill, please try deleting again'
+
   $scope.deleteSkill = (skill) ->
     index = $scope.skills.indexOf(skill)
     $scope.skills.splice(index,1)
@@ -139,6 +163,30 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
 
     modalInstance.result.then (location) ->
       $scope.deleteLocation location if location is 'deleted'
+
+  $scope.confirmDeleteLocation = (location) ->
+    modalInstance = $modal.open
+      templateUrl: '/assets/partials/confirm.html'
+      controller: ConfirmCtrl
+      resolve:
+        title: ->
+          "Delete this location?"
+        body: ->
+          "#{location.name}"
+        okButton: ->
+          "Delete"
+        showCancel: ->
+          true
+
+    modalInstance.result.then () ->
+      location.is_disabled = true
+      Locations.update location,
+        (data) ->
+          # Success
+          $scope.deleteLocation(location)
+        (data) ->
+          # Failure
+          $scope.error = 'Could not delete location, please try deleting again'
 
   $scope.deleteLocation = (location) ->
     index = $scope.locations.indexOf(location)

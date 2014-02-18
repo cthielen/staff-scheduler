@@ -39,7 +39,7 @@ StaffScheduler.controller "EditSkillCtrl", @EditSkillCtrl = ($scope, $modalInsta
         $modalInstance.close 'deleted'
       (data) ->
         # Failure
-        $scope.error = 'Could not delete skill, please try saving again'
+        $scope.error = 'Could not delete skill, please try deleting again'
         $scope.deleteText = 'Try Deleting Again'
         $scope.inProgress = false
 
