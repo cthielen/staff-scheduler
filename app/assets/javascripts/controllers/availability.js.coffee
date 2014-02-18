@@ -1,4 +1,4 @@
-StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filter, $modal, $location, Shifts, Schedules, Skills, Locations, Employees, Availabilities) ->
+StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filter, $modal, $location, $timeout, Shifts, Schedules, Skills, Locations, Employees, Availabilities) ->
   $scope.modalTemplate = null
   $scope.error = null
   $scope.modalVisible = false
@@ -47,7 +47,6 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
         angular.forEach result, (item) ->
           $scope.availabilities.push item if item.id
 
-        console.log $scope.availabilities
         $scope.$apply
         $scope.availabilityCalendar.fullCalendar 'refetchEvents'
 
@@ -95,6 +94,9 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
       scheduleStart = new Date(Date.parse(schedule.start_date))
   
   $scope.createAvailability = (startDate, endDate) ->
+    $scope.alertClass = "alert-warning"
+    $scope.alertText = "Saving Availability..."
+
     $scope.newAvailability.start_datetime = startDate
     $scope.newAvailability.end_datetime = endDate
 
@@ -117,6 +119,15 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
     Employees.update $scope.employee,
       (data) ->
         # Success
+        $scope.alertClass = "alert-success"
+        $scope.alertText = "Saved Successfully!"
+
+        $timeout.cancel(displayStatus)
+        displayStatus = $timeout (->
+          $scope.alertClass = null
+          $scope.alertText = null
+        ), 3000
+
         $scope.init()
         # Reset $scope.newAvailability
         $scope.newAvailability = {
