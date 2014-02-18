@@ -156,18 +156,18 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
           true
 
     modalInstance.result.then () ->
-      $scope.deleteShift(shift)
+      $scope.deleteAvailability(availability)
 
   $scope.deleteAvailability = (availability) ->
-    Shifts.delete {id: shift.id},
+    Availabilities.delete {id: availability.id},
       (data) ->
         # Success
-        index = $scope.shifts.indexOf(shift)
-        $scope.shifts.splice(index,1)
+        index = $scope.availabilities.indexOf(availability)
+        $scope.availabilities.splice(index,1)
         $scope.init()
     , (data) ->
         # Error
-        $scope.error = "Error deleting shift '#{shift.start_datetime} - #{shift.end_datetime}'"
+        $scope.error = "Error deleting availability '#{availability.start_datetime} - #{availability.end_datetime}'"
 
   $scope.setScheduleName = ->
     $scope.schedule = _.findWhere($scope.schedules, { id: $scope.newAvailability.schedule_id })
@@ -199,4 +199,4 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
       element.find('.fc-event-inner').css('display','none') if event.isBackground
     eventClick: (calEvent, jsEvent, view) ->
-      $scope.confirmDeleteShift(calEvent)
+      $scope.confirmDeleteAvailability(calEvent)
