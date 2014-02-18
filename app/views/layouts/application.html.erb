@@ -39,7 +39,7 @@
             <% permitted_to? :read, :shifts do %>
             <li class="active" id="shifts"><a href="#/">Shifts</a></li>
             <% end %>
-            <% permitted_to? :read, :employee_availability do %>
+            <% permitted_to? :read, :employee_availabilities do %>
             <li id="availability"><a href="#/availability">Availability</a></li>
             <% end %>
             <% permitted_to? :read, :shift_assignments do %>
