@@ -13,7 +13,7 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
       color: "#7AB"
       events: $scope.availabilities
     },{
-      color: "#CCC"
+      color: "#999"
       events: $scope.shifts
     }
   ]

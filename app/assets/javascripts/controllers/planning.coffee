@@ -14,7 +14,7 @@ StaffScheduler.controller "PlanningCtrl", @PlanningCtrl = ($scope, $filter, $mod
       events: $scope.shiftAssignments
     },
     {
-      color: "#000"
+      color: "#999"
       textColor: "yellow"
       events: $scope.shifts
     }
@@ -88,3 +88,5 @@ StaffScheduler.controller "PlanningCtrl", @PlanningCtrl = ($scope, $filter, $mod
       center: "title"
       right: "today agendaWeek,agendaDay"
       ignoreTimezone: false
+    eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
+      element.find('.fc-event-inner').css('display','none') if event.isBackground

@@ -380,8 +380,8 @@ a.fc-event,
     background-color: #edb; /* default BACKGROUND color */
     color:            #777; /* default TEXT color */
     text-align:       center;
-    opacity:          0.2;
-    filter:           alpha(opacity=20); /* for IE */
+    opacity:          0.33;
+    filter:           alpha(opacity=33); /* for IE */
     pointer-events:   none;
 }
 
