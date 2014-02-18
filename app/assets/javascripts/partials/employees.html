@@ -10,12 +10,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="employee in employees" ng-mouseover="showOptions(employee)" ng-mouseleave="hideOptions(employee)" ng-click="editEmployee(employee)">
+        <tr ng-repeat="employee in employees">
           <td><span>{{ employee.name }}</span></td>
           <td><span>{{ employee.email }}</span></td>
           <td><span>{{ employee.max_hours }}</span></td>
-          <td>
-            <i class="employee-options close" tooltip="Delete this employee" ng-show="showDelete == employee.id" ng-click="confirmDeleteEmployee(employee)" stop-event="click">&times;</i>
+          <td style="width: 5em;">
+            <span class="actions">
+              <span class="glyphicon glyphicon-edit" tooltip="Edit this employee"
+                ng-click="editEmployee(employee)" stop-event="click"></span>
+              <span class="glyphicon glyphicon-trash" tooltip="Delete this employee"
+                ng-click="confirmDeleteEmployee(employee)" stop-event="click"></span>
+            </span>
           </td>
         </tr>
         <tr ng-class="rowClass">

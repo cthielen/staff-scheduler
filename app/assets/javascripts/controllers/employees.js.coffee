@@ -3,16 +3,8 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
   $("li#employees").addClass "active"
   $scope.error = null
 
-  $scope.showDelete = null
-
   $scope.employees = Employees.query()
   
-  $scope.showOptions = (employee) ->
-    $scope.showDelete = employee.id
-
-  $scope.hideOptions = (employee) ->
-    $scope.showDelete = null
-
   $scope.editEmployee = (employee) ->
     modalInstance = $modal.open
       templateUrl: "/assets/partials/editEmployee.html"

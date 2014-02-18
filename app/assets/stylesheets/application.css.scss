@@ -26,37 +26,6 @@
   width: 15em;
 }
 
-td.ui-selecting {
-  background-color: #aaa;
-}
-
-td.ui-selected {
-  background-color: #ccc;
-}
-
-table.calendar {
-  z-index: 1;
-}
-
-table.calendar.table-bordered {
-  border-collapse: collapse;
-}
-
-td.time-cell {
-  position: relative;
-  z-index: 2;
-  height: 10px;
-}
-
-.fc-agenda-slots td div {
-  height: 18px !important;
-}
-
-.fc-agenda .fc-agenda-axis {
-  font-size:9pt;
-  line-height:18px;
-}
-
 li.shift-list-item {
   border: 1px dotted #ccc;
   border-radius: 3px;
@@ -76,4 +45,26 @@ li.shift-list-item {
   right: 15px;
   z-index: 1;
   opacity: 0.8;
+}
+
+table {
+  tr {
+    .actions {
+      width: 5em;
+      display: none;
+      padding-right: 1em;
+      white-space: nowrap;
+    }
+    
+    span {
+      margin: 0 0.1em;
+    }
+    
+    &:hover {
+      .actions {
+        display: block;
+        position: absolute;
+      }
+    }
+  }
 }
