@@ -122,7 +122,7 @@ module Authentication
         logger.warn "Valid CAS user is denied. Not in our local database or is disabled."
         flash[:error] = 'You have authenticated but are not allowed access.'
 
-        redirect_to :controller => "site", :action => "access_denied"
+        redirect_to :controller => "site", :action => "access_denied" and return
       end
 
       # Removing the CAS parameter
