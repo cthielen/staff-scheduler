@@ -116,13 +116,44 @@ module Authentication
         return
       else
         # Proper CAS request but user not in our database.
-        session[:user_id] = nil
-        session[:auth_via] = nil
 
-        logger.warn "Valid CAS user is denied. Not in our local database or is disabled."
-        flash[:error] = 'You have authenticated but are not allowed access.'
+        employee = Employee.where(is_disabled: false).find_by_email(RolesManagement.find_email_by_loginid(session[:cas_user]))
+        roles = RolesManagement.fetch_role_symbols_by_loginid(session[:cas_user])
 
-        redirect_to :controller => "site", :action => "access_denied" and return
+        if employee
+          # If user is an employee, add them to the database
+          logger.info "Valid CAS user is an employee. Creating user in database."
+          Authorization.ignore_access_control(true)
+          user = User.new
+          user.is_manager = roles.include?(:manager)
+          user.loginid = session[:cas_user]
+          user.employee_id = employee.id
+          user.logged_in_at = DateTime.now()
+          user.save
+          Authorization.ignore_access_control(false)
+          # Then re-authenticate
+          self.authenticate
+        elsif roles.include?(:manager)
+          # If user is a manager, add them to the database
+          logger.info "Valid CAS user is a manager. Creating user in database."
+          Authorization.ignore_access_control(true)
+          user = User.new
+          user.is_manager = roles.include?(:manager)
+          user.loginid = session[:cas_user]
+          user.logged_in_at = DateTime.now()
+          user.save
+          Authorization.ignore_access_control(false)
+          # Then re-authenticate
+          self.authenticate
+        else
+          session[:user_id] = nil
+          session[:auth_via] = nil
+
+          logger.warn "Valid CAS user is denied. Not in our local database or is disabled."
+          flash[:error] = 'You have authenticated but are not allowed access.'
+
+          redirect_to :controller => "site", :action => "access_denied" and return
+        end
       end
 
       # Removing the CAS parameter
