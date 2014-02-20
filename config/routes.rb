@@ -9,7 +9,7 @@ StaffScheduler::Application.routes.draw do
   resources :employee_availabilities
   resources :locations
   resources :skills
-  # resources :shift_assignments
+  resources :shift_assignments
   resources :shifts
   resources :employees
   get '/employee-lookup', to: 'employees#lookup'

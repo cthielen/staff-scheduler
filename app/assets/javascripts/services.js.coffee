@@ -6,18 +6,20 @@ angular.module("schedulerServices", ["ngResource"])
       update:
         method: "PUT"
   .factory "Shifts", ($resource) ->
-    $resource "/shifts/:id.json?schedule=:schedule&skill=:skill&location=:location",
+    $resource "/shifts/:id.json",
       id: "@id"
-      schedule: "@schedule"
-      skill: "@skill"
-      location: "@location"
     ,
       update:
         method: "PUT"
   .factory "Availabilities", ($resource) ->
-    $resource "/employee_availabilities/:id.json?schedule=:schedule",
+    $resource "/employee_availabilities/:id.json",
       id: "@id"
-      schedule: "@schedule"
+    ,
+      update:
+        method: "PUT"
+  .factory "Assignments", ($resource) ->
+    $resource "/shift_assignments/:id.json",
+      id: "@id"
     ,
       update:
         method: "PUT"
