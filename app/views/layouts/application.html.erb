@@ -19,7 +19,11 @@
       <%= javascript_include_tag "scheduler" %>
       <%= csrf_meta_tags %>
     <script type="text/javascript">
-      window.current_employee_id = <%= Authorization.current_user.employee.id %>;
+      <% if false %>
+        window.current_employee_id = <%= Authorization.current_user.employee.id %>;
+      <% else %>  
+        window.current_employee_id = null;
+      <% end %>
     </script>
   </head>
 
