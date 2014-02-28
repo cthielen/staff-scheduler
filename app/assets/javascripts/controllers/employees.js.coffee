@@ -13,12 +13,6 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
         employee: ->
           employee
 
-    modalInstance.result.then (employee) ->
-      $scope.applyChanges employee
-
-  $scope.applyChanges = (employee) ->
-    Employees.update employee
-
   $scope.confirmDeleteEmployee = (employee) ->
     modalInstance = $modal.open
       templateUrl: '/assets/partials/confirm.html'

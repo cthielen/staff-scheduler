@@ -22,6 +22,8 @@ class Employee < ActiveRecord::Base
   validates :is_disabled, inclusion: { in: [true, false] }
 
   accepts_nested_attributes_for :employee_availabilities
+  accepts_nested_attributes_for :location_assignments
+  accepts_nested_attributes_for :skill_assignments
 
   def self.active_managers
     Employee.joins(:user).where(:users => {:is_manager => true, :disabled => false})

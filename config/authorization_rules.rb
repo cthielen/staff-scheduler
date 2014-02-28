@@ -5,7 +5,9 @@ authorization do
     has_permission_on :shift_assignments, :to => :manage
     has_permission_on :schedules, :to => :manage
     has_permission_on :skills, :to => :manage
+    has_permission_on :skill_assignments, :to => :manage
     has_permission_on :locations, :to => :manage
+    has_permission_on :location_assignments, :to => :manage
     has_permission_on :employee_availabilities, :to => :manage
   end
   role :employee do
