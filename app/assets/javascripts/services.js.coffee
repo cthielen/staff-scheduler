@@ -44,3 +44,6 @@ angular.module("schedulerServices", ["ngResource"])
   .factory "EmpLookup", ($resource) ->
     $resource "/employee-lookup.json?q=:q",
       q: "@q"
+      
+  .factory "CurrentEmployee", () ->
+    currentEmployee = { id: window.current_employee_id }

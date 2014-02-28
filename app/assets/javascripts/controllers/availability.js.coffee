@@ -1,7 +1,9 @@
-StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filter, $modal, $location, $timeout, Shifts, Schedules, Skills, Locations, Employees, Availabilities) ->
+StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filter, $modal, $location, $timeout, Shifts, Schedules, Skills, Locations, Employees, Availabilities, CurrentEmployee) ->
   $scope.modalTemplate = null
   $scope.error = null
   $scope.modalVisible = false
+  $scope.currentEmployee = CurrentEmployee
+  
   $(".navbar-nav li").removeClass "active"
   $("li#availability").addClass "active"
 
@@ -28,7 +30,7 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
 
   # Get the logged in employee
   $scope.error = null
-  Employees.get {id: 45}, # FIX ME: this needs to be a service that grabs current logged in employee (Employees.current)
+  Employees.get {id: $scope.currentEmployee.id}, # FIX ME: this needs to be a service that grabs current logged in employee (Employees.current)
     (data) ->
       # Success
       $scope.employee = data
