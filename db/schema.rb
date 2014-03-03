@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140303215646) do
+ActiveRecord::Schema.define(version: 20140303225203) do
 
   create_table "employee_availabilities", force: true do |t|
     t.datetime "start_datetime"
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 20140303215646) do
     t.string   "profile_content_type"
     t.integer  "profile_file_size"
     t.datetime "profile_updated_at"
+    t.integer  "organization_id"
   end
 
   create_table "location_assignments", force: true do |t|
@@ -57,13 +58,20 @@ ActiveRecord::Schema.define(version: 20140303215646) do
     t.boolean  "is_disabled", default: false
   end
 
+  create_table "organizations", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "title"
+  end
+
   create_table "schedules", force: true do |t|
     t.date     "start_date"
     t.date     "end_date"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "state",      default: 1
+    t.integer  "state",           default: 1
     t.string   "name"
+    t.integer  "organization_id"
   end
 
   create_table "shift_assignment_statuses", force: true do |t|
