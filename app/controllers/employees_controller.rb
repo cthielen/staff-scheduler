@@ -64,8 +64,8 @@ class EmployeesController < ApplicationController
 
   private
     def clear_associations
-      @employee.locations.clear
-      @employee.skills.clear
+      @employee.locations.destroy_all
+      @employee.skills.destroy_all
     end
 
     # Use callbacks to share common setup or constraints between actions.
