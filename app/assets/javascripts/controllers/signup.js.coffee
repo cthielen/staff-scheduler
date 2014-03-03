@@ -1,7 +1,7 @@
 Welcome.controller "SignupCtrl", @SignupCtrl = ($scope, $http) ->
   $scope.sendStatus = null
   $scope.alertClass = ''
-  $scope.sendBtn = 'Send'
+  $scope.sendBtn = 'Sign Up'
   
   $scope.SendRequest = ->
     $scope.sendBtn = 'Sending...'
@@ -15,7 +15,7 @@ Welcome.controller "SignupCtrl", @SignupCtrl = ($scope, $http) ->
       $scope.name = $scope.email = $scope.reason = ""
       $scope.alertClass = 'success'
       $scope.sendStatus = 'Your request has been sent!'
-      $scope.sendBtn = 'Send'
+      $scope.sendBtn = 'Sign Up'
     .error ->
       $scope.alertClass = 'danger'
       $scope.sendStatus = 'There was an error sending your request!'
@@ -23,4 +23,4 @@ Welcome.controller "SignupCtrl", @SignupCtrl = ($scope, $http) ->
 
   $scope.clearStatus = ->
     $scope.sendStatus = null
-  
+    $scope.sendBtn = 'Sign Up'
