@@ -47,3 +47,6 @@ angular.module("schedulerServices", ["ngResource"])
       
   .factory "CurrentEmployee", () ->
     currentEmployee = { id: window.current_employee_id }
+
+  .factory "LastUpdated", () ->
+    lastUpdated= { date: window.last_updated }

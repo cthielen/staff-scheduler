@@ -15,6 +15,25 @@ schedulerRouter = ($routeProvider) ->
     .when "/schedules",
       templateUrl: "/assets/partials/schedules.html"
       controller: "SchedulesCtrl"
+    .when "/about",
+      template: '&nbsp'
+      resolve:
+        data: ($modal, LastUpdated) ->
+          modalInstance = $modal.open
+            templateUrl: '/assets/partials/confirm.html'
+            controller: ConfirmCtrl
+            resolve:
+              title: ->
+                "About"
+              body: ->
+                "<h4>Staff Scheduler</h4>
+                Last updated: #{LastUpdated.date}"
+              okButton: ->
+                "OK"
+              showCancel: ->
+                false
+          modalInstance.result.then () ->
+            history.back()
 
 includeCSRF = ($httpProvider) ->
   $httpProvider.defaults.headers.common["X-CSRF-Token"] = $("meta[name=csrf-token]").attr("content")
