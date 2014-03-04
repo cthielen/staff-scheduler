@@ -50,6 +50,21 @@ StaffScheduler.controller "ShiftsCtrl", @ShiftsCtrl = ($scope, $filter, $modal, 
         location_id: $scope.newShift.location_id
       }
 
+  $scope.editSchedule = (schedule_id) ->
+    schedule = _.findWhere($scope.schedules, { id: schedule_id })
+    modalInstance = $modal.open
+      templateUrl: "/assets/partials/editSchedule.html"
+      controller: EditScheduleCtrl
+      resolve:
+        schedule: ->
+          schedule
+
+    modalInstance.result.then (state) ->
+      if state is 'deleted'
+        $scope.deleteSchedule schedule
+      else
+        $scope.schedules = Schedules.query()
+
   $scope.schedules = Schedules.query (response) ->
     if response.length
       $scope.newShift.schedule_id = response[0].id

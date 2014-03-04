@@ -1,6 +1,6 @@
 <div class="modal-header">
   <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
-  <h4 class="modal-title" id="myModalLabel">Edit {{schedule.name}}</h4>
+  <h4 class="modal-title" id="myModalLabel">{{ actionText }}: {{schedule.name}}</h4>
 </div>
 <div class="modal-body">
   <div class="alert alert-danger" ng-show="error">
@@ -30,7 +30,7 @@
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-danger pull-left" ng-click="confirmDelete()"
-    ng-disabled="inProgress">{{deleteText}}</button>
+    ng-disabled="inProgress" ng-show="schedule.id">{{deleteText}}</button>
   <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">Close</button>
   <button type="button" class="btn btn-primary" ng-click="save()"
     ng-disabled="inProgress">{{submitText}}</button>

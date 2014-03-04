@@ -1,8 +1,15 @@
 StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $modalInstance, schedule, Schedules) ->
-  $scope.schedule = schedule
-  $scope.submitText = 'Update Schedule'
-  $scope.deleteText = 'Delete Schedule'
   $scope.inProgress = false
+  $scope.deleteText = 'Delete Schedule'
+
+  if schedule
+    $scope.schedule = schedule
+    $scope.submitText = 'Update Schedule'
+    $scope.actionText = 'Edit'
+  else
+    $scope.schedule = {}
+    $scope.submitText = 'Create Schedule'
+    $scope.actionText = 'New Schedule'
   
   $scope.clearError = ->
     $scope.error = null
@@ -11,15 +18,26 @@ StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $moda
     $scope.error = null
     $scope.submitText = 'Saving...'
     $scope.inProgress = true
-    Schedules.update $scope.schedule,
-      (data) ->
-        # Success
-        $modalInstance.close $scope.schedule
-      (data) ->
-        # Failure
-        $scope.error = 'Could not save schedule, please try saving again'
-        $scope.submitText = 'Try Again'
-        $scope.inProgress = false
+    if $scope.schedule.id
+      Schedules.update $scope.schedule,
+        (data) ->
+          # Success
+          $modalInstance.close $scope.schedule
+        (data) ->
+          # Failure
+          $scope.error = 'Could not save schedule, please try saving again'
+          $scope.submitText = 'Try Again'
+          $scope.inProgress = false
+    else
+      Schedules.save $scope.schedule,
+        (data) ->
+          # Success
+          $modalInstance.close $scope.schedule
+        (data) ->
+          # Failure
+          $scope.error = 'Could not save schedule, please try saving again'
+          $scope.submitText = 'Try Again'
+          $scope.inProgress = false
 
   $scope.confirmDelete = ->
     if $scope.deleteText is 'Delete Schedule'
