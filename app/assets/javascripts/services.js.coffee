@@ -50,3 +50,11 @@ angular.module("schedulerServices", ["ngResource"])
 
   .factory "LastUpdated", () ->
     lastUpdated= { date: window.last_updated }
+
+  .factory "CurrentEmployee", ($resource) ->
+    $resource "/current-employee",
+      id: "@id"
+    ,
+      query:
+        method: 'GET'
+        isArray: false

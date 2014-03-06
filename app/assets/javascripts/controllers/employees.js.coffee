@@ -1,9 +1,11 @@
-StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, $modal, Employees, EmpLookup, Skills, Locations) ->
+StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, $modal, Employees, EmpLookup, CurrentEmployee, Skills, Locations) ->
   $(".navbar-nav li").removeClass "active"
   $("li#employees").addClass "active"
   $scope.error = null
 
   $scope.employees = Employees.query()
+  CurrentEmployee.query (data) ->
+    $scope.currentEmployee = data
   
   $scope.editEmployee = (employee) ->
     modalInstance = $modal.open

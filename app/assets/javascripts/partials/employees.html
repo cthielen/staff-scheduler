@@ -1,4 +1,4 @@
-<tabset justified="true">
+<tabset justified="true" ng-show="currentEmployee.isManager">
   <tab heading="List">
     <table class="table table-hover table-striped" id="employees" style="margin-top: 15px;">
       <thead>
@@ -84,3 +84,6 @@
     </table>
   </tab>
 </tabset>
+<div class="col-md-12 text-center" ng-hide="currentEmployee.isManager">
+  You do not have permission to view this page!
+</div>

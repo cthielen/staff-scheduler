@@ -62,8 +62,13 @@ class EmployeesController < ApplicationController
     respond_with @employees
   end
 
-  def is_manager
-    respond_with Authorization.current_user.is_manager
+  def current_employee
+    @currentEmployee = {
+      id: Authorization.current_user.employee ? Authorization.current_user.employee.id : nil,
+      isManager: Authorization.current_user.is_manager
+    }
+
+    respond_with @currentEmployee
   end
 
   private
