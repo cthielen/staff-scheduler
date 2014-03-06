@@ -2,7 +2,15 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
   $scope.modalTemplate = null
   $scope.error = null
   $scope.modalVisible = false
-  $scope.currentEmployee = CurrentEmployee
+  CurrentEmployee.query (data) ->
+    if data.id
+      Employees.get {id: data.id},
+        (data) ->
+          # Success
+          $scope.employee = data
+      , (data) ->
+          # Error
+          $scope.error = 'Could not query current user'
   
   $(".navbar-nav li").removeClass "active"
   $("li#availability").addClass "active"
@@ -30,13 +38,6 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
 
   # Get the logged in employee
   $scope.error = null
-  Employees.get {id: $scope.currentEmployee.id}, # FIX ME: this needs to be a service that grabs current logged in employee (Employees.current)
-    (data) ->
-      # Success
-      $scope.employee = data
-  , (data) ->
-      # Error
-      $scope.error = 'Could not query current user'
 
   $scope.fetchAvailabilities = ->
     unless $scope.newAvailability.schedule_id is undefined

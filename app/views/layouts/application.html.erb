@@ -19,11 +19,6 @@
       <%= javascript_include_tag "scheduler" %>
       <%= csrf_meta_tags %>
     <script type="text/javascript">
-      <% if Authorization.current_user.employee %>
-        window.current_employee_id = <%= Authorization.current_user.employee.id %>;
-      <% else %>  
-        window.current_employee_id = null;
-      <% end %>
       window.last_updated = "<%= LAST_UPDATED %>"
     </script>
   </head>

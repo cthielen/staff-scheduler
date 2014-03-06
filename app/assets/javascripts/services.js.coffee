@@ -45,9 +45,6 @@ angular.module("schedulerServices", ["ngResource"])
     $resource "/employee-lookup.json?q=:q",
       q: "@q"
       
-  .factory "CurrentEmployee", () ->
-    currentEmployee = { id: window.current_employee_id }
-
   .factory "LastUpdated", () ->
     lastUpdated= { date: window.last_updated }
 
