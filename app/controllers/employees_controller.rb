@@ -62,6 +62,10 @@ class EmployeesController < ApplicationController
     respond_with @employees
   end
 
+  def is_manager
+    respond_with Authorization.current_user.is_manager
+  end
+
   private
     def clear_associations
       @employee.locations.destroy_all

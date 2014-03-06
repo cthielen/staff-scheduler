@@ -13,6 +13,7 @@ StaffScheduler::Application.routes.draw do
   resources :shifts
   resources :employees
   get '/employee-lookup', to: 'employees#lookup'
+  get '/employee-is-manager', to: 'employees#is_manager', :defaults => {format: :json}
   # resources :wages
   # resources :users
 
