@@ -25,12 +25,12 @@ class EmployeesController < ApplicationController
   end
 
   def create
-    @employee = Employee.new(employee_params)
+    @employee = Employee.new(employee_params.except(:location_assignments_attributes).except(:skill_assignments_attributes))
 
-    respond_to do |format|
-      if @employee.save
-        format.json { render action: 'show', status: :created, location: @employee }
-      else
+    if @employee.save
+      update
+    else
+      respond_to do |format|
         format.json { render json: @employee.errors, status: :unprocessable_entity }
       end
     end
@@ -41,7 +41,7 @@ class EmployeesController < ApplicationController
 
     respond_to do |format|
       if @employee.update(employee_params)
-        format.json { head :no_content }
+        format.json { render action: 'show' }
       else
         format.json { render json: @employee.errors, status: :unprocessable_entity }
       end

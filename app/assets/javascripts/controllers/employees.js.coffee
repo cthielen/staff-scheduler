@@ -105,7 +105,7 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
         (data) ->
           # Success
           $scope.unselectEmployee()
-          $scope.employee.push data
+          $scope.employees.push data
         (data) ->
           # Failure
           $scope.error = 'Could not save employee, please try saving again'
