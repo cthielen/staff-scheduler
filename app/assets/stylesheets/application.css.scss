@@ -47,10 +47,16 @@ li.shift-list-item {
   opacity: 0.8;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 table {
   tr {
-    &.clickable-row {
-      cursor: pointer;
+    .selected {
+      opacity: 0.8;
+      filter: alpha(opacity=80);
+      color: #428bca;
     }
 
     .actions {

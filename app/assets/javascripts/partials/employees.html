@@ -6,14 +6,17 @@
           <th>Name</th>
           <th>E-Mail</th>
           <th>Max Hours</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <tr ng-repeat="employee in employees" ng-click="selectEmployee(employee)"
-          ng-class="{'warning': employee == selectedEmployee}" class="clickable-row">
+          ng-class="{'warning': employee == selectedEmployee}" class="clickable">
           <td><span>{{ employee.name }}</span></td>
           <td><span>{{ employee.email }}</span></td>
           <td><span>{{ employee.max_hours }}</span></td>
+          <td><span class="glyphicon glyphicon-chevron-right close"
+            ng-class="{'selected': employee == selectedEmployee}"></span></td>
         </tr>
       </tbody>
     </table>
