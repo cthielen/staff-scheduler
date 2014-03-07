@@ -66,6 +66,7 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
     index = $scope.employees.indexOf(employee)
     employee.is_disabled = true
     Employees.update employee, (data) ->
+      $scope.unselectEmployee()
       $scope.employees.splice(index,1)
 
 
