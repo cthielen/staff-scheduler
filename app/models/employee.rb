@@ -31,7 +31,9 @@ class Employee < ActiveRecord::Base
   end
   
   def self.active_employees
-    Employee.joins(:user).where(:users => {:is_manager => false, :disabled => false})
+    # This pulls employees that have no users OR those who have users but are not managers
+    Employee.joins('LEFT OUTER JOIN users ON employees.id = users.employee_id')
+      .where('users.employee_id IS NULL OR users.is_manager = "f"').where(is_disabled: false).uniq
   end
  
   # Accepts a date, returns the number of hours the employee will work or has worked on the week of that date
