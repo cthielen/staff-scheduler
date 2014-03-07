@@ -21,4 +21,6 @@ StaffScheduler::Application.routes.draw do
   
   post '/signup', to: 'site#signup'
   get '/access_denied', to: 'site#access_denied'
+  get "/logout" => 'application#logout'
+
 end
