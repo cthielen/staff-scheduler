@@ -49,6 +49,10 @@ li.shift-list-item {
 
 table {
   tr {
+    &.clickable-row {
+      cursor: pointer;
+    }
+
     .actions {
       width: 5em;
       display: none;

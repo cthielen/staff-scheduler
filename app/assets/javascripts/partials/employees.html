@@ -1,88 +1,108 @@
-<tabset justified="true" ng-show="currentEmployee.isManager">
-  <tab heading="List">
-    <table class="table table-hover table-striped" id="employees" style="margin-top: 15px;">
+<div class="row" ng-show="currentEmployee.isManager">
+  <div class="col-sm-6">
+    <table class="table table-hover" id="employees" style="margin-top: 15px;">
       <thead>
         <tr>
           <th>Name</th>
           <th>E-Mail</th>
           <th>Max Hours</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="employee in employees">
+        <tr ng-repeat="employee in employees" ng-click="selectEmployee(employee)"
+          ng-class="{'warning': employee == selectedEmployee}" class="clickable-row">
           <td><span>{{ employee.name }}</span></td>
           <td><span>{{ employee.email }}</span></td>
           <td><span>{{ employee.max_hours }}</span></td>
-          <td style="width: 5em;">
-            <span class="actions">
-              <span class="glyphicon glyphicon-edit" tooltip="Edit this employee"
-                ng-click="editEmployee(employee)" stop-event="click"></span>
-              <span class="glyphicon glyphicon-trash" tooltip="Delete this employee"
-                ng-click="confirmDeleteEmployee(employee)" stop-event="click"></span>
-            </span>
-          </td>
-        </tr>
-        <tr ng-class="rowClass">
-          <td><input ng-model="newEmp.name" name="new-name" placeholder="Name" class="form-control" type="text" on-enter="submit()" typeahead="name for name in names | filter:$viewValue | limitTo:8"></td>
-          <td><input ng-model="newEmp.email" name="new-email" placeholder="Email" class="form-control" type="text" on-enter="submit()"></td>
-          <td colspan="2"><input ng-model="newEmp.max_hours" name="new-max-hours" ng-init="newEmp.max_hours = 10" placeholder="Max hours" class="form-control" type="number" min="0" max="20" step="0.5" on-enter="submit()"></td>
         </tr>
       </tbody>
     </table>
-  </tab>
-  <tab heading="Manage Skills" select="fetchSkills()">
-    <table class="table table-hover table-striped" id="skills" style="margin-top: 15px;">
-      <thead>
-        <tr>
-          <th>Skill</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="skill in skills">
-          <td><span>{{ skill.title }}</span></td>
-          <td style="width: 5em;">
-            <span class="actions">
-              <span class="glyphicon glyphicon-edit" tooltip="Edit this skill"
-                ng-click="editSkill(skill)" stop-event="click"></span>
-              <span class="glyphicon glyphicon-trash" tooltip="Delete this skill"
-                ng-click="confirmDeleteSkill(skill)" stop-event="click"></span>
-            </span>
-          </td>
-        </tr>
-        <tr ng-class="rowClass">
-          <td colspan="2"><input ng-model="newSkill.title" name="new-skill" placeholder="New Skill" class="form-control" type="text" on-enter="createSkill()"></td>
-        </tr>
-      </tbody>
-    </table>
-  </tab>
-  <tab heading="Manage Locations" select="fetchLocations()">
-    <table class="table table-hover table-striped" id="locations" style="margin-top: 15px;">
-      <thead>
-        <tr>
-          <th>Location</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="location in locations">
-          <td><span>{{ location.name }}</span></td>
-          <td style="width: 5em;">
-            <span class="actions">
-              <span class="glyphicon glyphicon-edit" tooltip="Edit this location"
-                ng-click="editLocation(location)" stop-event="click"></span>
-              <span class="glyphicon glyphicon-trash" tooltip="Delete this location"
-                ng-click="confirmDeleteLocation(location)" stop-event="click"></span>
-            </span>
-          </td>
-        </tr>
-        <tr ng-class="rowClass">
-          <td colspan="2"><input ng-model="newLocation.name" name="new-location" placeholder="New Location" class="form-control" type="text" on-enter="createLocation()"></td>
-        </tr>
-      </tbody>
-    </table>
-  </tab>
+  </div>
+  <div class="col-sm-6">
+    <div class="panel panel-default" style="padding: 1em; margin-top: 3em;">
+      <button type="button" class="close" ng-click="unselectEmployee()"
+        ng-show="selectedEmployee.id">&times;</button>
+      <h4 class="title" ng-show="selectedEmployee.id">Edit {{selectedEmployee.name}}</h4>
+      <h4 class="title" ng-hide="selectedEmployee.id">New Employee</h4>
+      <div class="alert alert-danger" ng-show="error">
+        <button type="button" class="close" ng-click="clearError()">&times;</button>
+        <div ng-bind-html="error"></div>
+      </div>
+      <form class="form-horizontal" role="form">
+        <div class="form-group">
+          <label for="Name" class="col-sm-3 control-label">Name</label>
+          <div class="col-sm-9">
+            <input type="text" class="form-control" id="name" placeholder="Name" ng-model="selectedEmployee.name"
+               typeahead="name for name in names | filter:$viewValue | limitTo:8">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email" class="col-sm-3 control-label">Email</label>
+          <div class="col-sm-9">
+            <input type="email" class="form-control" id="email" placeholder="Email" ng-model="selectedEmployee.email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="max-hours" class="col-sm-3 control-label">Max Hours</label>
+          <div class="col-sm-9">
+            <input type="number" class="form-control" id="max-hours" placeholder="Max Hours" ng-model="selectedEmployee.max_hours">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="locations" class="col-sm-3 control-label">Locations</label>
+          <div class="col-sm-9">
+            <div class="checkbox" ng-repeat="location in locations">
+              <label>
+                <input type="checkbox" ng-model="location.assigned"> {{location.name}}
+                <a class="glyphicon glyphicon-edit pull-right" ng-click="editLocation(location)"></a>
+                <a class="glyphicon glyphicon-trash pull-right text-danger"
+                  ng-click="confirmDeleteLocation(location)" style="margin-right: 5px;"></a>
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" disabled>
+                <input type="text" class="form-control" placeholder="New Location"
+                  ng-model="newLocation.name" on-enter="createLocation()">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="skills" class="col-sm-3 control-label">Skills</label>
+          <div class="col-sm-9">
+            <div class="checkbox" ng-repeat="skill in skills">
+              <label>
+                <input type="checkbox" ng-model="skill.assigned"> {{skill.title}}
+                <a class="glyphicon glyphicon-edit pull-right" ng-click="editSkill(skill)"></a>
+                <a class="glyphicon glyphicon-trash pull-right text-danger"
+                  ng-click="confirmDeleteSkill(skill)" style="margin-right: 5px;"></a>
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" disabled>
+                <input type="text" class="form-control" placeholder="New Skill"
+                  ng-model="newSkill.title" on-enter="createSkill()">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-3 col-sm-9">
+            <button type="button" class="btn btn-default"
+              ng-click="unselectEmployee()" ng-show="selectedEmployee.id">Cancel</button>
+            <button type="button" class="btn btn-primary" ng-click="save()"
+              ng-disabled="submitText == 'Saving...'">{{submitText}}</button>
+            <button type="button" class="btn btn-danger pull-right" ng-show="selectedEmployee.id"
+              ng-click="confirmDeleteEmployee(selectedEmployee)">Delete</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 </tabset>
 <div class="col-md-12 text-center" ng-hide="currentEmployee.isManager">
   You do not have permission to view this page!

@@ -2,18 +2,48 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
   $(".navbar-nav li").removeClass "active"
   $("li#employees").addClass "active"
   $scope.error = null
+  $scope.selectedEmployee = {}
+  $scope.submitText = 'Create Employee'
 
-  $scope.employees = Employees.query()
-  CurrentEmployee.query (data) ->
-    $scope.currentEmployee = data
-  
-  $scope.editEmployee = (employee) ->
-    modalInstance = $modal.open
-      templateUrl: "/assets/partials/editEmployee.html"
-      controller: EditEmployeeCtrl
-      resolve:
-        employee: ->
-          employee
+  Employees.query {}, (result) ->
+    $scope.employees = result
+
+  CurrentEmployee.query (result) ->
+    $scope.currentEmployee = result
+
+  Locations.query {}, (result) ->
+    # Success
+    $scope.locations = []
+    angular.forEach result, (item) ->
+      $scope.locations.push item if item.id
+
+  Skills.query {}, (result) ->
+    # Success
+    $scope.skills = []
+    angular.forEach result, (item) ->
+      $scope.skills.push item if item.id
+
+  $scope.selectEmployee = (employee) ->
+    $scope.selectedEmployee = employee
+    $scope.submitText = 'Update Employee'
+    angular.forEach $scope.locations, (item) ->
+      if _.find(employee.locations, (l) -> l.id == item.id)
+        item.assigned = true
+      else
+        item.assigned = false
+    angular.forEach $scope.skills, (item) ->
+      if _.find(employee.skills, (s) -> s.id == item.id)
+        item.assigned = true
+      else
+        item.assigned = false
+
+  $scope.unselectEmployee = () ->
+    $scope.selectedEmployee = {}
+    $scope.submitText = 'Create Employee'
+    angular.forEach $scope.locations, (item) ->
+      item.assigned = false
+    angular.forEach $scope.skills, (item) ->
+      item.assigned = false
 
   $scope.confirmDeleteEmployee = (employee) ->
     modalInstance = $modal.open
@@ -39,54 +69,56 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
       $scope.employees.splice(index,1)
 
 
-  # New employee row
+  # Employee Name Type-ahead
   $scope.names = []
-  $scope.rowClass = ''
-  $scope.newEmp = {name: ''}
-  
-  $scope.$watch "newEmp.name", (value) ->
-    if value.length > 1
+  $scope.$watch "selectedEmployee.name", (value) ->
+    if value and value.length > 1
       EmpLookup.query
         q: value
       , (response) ->
         $scope.names = []
         angular.forEach response, (item) ->
           $scope.names.push item.name  if item.id
-    
-  
-  $scope.initFields = ->
-    # Reset fields
-    angular.forEach $scope.newEmp, (value,key) =>
-      $scope.newEmp[key] = ''
-    $scope.newEmp['max_hours'] = 10
-    $("input[name='new-name']").focus()
 
-  $scope.submit = ->
-    # Submit only if all fields are filled
-    unless ($scope.newEmp['name'] is '' or $scope.newEmp['email'] is '' or $scope.newEmp['max_hours'] is '')
-      Employees.save $scope.newEmp,
+  $scope.save = ->
+    $scope.error = null
+    $scope.submitText = 'Saving...'
+
+    $scope.selectedEmployee.location_assignments_attributes = _.map(
+        _.filter($scope.locations, (l) ->l.assigned), (loc) -> {location_id: loc.id}
+      )
+    $scope.selectedEmployee.skill_assignments_attributes = _.map(
+        _.filter($scope.skills, (s) -> s.assigned), (skl) -> {skill_id: skl.id}
+      )
+
+    if $scope.selectedEmployee.id
+      Employees.update $scope.selectedEmployee,
         (data) ->
           # Success
-          $scope.employees.push(data);
-          $scope.initFields()
-          $scope.rowClass = ''
-      , (data) ->
-          # Error
-          $scope.rowClass = 'error'
-  
-  $scope.initFields()
+          $scope.unselectEmployee()
+        (data) ->
+          # Failure
+          $scope.error = 'Could not save employee, please try saving again'
+          $scope.submitText = 'Try Again'
+    else
+      Employees.save $scope.selectedEmployee,
+        (data) ->
+          # Success
+          $scope.unselectEmployee()
+          $scope.employee.push data
+        (data) ->
+          # Failure
+          $scope.error = 'Could not save employee, please try saving again'
+          $scope.submitText = 'Try Again'
 
   # Skills
   $scope.newSkill = {}
-
-  $scope.fetchSkills = () ->
-    $scope.skills = Skills.query()
 
   $scope.createSkill = () ->
     Skills.save $scope.newSkill,
       (data) ->
         # Success
-        $scope.skills = Skills.query()
+        $scope.skills.push data
         $scope.newSkill = {}
         $scope.error= null
     , (data) ->
@@ -135,14 +167,11 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
   # Locations
   $scope.newLocation = {}
 
-  $scope.fetchLocations = () ->
-    $scope.locations = Locations.query()
-
   $scope.createLocation = () ->
     Locations.save $scope.newLocation,
       (data) ->
         # Success
-        $scope.locations = Locations.query()
+        $scope.locations.push data
         $scope.newLocation = {}
         $scope.error= null
     , (data) ->
