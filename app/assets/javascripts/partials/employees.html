@@ -36,7 +36,8 @@
           <label for="Name" class="col-sm-3 control-label">Name</label>
           <div class="col-sm-9">
             <input type="text" class="form-control" id="name" placeholder="Name" ng-model="selectedEmployee.name"
-               typeahead="name for name in names | filter:$viewValue | limitTo:8">
+               typeahead="entity as entity.name for entity in queryNames($viewValue) | filter:$viewValue | limitTo:8"
+               typeahead-on-select="getEmail($model)" typeahead-min-length="3">
           </div>
         </div>
         <div class="form-group">

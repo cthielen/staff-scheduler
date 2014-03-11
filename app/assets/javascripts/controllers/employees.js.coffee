@@ -1,4 +1,4 @@
-StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, $modal, Employees, EmpLookup, CurrentEmployee, Skills, Locations) ->
+StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParams, $modal, $http, Employees, CurrentEmployee, Skills, Locations) ->
   $(".navbar-nav li").removeClass "active"
   $("li#employees").addClass "active"
   $scope.error = null
@@ -70,16 +70,22 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
       $scope.employees.splice(index,1)
 
 
-  # Employee Name Type-ahead
-  $scope.names = []
-  $scope.$watch "selectedEmployee.name", (value) ->
-    if value and value.length > 1
-      EmpLookup.query
-        q: value
-      , (response) ->
-        $scope.names = []
-        angular.forEach response, (item) ->
-          $scope.names.push item.name  if item.id
+  $scope.queryNames = (query) ->
+    $http.get("/employee-lookup.json",
+      params:
+        q: query
+    ).then (res) ->
+      entities= []
+      angular.forEach res.data, (i) ->
+        entities.push i
+      entities
+
+  $scope.getEmail = (entity) ->
+    $http.get("/rm-employee.json",
+      params:
+        q: entity.loginid
+    ).then (res) ->
+      $scope.selectedEmployee.email = res.data.email
 
   $scope.save = ->
     $scope.error = null

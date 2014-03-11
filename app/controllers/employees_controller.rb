@@ -62,6 +62,13 @@ class EmployeesController < ApplicationController
     respond_with @employees
   end
 
+  def rm_employee
+    req = RestClient::Resource.new "https://roles.dss.ucdavis.edu/people/#{params[:q]}.json", 'Staff Scheduler', '376d988a44b395ace5b6d3a4ae206e9b'
+    @employee = req.get if !params[:q].blank?
+    
+    respond_with @employee
+  end
+
   def current_employee
     @currentEmployee = {
       id: Authorization.current_user.employee ? Authorization.current_user.employee.id : nil,
