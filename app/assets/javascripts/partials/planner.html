@@ -26,7 +26,7 @@
   <div class="col-sm-3 col-md-2 sidebar" style="margin-top: 15px;">
     <ul class="nav nav-pills nav-stacked">
       <li ng-repeat="locationSkill in locationSkillCombinations" ng-class="{active: selections.lsCombination == $index}">
-        <a ng-model="selections.lsCombination" ng-click="selections.lsCombination == $index" style="padding: 3px;">
+        <a ng-model="selections.lsCombination" ng-click="selections.lsCombination = $index" style="padding: 3px;">
           {{locationSkill.location.name + ' ' + locationSkill.skill.title}}
         </a>
       </li>

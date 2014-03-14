@@ -1,4 +1,4 @@
-StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, Schedules, Skills, Locations, LocationSkillCombinations) ->
+StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, Schedules, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations) ->
 
   ## Initializations
   $scope.locationSkillCombinations = []
@@ -20,6 +20,20 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, Schedul
     }
   ]
 
+  ## Construct the calendar when selections change
+  $scope.$watch "selections", (selections) ->
+    switch selections.layer
+      when 0
+        $scope.fetchEvents(Assignments,false)
+        $scope.fetchEvents(Shifts,true)
+      when 1
+        $scope.fetchEvents(Assignments,false)
+        $scope.fetchEvents(Shifts,true)
+      when 2
+        $scope.fetchEvents(Shifts,false)
+        $scope.fetchEvents(Shifts,true,true)
+  , true
+
   ## Fetching Data
   # Fetch Location/Skill combinations
   LocationSkillCombinations.then (combinations) ->
@@ -31,6 +45,33 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, Schedul
       $scope.selections.schedule = response[0]
     else
       $scope.redirectTo('schedule','/schedules')
+
+  # Fetching events
+  # fetchEvents(
+  #     Source: the angular service to perform the .query call on
+  #     isBackground: Boolean, whether a background event (true), or a main event (false)
+  #     clearEvents: Optional Boolean, clears the array of background or main events if set to true
+  # )
+  $scope.fetchEvents = (Source, isBackground, clearEvents) ->
+    clearEvents ?= false
+    events = (if isBackground then $scope.backEvents else $scope.frontEvents)
+    if clearEvents
+      events.length = 0
+    else
+      unless $scope.locationSkillCombinations.length is 0 or $scope.selections.schedule is undefined
+        Source.query {
+          schedule: $scope.selections.schedule.id,
+          skill: $scope.locationSkillCombinations[$scope.selections.lsCombination].skill.id,
+          location: $scope.locationSkillCombinations[$scope.selections.lsCombination].location.id
+        }, (result) ->
+          # Success
+          events.length = 0 # Preferred way of emptying a JS array
+          angular.forEach result, (item) ->
+            item.isBackground = true if isBackground
+            events.push item if item.id
+
+          $scope.$apply
+          $scope.plannerCalendar.fullCalendar 'refetchEvents'
 
   # TODO: See if you can move these functions to a factory
   $scope.editSchedule = (schedule_id) ->
