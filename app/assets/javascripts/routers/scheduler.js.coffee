@@ -1,6 +1,9 @@
 schedulerRouter = ($routeProvider) ->
   $routeProvider
     .when "/",
+      templateUrl: "/assets/partials/planner.html"
+      controller: "PlannerCtrl"
+    .when "/shifts",
       templateUrl: "/assets/partials/shifts.html"
       controller: "ShiftsCtrl"
     .when "/availability",
@@ -34,6 +37,7 @@ schedulerRouter = ($routeProvider) ->
                 false
           modalInstance.result.then () ->
             history.back()
+    .otherwise redirectTo: "/"
 
 includeCSRF = ($httpProvider) ->
   $httpProvider.defaults.headers.common["X-CSRF-Token"] = $("meta[name=csrf-token]").attr("content")
