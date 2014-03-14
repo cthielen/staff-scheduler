@@ -1,5 +1,11 @@
-StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, Skills, Locations, LocationSkillCombinations) ->
+StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, Schedules, Skills, Locations, LocationSkillCombinations) ->
 
+  ## Initializations
+  $scope.locationSkillCombinations = []
+  $scope.selections = {
+    lsCombination: 0,
+    layer: 0
+  }
   $scope.frontEvents = []
   $scope.backEvents = []
   $scope.eventSources = [
@@ -14,10 +20,37 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, Skills, Locatio
     }
   ]
 
+  ## Fetching Data
+  # Fetch Location/Skill combinations
   LocationSkillCombinations.then (combinations) ->
     $scope.locationSkillCombinations = combinations
 
-  # config calendar 
+  # Fetch Schedules
+  $scope.schedules = Schedules.query (response) ->
+    if response.length
+      $scope.selections.schedule = response[0]
+    else
+      $scope.redirectTo('schedule','/schedules')
+
+  # TODO: See if you can move these functions to a factory
+  $scope.redirectTo = (type, path) ->
+    modalInstance = $modal.open
+      templateUrl: '/assets/partials/confirm.html'
+      controller: ConfirmCtrl
+      resolve:
+        title: ->
+          "No #{type} defined"
+        body: ->
+          "You are being redirected to create a #{type}"
+        okButton: ->
+          "OK"
+        showCancel: ->
+          false
+
+    modalInstance.result.then () ->
+      $location.path path
+
+  ## config calendar
   $scope.uiConfig = calendar:
     weekends: false
     contentHeight: 350

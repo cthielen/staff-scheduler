@@ -1,12 +1,13 @@
 <div class="row" style="margin-top: 15px;">
+  <div class="col-sm-9 col-md-10 col-sm-offset-3 col-md-offset-2">
   <ul class="selection-dropdowns nav nav-pills nav-stacked" style="margin-bottom: 15px;">
     <li class="dropdown">
       <a class="dropdown-toggle btn btn-default">
-        <h2 style="margin: 0px;">{{ selectionsNames.schedule }}</h2>
+        <h2 style="margin: 0px;">{{ selections.schedule.name }}</h2>
       </a>
       <ul class="dropdown-menu col-md-12">
         <li ng-repeat="schedule in schedules">
-          <a ng-click="setSchedule(schedule)">{{ schedule.name }}</a>
+          <a ng-click="setSchedule(schedule)" class="text-center">{{ schedule.name }}</a>
         </li>
       </ul>
     </li>
@@ -17,8 +18,8 @@
   
   <div class="col-sm-3 col-md-2 sidebar" style="margin-top: 15px;">
     <ul class="nav nav-pills nav-stacked">
-      <li ng-repeat="locationSkill in locationSkillCombinations" ng-class="{active: currentLocationSkill == $index}">
-        <a ng-model="currentLocationSkill" ng-click="switchLocationSkill($index)" style="padding: 3px;">
+      <li ng-repeat="locationSkill in locationSkillCombinations" ng-class="{active: selections.lsCombination == $index}">
+        <a ng-model="selections.lsCombination" ng-click="selections.lsCombination == $index" style="padding: 3px;">
           {{locationSkill.location.name + ' ' + locationSkill.skill.title}}
         </a>
       </li>
@@ -34,6 +35,15 @@
 
     <div ui-calendar="uiConfig.calendar" class="calendar"
       ng-model="eventSources" calendar="plannerCalendar">
+    </div>
+
+    <div class="btn-group pull-right" style="margin-top: 15px;">
+        <button type="button" class="btn btn-default" ng-click="selections.layer = 0"
+          ng-class="{active: selections.layer == 0}">Assignments</button>
+        <button type="button" class="btn btn-default" ng-click="selections.layer = 1"
+          ng-class="{active: selections.layer == 1}">Availabilities</button>
+        <button type="button" class="btn btn-default" ng-click=" selections.layer = 2"
+          ng-class="{active: selections.layer == 2}">Shifts</button>
     </div>
 
   </div>
