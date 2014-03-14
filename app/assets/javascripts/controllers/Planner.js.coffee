@@ -1,4 +1,4 @@
-StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, Skills, Locations) ->
+StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, Skills, Locations, LocationSkillCombinations) ->
 
   $scope.frontEvents = []
   $scope.backEvents = []
@@ -14,22 +14,8 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, Skills, Locatio
     }
   ]
 
-  # Calculate the Location/Skill combinations
-  $scope.locationSkillCombinations = []
-  Skills.query {},
-    (skills) ->
-      # Success
-      Locations.query {},
-        (locations) ->
-          # Success
-          angular.forEach locations, (location) ->
-            if location.id
-              angular.forEach skills, (skill) ->
-                $scope.locationSkillCombinations.push {skill: skill, location: location} if skill.id
-        (data) ->
-          # Error fetching location
-    (data) ->
-      # Error fetching skills
+  LocationSkillCombinations.then (combinations) ->
+    $scope.locationSkillCombinations = combinations
 
   # config calendar 
   $scope.uiConfig = calendar:

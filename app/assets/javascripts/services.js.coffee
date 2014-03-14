@@ -41,13 +41,26 @@ angular.module("schedulerServices", ["ngResource"])
     ,
       update:
         method: "PUT"
-  .factory "Organizations, ($resource) ->
+  .factory "Organizations", ($resource) ->
     $resource "/organizations/:id.json",
-      id: @id"
+      id: @id
     ,
       update:
         method: "PUT"
         
+  .factory "LocationSkillCombinations", ($http, $q) ->
+    # Calculate the Location/Skill combinations
+    deferred = $q.defer()
+    locationSkillCombinations = []
+    $http.get("/skills.json").then (skills) ->
+      $http.get("/locations.json").then (locations) ->
+        angular.forEach locations.data, (location) ->
+          if location.id
+            angular.forEach skills.data, (skill) ->
+              locationSkillCombinations.push {skill: skill, location: location} if skill.id
+        deferred.resolve(locationSkillCombinations)
+    deferred.promise
+
   .factory "LastUpdated", () ->
     lastUpdated= { date: window.last_updated }
 
