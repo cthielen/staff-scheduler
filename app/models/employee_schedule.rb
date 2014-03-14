@@ -1,5 +1,4 @@
 class EmployeeSchedule < ActiveRecord::Base
-  using_access_control
 
   # This model tracks which employees have been assigned to which schedules, and the state of their availability submission
 

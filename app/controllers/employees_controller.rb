@@ -6,7 +6,7 @@ class EmployeesController < ApplicationController
   # GET /employees
   # GET /employees.json
   def index
-    @employees = Employee.active_employees
+    @employees = Employee.active_employees.with_permissions_to(:read)
     
     respond_with @employees
   end
