@@ -8,7 +8,7 @@ class Schedule < ActiveRecord::Base
   belongs_to :organization
   
   validate :schedules_cannot_overlap, :end_date_must_be_later_than_start_date
-  validates :start_date, :end_date, presence: true
+  validates :start_date, :end_date, :organization_id, presence: true
   
   accepts_nested_attributes_for :shifts
 

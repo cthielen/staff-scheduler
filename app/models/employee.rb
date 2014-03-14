@@ -19,9 +19,9 @@ class Employee < ActiveRecord::Base
   :url => "/system/:class/:attachment/:id/:style/:basename.:extension",
   :path => ":rails_root/public/system/:class/:attachment/:id/:style/:basename.:extension"
 
-  validates :max_hours, :email, :name, presence: true
+  validates :max_hours, :email, :name, :organization_id, presence: true
   validates :is_disabled, inclusion: { in: [true, false] }
-
+  
   accepts_nested_attributes_for :employee_availabilities
   accepts_nested_attributes_for :location_assignments
   accepts_nested_attributes_for :skill_assignments
