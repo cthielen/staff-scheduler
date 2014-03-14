@@ -3,6 +3,7 @@ class Organization < ActiveRecord::Base
   
   has_many :employees
   has_many :schedules
+  has_many :users
   
   validates :title, presence: true
   

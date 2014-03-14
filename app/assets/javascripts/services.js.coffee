@@ -41,7 +41,13 @@ angular.module("schedulerServices", ["ngResource"])
     ,
       update:
         method: "PUT"
-
+  .factory "Organizations, ($resource) ->
+    $resource "/organizations/:id.json",
+      id: @id"
+    ,
+      update:
+        method: "PUT"
+        
   .factory "LastUpdated", () ->
     lastUpdated= { date: window.last_updated }
 
