@@ -3,12 +3,19 @@
   <ul class="selection-dropdowns nav nav-pills nav-stacked" style="margin-bottom: 15px;">
     <li class="dropdown">
       <a class="dropdown-toggle btn btn-default">
-        <h2 style="margin: 0px;">{{ selections.schedule.name }}</h2>
+        <h2 style="margin: 0px;">
+          {{ selections.schedule.name }}
+          <span style="font-size: 12px;">
+            <span class="glyphicon glyphicon-edit" tooltip="Edit this schedule"
+              ng-click="editSchedule(selections.schedule.id)" stop-event="click"></span>
+          </span>
+        </h2>
       </a>
       <ul class="dropdown-menu col-md-12">
         <li ng-repeat="schedule in schedules">
-          <a ng-click="setSchedule(schedule)" class="text-center">{{ schedule.name }}</a>
+          <a ng-click="selections.schedule = schedule" class="text-center">{{ schedule.name }}</a>
         </li>
+        <li><a ng-click="editSchedule()" class="text-center">Create New Schedule</a></li>
       </ul>
     </li>
   </ul>

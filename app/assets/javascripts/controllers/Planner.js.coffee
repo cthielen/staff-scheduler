@@ -1,4 +1,4 @@
-StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, Schedules, Skills, Locations, LocationSkillCombinations) ->
+StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, Schedules, Skills, Locations, LocationSkillCombinations) ->
 
   ## Initializations
   $scope.locationSkillCombinations = []
@@ -33,6 +33,21 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, Schedules, Skil
       $scope.redirectTo('schedule','/schedules')
 
   # TODO: See if you can move these functions to a factory
+  $scope.editSchedule = (schedule_id) ->
+    schedule = _.findWhere($scope.schedules, { id: schedule_id })
+    modalInstance = $modal.open
+      templateUrl: "/assets/partials/editSchedule.html"
+      controller: EditScheduleCtrl
+      resolve:
+        schedule: ->
+          schedule
+
+    modalInstance.result.then (state) ->
+      if state is 'deleted'
+        $scope.deleteSchedule schedule
+      else
+        $scope.schedules = Schedules.query()
+
   $scope.redirectTo = (type, path) ->
     modalInstance = $modal.open
       templateUrl: '/assets/partials/confirm.html'
