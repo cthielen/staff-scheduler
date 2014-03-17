@@ -1,4 +1,4 @@
-StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, Schedules, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations) ->
+StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeout, Schedules, CurrentEmployee, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations) ->
 
   ## Initializations
   $scope.locationSkillCombinations = []
@@ -20,9 +20,33 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, Schedul
     }
   ]
 
+  CurrentEmployee.query (result) ->
+    $scope.currentEmployee = result
+    $timeout(->
+      $scope.plannerCalendar.fullCalendar 'render'
+    , 10) # Delaying the render was necessary: http://goo.gl/lkHOXD
+
   ## Construct the calendar when selections change
   $scope.$watch "selections", (selections) ->
-    switch selections.layer
+    $scope.populateEvents()
+  , true
+
+  ## Fetching Data
+  # Fetch Location/Skill combinations
+  LocationSkillCombinations.then (combinations) ->
+    $scope.locationSkillCombinations = combinations
+    $scope.populateEvents()
+
+  # Fetch Schedules
+  $scope.schedules = Schedules.query (response) ->
+    if response.length
+      $scope.selections.schedule = response[0]
+      $scope.populateEvents()
+    else
+      $scope.redirectTo('schedule','/schedules')
+
+  $scope.populateEvents = ->
+    switch $scope.selections.layer
       when 0
         $scope.fetchEvents(Assignments,false)
         $scope.fetchEvents(Shifts,true)
@@ -32,19 +56,6 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, Schedul
       when 2
         $scope.fetchEvents(Shifts,false)
         $scope.fetchEvents(Shifts,true,true)
-  , true
-
-  ## Fetching Data
-  # Fetch Location/Skill combinations
-  LocationSkillCombinations.then (combinations) ->
-    $scope.locationSkillCombinations = combinations
-
-  # Fetch Schedules
-  $scope.schedules = Schedules.query (response) ->
-    if response.length
-      $scope.selections.schedule = response[0]
-    else
-      $scope.redirectTo('schedule','/schedules')
 
   # Fetching events
   # fetchEvents(
