@@ -1,4 +1,4 @@
-StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filter, $modal, $location, $timeout, Shifts, Schedules, Skills, Locations, Employees, Availabilities, CurrentEmployee) ->
+StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filter, $modal, $location, $timeout, Shifts, Schedules, Skills, Locations, Employees, Availabilities, CurrentEmployee, EmployeeSchedules) ->
   $scope.modalTemplate = null
   $scope.error = null
   $scope.modalVisible = false
@@ -18,6 +18,7 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
   $scope.newAvailability = {}
   $scope.newAvailabilities = []
   $scope.availabilities = []
+  $scope.employeeSchedules = []
   $scope.shifts = []
   $scope.calSources = [{
       color: "#7AB"
@@ -68,6 +69,20 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
         $scope.$apply
         $scope.availabilityCalendar.fullCalendar 'refetchEvents'
 
+  $scope.fetchEmployeeSchedules = ->    
+    unless $scope.newAvailability.schedule_id is undefined
+      console.log 'Fetching employee schedules...'
+      EmployeeSchedules.query {
+        schedule: $scope.schedule.id
+        }, (result) ->
+          # Success        
+          $scope.employeeSchedules.length = 0 # Preferred way of emptying a JS array
+          angular.forEach result, (item) ->
+            $scope.employeeSchedules.push item if item.id
+          
+          $scope.$apply
+          $scope.setEmployeeSchedule()   
+                
   $scope.redirectTo = (type, path) ->
     modalInstance = $modal.open
       templateUrl: '/assets/partials/confirm.html'
@@ -91,7 +106,8 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
       $scope.fetchAvailabilities()
       $scope.fetchShifts()
       $scope.setScheduleName()
-
+      $scope.fetchEmployeeSchedules()
+      
       # Change calendar date to the beginning of the schedule
       schedule = _.findWhere($scope.schedules, { id: $scope.newAvailability.schedule_id })
       scheduleStart = new Date(Date.parse(schedule.start_date))
@@ -179,9 +195,21 @@ StaffScheduler.controller "AvailabilityCtrl", @AvailabilityCtrl = ($scope, $filt
     $scope.newAvailability.schedule_id = schedule.id
     $scope.init()
 
+  $scope.setEmployeeSchedule = ->
+    $scope.employeeSchedule = _.findWhere($scope.employeeSchedules, { schedule_id: $scope.schedule.id})
   $scope.clearError = ->
     $scope.error = null
 
+  $scope.submitEmployeeSchedules = () ->
+    $scope.employeeSchedule.availability_submitted = true
+    EmployeeSchedules.update $scope.employeeSchedule,
+      (data) ->
+        # Success
+    , (data) ->
+        # Error
+        
+        
+    
   # config calendar 
   $scope.uiConfig = calendar:
     weekends: false

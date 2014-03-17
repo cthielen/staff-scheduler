@@ -24,4 +24,5 @@
   </div>
 
   <div ui-calendar="uiConfig.calendar" class="calendar" ng-model="calSources" calendar="availabilityCalendar"></div> 
+            <button type="button" class="btn btn-primary" ng-hide="employeeSchedule.availability_submitted" ng-click="submitEmployeeSchedules()">Submit Availabilities</button>
 </div>

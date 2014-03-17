@@ -13,6 +13,7 @@ class Employee < ActiveRecord::Base
   has_many :shifts, through: :shift_assignments
   has_many :wages, dependent: :destroy
   has_many :employee_availabilities, dependent: :destroy
+  has_many :employee_schedules, dependent: :destroy
   has_one :user
   belongs_to :organization
   belongs_to :schedule

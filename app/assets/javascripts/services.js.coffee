@@ -41,7 +41,18 @@ angular.module("schedulerServices", ["ngResource"])
     ,
       update:
         method: "PUT"
-        
+  .factory "Locations", ($resource) ->
+    $resource "/locations/:id.json",
+      id: "@id"
+    ,
+      update:
+        method: "PUT"    
+  .factory "EmployeeSchedules", ($resource) ->
+    $resource "/employee_schedules/:id.json",
+      id: "@id"
+    ,
+      update:
+        method: "PUT"     
   .factory "LocationSkillCombinations", ($http, $q) ->
     # Calculate the Location/Skill combinations
     deferred = $q.defer()

@@ -69,6 +69,6 @@ class EmployeeSchedulesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def employee_schedule_params
-      params.require(:employee_schedule).permit(:amount, :employee_id, :starting_date)
+      params.require(:employee_schedule).permit(:schedule_id, :employee_id, :availability_submitted)
     end
 end
