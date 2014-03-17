@@ -1,4 +1,4 @@
-StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, Schedules, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations) ->
+StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeout, Schedules, CurrentEmployee, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations) ->
 
   ## Initializations
   $scope.locationSkillCombinations = []
@@ -19,6 +19,12 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, Schedul
       events: $scope.backEvents
     }
   ]
+
+  CurrentEmployee.query (result) ->
+    $scope.currentEmployee = result
+    $timeout(->
+      $scope.plannerCalendar.fullCalendar 'render'
+    , 10) # Delaying the render was necessary: http://goo.gl/lkHOXD
 
   ## Construct the calendar when selections change
   $scope.$watch "selections", (selections) ->
