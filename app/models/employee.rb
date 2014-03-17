@@ -27,6 +27,7 @@ class Employee < ActiveRecord::Base
   accepts_nested_attributes_for :employee_availabilities
   accepts_nested_attributes_for :location_assignments
   accepts_nested_attributes_for :skill_assignments
+  accepts_nested_attributes_for :shift_assignments
 
   def self.active_managers
     Employee.joins(:user).where(:users => {:is_manager => true, :disabled => false})
@@ -92,7 +93,7 @@ class Employee < ActiveRecord::Base
   
   # Accepts a shift, shift fragment start, and shift fragmnet end, returns true if employee is avaialble to work
   # NOTE: Checks only against employee availability, not other eligibility criteria
-  def available_to_work(shift, fragment_start, fragment_end)  
+  def available_to_work(shift, fragment_start, fragment_end)
     employee_availabilities.where(schedule_id: shift.schedule_id).each do |availability|
       if (availability.start_datetime <= fragment_start) && (availability.end_datetime >= fragment_end)
         return true

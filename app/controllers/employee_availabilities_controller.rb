@@ -4,7 +4,7 @@ class EmployeeAvailabilitiesController < ApplicationController
   # GET /employee_availabilities
   # GET /employee_availabilities.json
   def index
-    @employee_availabilities = EmployeeAvailability.with_permissions_to(:read).by_schedule(params[:schedule]).by_skill(params[:skill]).by_location(params[:location])
+    @employee_availabilities = EmployeeAvailability.with_permissions_to(:read)#.by_schedule(params[:schedule]).by_skill(params[:skill]).by_location(params[:location])
   end
 
   # GET /employee_availabilities/1

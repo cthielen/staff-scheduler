@@ -51,7 +51,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         $scope.fetchEvents(Assignments,false)
         $scope.fetchEvents(Shifts,true)
       when 1
-        $scope.fetchEvents(Assignments,false)
+        $scope.fetchEvents(Availabilities,false)
         $scope.fetchEvents(Shifts,true)
       when 2
         $scope.fetchEvents(Shifts,false)
@@ -59,18 +59,18 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
 
   # Fetching events
   # fetchEvents(
-  #     Source: the angular service to perform the .query call on
+  #     source: the angular service to perform the .query call on
   #     isBackground: Boolean, whether a background event (true), or a main event (false)
   #     clearEvents: Optional Boolean, clears the array of background or main events if set to true
   # )
-  $scope.fetchEvents = (Source, isBackground, clearEvents) ->
+  $scope.fetchEvents = (source, isBackground, clearEvents) ->
     clearEvents ?= false
     events = (if isBackground then $scope.backEvents else $scope.frontEvents)
     if clearEvents
       events.length = 0
     else
       unless $scope.locationSkillCombinations.length is 0 or $scope.selections.schedule is undefined
-        Source.query {
+        source.query {
           schedule: $scope.selections.schedule.id,
           skill: $scope.locationSkillCombinations[$scope.selections.lsCombination].skill.id,
           location: $scope.locationSkillCombinations[$scope.selections.lsCombination].location.id
@@ -81,10 +81,34 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
             item.isBackground = true if isBackground
             events.push item if item.id
 
-          $scope.$apply
+          $scope.$apply() if !$scope.$$phase
           $scope.plannerCalendar.fullCalendar 'refetchEvents'
 
   # TODO: See if you can move these functions to a factory
+  $scope.createAssignmentDialog = (start, end) ->
+    shift = _.find $scope.backEvents, (e) ->
+      e.start <= start and e.end >= end
+
+    if shift
+      newAssignment = {
+        shift_id: shift.id,
+        start_datetime: start,
+        end_datetime: end
+      }
+
+      modalInstance = $modal.open
+        templateUrl: "/assets/partials/newAssignment.html"
+        controller: NewAssignmentCtrl
+        resolve:
+          newAssignment: ->
+            newAssignment
+
+      modalInstance.result.then (assignment) ->
+        $scope.populateEvents()
+    else
+      $scope.error = "Assignments must fall within a defined shift"
+      $scope.$apply() if !$scope.$$phase
+
   $scope.editSchedule = (schedule_id) ->
     schedule = _.findWhere($scope.schedules, { id: schedule_id })
     modalInstance = $modal.open
@@ -133,5 +157,13 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
       center: "title"
       right: "today agendaWeek,agendaDay"
       ignoreTimezone: false
+    select: (startDate, endDate, allDay) ->
+      switch $scope.selections.layer
+        when 0
+          $scope.createAssignmentDialog(startDate, endDate)
+        when 1
+          $scope.createEvents(Availabilities)
+        when 2
+          $scope.createEvents(Shifts)
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
       element.find('.fc-event-inner').css('display','none') if event.isBackground

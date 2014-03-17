@@ -1,13 +1,20 @@
 class EmployeesController < ApplicationController
   before_action :set_employee, only: [:show, :edit, :update, :destroy]
-  wrap_parameters :employee, include: [:max_hours, :email, :name, :is_disabled, :profile, :employee_availabilities_attributes, :location_assignments_attributes, :skill_assignments_attributes]
+  wrap_parameters :employee, include: [:max_hours, :email, :name, :is_disabled, :profile, :employee_availabilities_attributes, :location_assignments_attributes, :skill_assignments_attributes, :shift_assignments_attributes]
   respond_to :json
 
   # GET /employees
   # GET /employees.json
   def index
-    @employees = Employee.active_employees.with_permissions_to(:read)
-    
+    if params[:shift].blank? or params[:start].blank? or params[:end].blank?
+      @employees = Employee.active_employees.with_permissions_to(:read)
+    else
+      @employees = Array.new
+      Employee.active_employees.with_permissions_to(:read).each do |employee|
+        @employees << employee if employee.eligible_to_work(Shift.find(params[:shift]), DateTime.parse(params[:start]).in_time_zone, DateTime.parse(params[:end]).in_time_zone)
+      end
+    end
+
     respond_with @employees
   end
 
@@ -80,8 +87,8 @@ class EmployeesController < ApplicationController
 
   private
     def clear_associations
-      @employee.locations.destroy_all
-      @employee.skills.destroy_all
+      @employee.locations.destroy_all unless params[:location_assignments_attributes].blank?
+      @employee.skills.destroy_all unless params[:skill_assignments_attributes].blank?
     end
 
     # Use callbacks to share common setup or constraints between actions.
@@ -91,6 +98,6 @@ class EmployeesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def employee_params
-      params.require(:employee).permit(:max_hours, :email, :name, :is_disabled, :profile, employee_availabilities_attributes: [:id, :schedule_id, :start_datetime, :end_datetime], location_assignments_attributes: [:location_id], skill_assignments_attributes: [:skill_id])
+      params.require(:employee).permit(:max_hours, :email, :name, :is_disabled, :profile, employee_availabilities_attributes: [:id, :schedule_id, :start_datetime, :end_datetime], location_assignments_attributes: [:location_id], skill_assignments_attributes: [:skill_id], shift_assignments_attributes: [:shift_id, :start_datetime, :end_datetime])
     end
 end

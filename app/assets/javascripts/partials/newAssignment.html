@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+  <h4 class="modal-title" id="myModalLabel">New Assignment</h4>
+</div>
+<div class="modal-body">
+  <div class="alert alert-danger" ng-show="error">
+    <button type="button" class="close" ng-click="clearError()">&times;</button>
+    <div ng-bind-html="error"></div>
+  </div>
+  <div ng-show="eligibleEmployees.length">
+    <h5>Select Employee</h5>
+    <table class="table table-striped">
+      <tr ng-repeat="employee in eligibleEmployees" ng-click="createAssignment(employee)" class="clickable">
+        <td>{{employee.name}}</td>
+      </tr>
+    </table>
+  </div>
+  <div ng-hide="eligibleEmployees.length">
+    {{status}}
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">Close</button>
+</div>

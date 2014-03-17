@@ -16,5 +16,6 @@
 //= require ./controllers/EditLocation
 //= require ./controllers/EditSchedule
 //= require ./controllers/NewShift
+//= require ./controllers/NewAssignment
 //= require ./directives/onEnter
 //= require ./directives/stopEvent

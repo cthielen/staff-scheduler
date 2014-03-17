@@ -6,7 +6,7 @@ class ShiftAssignment < ActiveRecord::Base
   belongs_to :shift
   belongs_to :shift_assignment_status, :foreign_key => 'status_id'
 
-  validates :employee, :shift, :shift_assignment_status, presence: true
+  validates :employee, :shift, presence: true
   validate :shift_assignment_must_fit_inside_shift, :end_date_must_be_later_than_start_date, :planned_or_completed_shift_assignments_cannot_overlap
   validates :start_datetime, :end_datetime, :employee_id, :status_id, :shift_id, presence: true
   validates :is_confirmed, :inclusion => {:in => [true, false]}
