@@ -69,6 +69,6 @@ class ShiftAssignmentsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shift_assignment_params
-      params.require(:shift_assignment).permit(:start_datetime, :end_datetime, :employee_id, :is_absence, :is_confirmed, :shift_id)
+      params.require(:shift_assignment).permit(:start_datetime, :end_datetime, :employee_id, :is_confirmed, :shift_id)
     end
 end
