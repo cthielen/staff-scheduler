@@ -47,7 +47,7 @@ class Employee < ActiveRecord::Base
     
     # Only shift assignments from the week of the specified date
     self.shift_assignments.where(start_datetime: week_start .. week_end) do |assignment|
-      if scheduled?
+      if assignment.scheduled?
         total_hours += (assignment.end_datetime - assignment.start_atetime) / 3600
       end
     end
@@ -68,11 +68,10 @@ class Employee < ActiveRecord::Base
 
     # Ensure employee is not working those hours already 
     self.shift_assignments.each do |assignment|
-      if scheduled?
-        unless (fragment_start < assignment.start_datetime) && (fragment_end <= assignment.start_datetime)
-          return false
-        end
-        unless (fragment_start >= assignment.end_datetime) && (fragment_end > assignment.end_datetime)
+      if assignment.scheduled?
+        completely_before = (fragment_start < assignment.start_datetime.in_time_zone) && (fragment_end <= assignment.start_datetime.in_time_zone)
+        completely_after = (fragment_start >= assignment.end_datetime.in_time_zone) && (fragment_end > assignment.end_datetime.in_time_zone)
+        unless completely_before || completely_after
           return false
         end        
       end

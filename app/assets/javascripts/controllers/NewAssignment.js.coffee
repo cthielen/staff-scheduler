@@ -4,8 +4,8 @@ StaffScheduler.controller "NewAssignmentCtrl", @NewAssignmentCtrl = ($scope, $mo
 
   Employees.query {
     shift: newAssignment.shift_id,
-    start: newAssignment.start_datetime,
-    end: newAssignment.end_datetime
+    start: new Date(newAssignment.start_datetime),
+    end: new Date(newAssignment.end_datetime)
   },
     (data) ->
       # Sccuess
