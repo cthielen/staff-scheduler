@@ -42,12 +42,11 @@ class ShiftAssignment < ActiveRecord::Base
   def planned_or_completed_shift_assignments_cannot_overlap
     if self.shift.present? && self.shift.shift_assignments.present?
       self.shift.shift_assignments.each do |assignment|
-        if scheduled?
-          unless (self.start_datetime < assignment.start_datetime) && (self.end_datetime <= assignment.end_datetime)
-            errors.add(:start_datetime, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")       
-          end
-          unless (self.start_datetime >= assignment.end_datetime) && (self.end_datetime > assignment.end_datetime)
-            errors.add(:end_datetime, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")               
+        if scheduled? && (self.id != assignment.id)
+          completely_before = (self.start_datetime < assignment.start_datetime) && (self.end_datetime <= assignment.start_datetime)
+          completely_after = (self.start_datetime >= assignment.end_datetime) && (self.end_datetime > assignment.end_datetime)
+          unless completely_before || completely_after
+            errors.add(:overlap, "shift_assignment cannot overlap an existing planned shift_assignment on the same shift")       
           end        
         end
       end

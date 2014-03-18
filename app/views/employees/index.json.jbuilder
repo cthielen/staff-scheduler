@@ -8,6 +8,6 @@ json.array!(@employees) do |employee|
     json.extract! location, :id, :name
   end
   json.assignments employee.shift_assignments do |assignment|
-    json.extract! assignment, :start_datetime, :end_datetime, :shift_id, :status_id
+    json.extract! assignment, :id, :start_datetime, :end_datetime, :shift_id, :status_id
   end
 end
