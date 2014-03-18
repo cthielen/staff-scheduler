@@ -1,7 +1,30 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
+planned:
+  id: 1
   name: "planned"
 
-two:
+completed:
+  id: 2
+  name: "completed"
+
+rejected:
+  id: 3
+  name: "rejected"
+
+sick:
+  id: 4
+  name: "sick"
+
+absent:
+  id: 5
+  name: "absent"
+
+vacation:
+  id: 6
   name: "vacation"
+
+no_show:
+  id: 7
+  name: "no_show"
+
