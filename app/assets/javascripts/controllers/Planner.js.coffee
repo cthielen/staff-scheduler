@@ -84,7 +84,45 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
           $scope.$apply() if !$scope.$$phase
           $scope.plannerCalendar.fullCalendar 'refetchEvents'
 
-  # TODO: See if you can move these functions to a factory
+  $scope.confirmDelete = (event) ->
+    switch $scope.selections.layer
+      when 0
+        source = Assignments
+        type = "Assignment"
+      when 1
+        source = Availabilities
+        type = "Availability"
+      when 2
+        source = Shifts
+        type = "Shift"
+
+    modalInstance = $modal.open
+      templateUrl: '/assets/partials/confirm.html'
+      controller: ConfirmCtrl
+      resolve:
+        title: ->
+          "Delete this #{type}?"
+        body: ->
+          "#{event.title}: #{moment(event.start).format('MMM Do YY, h:mm a')} - #{moment(event.end).format('h:mm a')}"
+        okButton: ->
+          "Delete"
+        showCancel: ->
+          true
+
+    modalInstance.result.then () ->
+      $scope.deleteEvent(source, event, type )
+
+  $scope.deleteEvent = (source, event, type ) ->
+    source.delete {id: event.id},
+      (data) ->
+        # Success
+        index = $scope.frontEvents.indexOf(event)
+        $scope.frontEvents.splice(index,1)
+        $scope.populateEvents()
+    , (data) ->
+        # Error
+        $scope.error = "Error deleting #{type} '#{event.start_datetime} - #{event.end_datetime}'"
+
   $scope.createAssignmentDialog = (start, end) ->
     shift = _.find $scope.backEvents, (e) ->
       e.start <= start and e.end >= end
@@ -170,3 +208,5 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
           $scope.createEvents(Shifts)
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
       element.find('.fc-event-inner').css('display','none') if event.isBackground
+    eventClick: (calEvent, jsEvent, view) ->
+      $scope.confirmDelete(calEvent)

@@ -2,6 +2,7 @@
 //= require fullcalendar
 //= require underscore
 //= require jquery-ui
+//= require moment
 //= require calendar
 //= require services
 //= require ./routers/scheduler
