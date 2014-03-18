@@ -141,6 +141,9 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     modalInstance.result.then () ->
       $location.path path
 
+  $scope.clearError = ->
+    $scope.error = null
+
   ## config calendar
   $scope.uiConfig = calendar:
     weekends: false
