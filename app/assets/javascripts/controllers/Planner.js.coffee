@@ -1,4 +1,4 @@
-StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeout, Schedules, CurrentEmployee, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations) ->
+StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeout, Schedules, Employees, CurrentEmployee, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations) ->
 
   ## Initializations
   $scope.locationSkillCombinations = []
@@ -20,8 +20,13 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     }
   ]
 
-  CurrentEmployee.query (result) ->
-    $scope.currentEmployee = result
+  CurrentEmployee.query (current) ->
+    $scope.currentEmployee = current
+
+    $scope.employees = Employees.query (response) ->
+      if response.length
+        $scope.selections.employee = if current then _.findWhere(response, {id: current.id}) else response[0]
+
     $timeout(->
       $scope.plannerCalendar.fullCalendar 'render'
     , 10) # Delaying the render was necessary: http://goo.gl/lkHOXD
@@ -124,6 +129,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         $scope.error = "Error deleting #{type} '#{event.start_datetime} - #{event.end_datetime}'"
 
   $scope.createAssignmentDialog = (start, end) ->
+    $scope.clearError()
     shift = _.find $scope.backEvents, (e) ->
       e.start <= start and e.end >= end
 
@@ -161,6 +167,64 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         $scope.deleteSchedule schedule
       else
         $scope.schedules = Schedules.query()
+
+  $scope.createShifts = (start, end) ->
+    currentLS = $scope.locationSkillCombinations[$scope.selections.lsCombination]
+    $scope.clearError()
+    newShifts = $scope.calculateRepetitions({
+      is_mandatory: true,
+      start_datetime: start,
+      end_datetime: end,
+      schedule_id: $scope.selections.schedule.id,
+      skill_id: currentLS.skill.id,
+      location_id: currentLS.location.id
+    })
+    $scope.selections.schedule.shifts_attributes = $scope.selections.schedule.shifts.concat(newShifts)
+    Schedules.update $scope.selections.schedule,
+      (data) ->
+        # Success
+        $scope.populateEvents()
+      (data) ->
+        # Failure
+        $scope.error = 'Could not save shifts, please try saving again'
+        # Display specific errors
+        _.each(data.data , (e,i) ->
+            $scope.error = $scope.error + "<li>#{i}: #{e}</li>"
+          )
+
+  $scope.createAvailabilities = (start, end) ->
+    $scope.clearError()
+    newAvailabilities = $scope.calculateRepetitions({
+      start_datetime: start,
+      end_datetime: end,
+      schedule_id: $scope.selections.schedule.id,
+    })
+    $scope.selections.employee.employee_availabilities_attributes = $scope.selections.employee.availabilities.concat(newAvailabilities)
+    Employees.update $scope.selections.employee,
+      (data) ->
+        # Success
+        $scope.populateEvents()
+      (data) ->
+        # Failure
+        $scope.error = 'Could not save availabilities, please try saving again'
+        # Display specific errors
+        _.each(data.data , (e,i) ->
+            $scope.error = $scope.error + "<li>#{i}: #{e}</li>"
+          )
+
+  $scope.calculateRepetitions = (model) ->
+    repetitions = []
+    this_start_date = new Date(Date.parse(model.start_datetime))
+    this_end_date = new Date(Date.parse(model.end_datetime))
+    while this_end_date <= Date.parse($scope.selections.schedule.end_date)
+      copy = angular.copy(model)
+      copy.start_datetime = new Date(this_start_date)
+      copy.end_datetime = new Date(this_end_date)
+      repetitions.push copy
+
+      this_start_date.setDate(this_start_date.getDate()+7)
+      this_end_date.setDate(this_end_date.getDate()+7)
+    repetitions
 
   $scope.redirectTo = (type, path) ->
     modalInstance = $modal.open
@@ -203,9 +267,9 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         when 0
           $scope.createAssignmentDialog(startDate, endDate)
         when 1
-          $scope.createEvents(Availabilities)
+          $scope.createAvailabilities(startDate, endDate)
         when 2
-          $scope.createEvents(Shifts)
+          $scope.createShifts(startDate, endDate)
     eventAfterRender: (event, element) -> # Here we customize the content and the color of the cell
       element.find('.fc-event-inner').css('display','none') if event.isBackground
     eventClick: (calEvent, jsEvent, view) ->

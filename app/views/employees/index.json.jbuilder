@@ -1,5 +1,5 @@
 json.array!(@employees) do |employee|
-  json.extract! employee, :id, :max_hours, :email, :name, :is_disabled
+  json.extract! employee, :id, :max_hours, :email, :name, :is_disabled, :organization_id
   json.url employee_url(employee, format: :json)
   json.skills employee.skills do |skill|
     json.extract! skill, :id, :title
@@ -9,5 +9,8 @@ json.array!(@employees) do |employee|
   end
   json.assignments employee.shift_assignments do |assignment|
     json.extract! assignment, :id, :start_datetime, :end_datetime, :shift_id, :status_id
+  end
+  json.availabilities employee.employee_availabilities do |availability|
+    json.extract! availability, :id, :start_datetime, :end_datetime, :schedule_id
   end
 end
