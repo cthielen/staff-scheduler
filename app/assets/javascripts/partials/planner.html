@@ -47,13 +47,18 @@
       ng-model="eventSources" calendar="plannerCalendar">
     </div>
 
-    <div class="btn-group pull-right" style="margin-top: 15px;" ng-show="currentEmployee.isManager">
-        <button type="button" class="btn btn-default" ng-click="selections.layer = 0"
-          ng-class="{active: selections.layer == 0}">Assignments</button>
-        <button type="button" class="btn btn-default" ng-click="selections.layer = 1"
-          ng-class="{active: selections.layer == 1}">Availabilities</button>
-        <button type="button" class="btn btn-default" ng-click=" selections.layer = 2"
-          ng-class="{active: selections.layer == 2}">Shifts</button>
+    <div style="margin-top: 15px;">
+      <button type="button" class="btn btn-default pull-left" ng-click="changeStatus()"
+        ng-disabled="loading > 0">Mark as Complete</button>
+
+      <div class="btn-group pull-right" ng-show="currentEmployee.isManager">
+          <button type="button" class="btn btn-default" ng-click="selections.layer = 0"
+            ng-class="{active: selections.layer == 0}" ng-disabled="loading > 0">Assignments</button>
+          <button type="button" class="btn btn-default" ng-click="selections.layer = 1"
+            ng-class="{active: selections.layer == 1}" ng-disabled="loading > 0">Availabilities</button>
+          <button type="button" class="btn btn-default" ng-click=" selections.layer = 2"
+            ng-class="{active: selections.layer == 2}" ng-disabled="loading > 0">Shifts</button>
+      </div>
     </div>
 
   </div>

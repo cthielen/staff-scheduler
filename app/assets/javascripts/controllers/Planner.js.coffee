@@ -2,6 +2,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
 
   ## Initializations
   $scope.locationSkillCombinations = []
+  $scope.loading = 0
   $scope.selections = {
     lsCombination: 0,
     layer: 0
@@ -20,16 +21,40 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     }
   ]
 
-  CurrentEmployee.query (current) ->
-    $scope.currentEmployee = current
+  # Fetch Schedules
+  $scope.schedules = Schedules.query {},
+    (schedules) ->
+      # Success
+      if schedules.length
+        # Fetch Current Employee
+        CurrentEmployee.query {},
+          (current) ->
+            # Success
+            $scope.currentEmployee = current
+            # Render the calendar after setting the current employee to resize the days properly
+            $timeout(->
+              $scope.plannerCalendar.fullCalendar 'render'
+            , 10) # Delaying the render was necessary: http://goo.gl/lkHOXD
 
-    $scope.employees = Employees.query (response) ->
-      if response.length
-        $scope.selections.employee = if current then _.findWhere(response, {id: current.id}) else response[0]
-
-    $timeout(->
-      $scope.plannerCalendar.fullCalendar 'render'
-    , 10) # Delaying the render was necessary: http://goo.gl/lkHOXD
+            # Fetch Employees
+            $scope.employees = Employees.query {},
+              (employees) ->
+                # Success
+                if employees.length
+                  $scope.selections.employee = if current then _.findWhere(employees, {id: current.id}) else employees[0]
+                  $scope.selections.schedule = schedules[0]
+                  $scope.populateEvents()
+              (employees) ->
+                # Error
+                $scope.error = "Error loading employees!"
+          (current) ->
+            # Error
+            $scope.error = "Error fetching current employee!"
+      else
+        $scope.redirectTo('schedule','/schedules')
+    (schedules) ->
+      # Error
+      $scope.error = "Error loading schedules!"
 
   ## Construct the calendar when selections change
   $scope.$watch "selections", (selections) ->
@@ -41,14 +66,6 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
   LocationSkillCombinations.then (combinations) ->
     $scope.locationSkillCombinations = combinations
     $scope.populateEvents()
-
-  # Fetch Schedules
-  $scope.schedules = Schedules.query (response) ->
-    if response.length
-      $scope.selections.schedule = response[0]
-      $scope.populateEvents()
-    else
-      $scope.redirectTo('schedule','/schedules')
 
   $scope.populateEvents = ->
     switch $scope.selections.layer
@@ -75,12 +92,14 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
       events.length = 0
     else
       unless $scope.locationSkillCombinations.length is 0 or $scope.selections.schedule is undefined
+        $scope.loading++
         source.query {
           schedule: $scope.selections.schedule.id,
           skill: $scope.locationSkillCombinations[$scope.selections.lsCombination].skill.id,
           location: $scope.locationSkillCombinations[$scope.selections.lsCombination].location.id
         }, (result) ->
           # Success
+          $scope.loading--
           events.length = 0 # Preferred way of emptying a JS array
           angular.forEach result, (item) ->
             item.isBackground = true if isBackground
