@@ -245,6 +245,42 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
       this_end_date.setDate(this_end_date.getDate()+7)
     repetitions
 
+  $scope.changeState = () ->
+    $scope.loading++
+    switch $scope.selections.layer
+      when 0
+        # assignments
+        $scope.loading--
+      when 1
+        # availabilities
+        $scope.loading--
+      when 2
+        $scope.selections.schedule.state = 2
+        Schedules.update $scope.selections.schedule,
+          (data) ->
+            # Success
+            $scope.selections.schedule = data
+            $scope.loading--
+          (data) ->
+            # Failure
+            $scope.selections.schedule.state = 1
+            $scope.error = 'Could not mark as complete, please try again'
+            $scope.loading--
+
+  $scope.readyToSubmit = () ->
+    loading = $scope.loading > 0
+    switch $scope.selections.layer
+      when 0
+        # assignments
+        validState = false
+      when 1
+        # availabilities
+        validState = false
+      when 2
+        validState = ($scope.selections.schedule.state == 1)
+
+    validState and !loading
+
   $scope.redirectTo = (type, path) ->
     modalInstance = $modal.open
       templateUrl: '/assets/partials/confirm.html'

@@ -1,6 +1,6 @@
 class SchedulesController < ApplicationController
   before_action :set_schedule, only: [:show, :edit, :update, :destroy]
-  wrap_parameters :schedule, include: [:name, :start_date, :end_date, :organization_id, :shifts_attributes]
+  wrap_parameters :schedule, include: [:name, :start_date, :end_date, :organization_id, :state, :shifts_attributes]
 
   # GET /schedules
   # GET /schedules.json
@@ -41,6 +41,8 @@ class SchedulesController < ApplicationController
   # PATCH/PUT /schedules/1
   # PATCH/PUT /schedules/1.json
   def update
+    send_notifications(params)
+
     respond_to do |format|
       if @schedule.update(schedule_params)
         format.html { redirect_to @schedule, notice: 'Schedule was successfully updated.' }
@@ -68,8 +70,22 @@ class SchedulesController < ApplicationController
       @schedule = Schedule.find(params[:id])
     end
 
+    def send_notifications(params)
+      return unless params[:schedule][:state]
+
+      new_state = params[:schedule][:state].to_i
+      unless new_state.blank? or (new_state == @schedule.state)
+        case new_state
+        when 2
+          # Schedule complete, email employees for availabilities
+        when 4
+          # Assignments are done, email employees for confirmation
+        end
+      end
+    end
+
     # Never trust parameters from the scary internet, only allow the white list through.
     def schedule_params
-      params.require(:schedule).permit(:start_date, :end_date, :name, :organization_id, shifts_attributes: [:id, :start_datetime, :end_datetime, :is_mandatory, :location_id, :skill_id])
+      params.require(:schedule).permit(:start_date, :end_date, :name, :organization_id, :state, shifts_attributes: [:id, :start_datetime, :end_datetime, :is_mandatory, :location_id, :skill_id])
     end
 end
