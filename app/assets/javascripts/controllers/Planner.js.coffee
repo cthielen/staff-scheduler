@@ -140,8 +140,13 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     source.delete {id: event.id},
       (data) ->
         # Success
+        # Remove from calendar events
         index = $scope.frontEvents.indexOf(event)
         $scope.frontEvents.splice(index,1)
+        # Remove from employee availabilities
+        index = $scope.selections.employee.availabilities.indexOf(event)
+        $scope.selections.employee.availabilities.splice(index,1)
+
         $scope.populateEvents()
     , (data) ->
         # Error
