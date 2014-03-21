@@ -78,8 +78,10 @@ class SchedulesController < ApplicationController
         case new_state
         when 2
           # Schedule complete, email employees for availabilities
+          StaffMailer.request_availability_form().deliver
         when 4
           # Assignments are done, email employees for confirmation
+          StaffMailer.request_assignment_confirmation_form().deliver
         end
       end
     end

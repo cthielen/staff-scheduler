@@ -7,17 +7,25 @@ class StaffMailer < ActionMailer::Base
   end
   
   def request_availability_form
-    @message = "Your hours of availability are needed to begin planning the next schedule. You can submit this information on Staff-Scheduler <link>"
+    message = "Your hours of availability are needed to begin planning the next schedule. You can submit this information on Staff-Scheduler " + root_url
     subject = "Request for availability"   
     recipients = Employee.active_employees.pluck(:email)  
-    mail(:subject => subject, :bcc => recipients)    
+    mail(:subject => subject, :bcc => recipients) do |format|
+      format.text do
+        render :text => message
+      end
+    end
   end  
 
   def request_assignment_confirmation_form
     subject = "Shifts assigned to you are awaiting confirmation"
-    message = "Shifts have been assigned to you and are awaiting your confirmation. You can confirm your shifts on Staff-scheduler <link>" 
+    message = "Shifts have been assigned to you and are awaiting your confirmation. You can confirm your shifts on Staff-scheduler " + root_url
     recipients = Employee.active_employees.pluck(:email)
-    mail(:subject => subject, :bcc => recipients)   
+    mail(:subject => subject, :bcc => recipients) do |format|
+      format.text do
+        render :text => message
+      end
+    end
   end
   
   def request_shift_exception_fill
