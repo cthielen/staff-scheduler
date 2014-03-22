@@ -4,7 +4,11 @@ class EmployeeSchedulesController < ApplicationController
   # GET /employee_schedules
   # GET /employee_schedules.json
   def index
-    @employee_schedules = EmployeeSchedule.all
+    if params[:employee].blank? and params[:schedule].blank?
+      @employee_schedules = EmployeeSchedule.all
+    else
+      @employee_schedules = EmployeeSchedule.where(employee_id: params[:employee], schedule_id: params[:schedule])
+    end
   end
 
   # GET /employee_schedules/1

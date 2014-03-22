@@ -1,4 +1,4 @@
-StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeout, Schedules, Employees, CurrentEmployee, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations) ->
+StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeout, Schedules, Employees, CurrentEmployee, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations, EmployeeSchedules) ->
 
   ## Initializations
   $scope.locationSkillCombinations = []
@@ -73,6 +73,15 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         $scope.fetchEvents(Assignments,false)
         $scope.fetchEvents(Shifts,true)
       when 1
+        # Fetch EmployeeSchedule
+        EmployeeSchedules.query {
+          employee: $scope.currentEmployee.id,
+          schedule: $scope.selections.schedule.id
+        },
+          (data) ->
+            # Success
+            $scope.employeeSchedule = data[0]
+
         $scope.fetchEvents(Availabilities,false)
         $scope.fetchEvents(Shifts,true)
       when 2
@@ -258,7 +267,15 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         $scope.loading--
       when 1
         # availabilities
-        $scope.loading--
+        $scope.employeeSchedule.availability_submitted = true
+        EmployeeSchedules.update $scope.employeeSchedule,
+          (data) ->
+            # Success
+            $scope.loading--
+        , (data) ->
+            # Error
+            $scope.error = 'Could not mark as complete, please try again'
+            $scope.loading--
       when 2
         $scope.selections.schedule.state = 2
         Schedules.update $scope.selections.schedule,
@@ -280,7 +297,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         validState = false
       when 1
         # availabilities
-        validState = false
+        validState = ($scope.employeeSchedule and !$scope.employeeSchedule.availability_submitted)
       when 2
         validState = ($scope.selections.schedule.state == 1)
 
