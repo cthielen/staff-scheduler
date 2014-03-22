@@ -264,7 +264,17 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     switch $scope.selections.layer
       when 0
         # assignments
-        $scope.loading--
+        $scope.selections.schedule.state = 4
+        Schedules.update $scope.selections.schedule,
+          (data) ->
+            # Success
+            $scope.selections.schedule = data
+            $scope.loading--
+          (data) ->
+            # Failure
+            $scope.selections.schedule.state = 3
+            $scope.error = 'Could not mark as complete, please try again'
+            $scope.loading--
       when 1
         # availabilities
         $scope.employeeSchedule.availability_submitted = true
@@ -294,7 +304,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     switch $scope.selections.layer
       when 0
         # assignments
-        validState = false
+        validState = ($scope.selections.schedule.state == 3)
       when 1
         # availabilities
         validState = ($scope.employeeSchedule and !$scope.employeeSchedule.availability_submitted)
