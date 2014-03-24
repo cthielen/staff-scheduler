@@ -81,6 +81,7 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
       entities
 
   $scope.getEmail = (entity) ->
+    $scope.selectedEmployee.name = entity.name
     $http.get("/rm-employee.json",
       params:
         q: entity.loginid
