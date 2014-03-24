@@ -74,6 +74,11 @@ class Schedule < ActiveRecord::Base
   end
 
   # Triggered by Whenever schedule
+  def daily_scheduled_tasks
+    check_upcoming_shortages
+    notify_schedule_ending
+  end
+
   def self.check_upcoming_shortages  
     schedule = Schedule.active_schedule  
  
@@ -86,7 +91,8 @@ class Schedule < ActiveRecord::Base
     end
   end
   
-  def notify_schedule_ending
+  def self.notify_schedule_ending
+    schedule = Schedule.active_schedule  
     if Time.now.to_date + 2.weeks > schedule.end_date
       StaffMailer.notify_schedule_ending.deliver
     end
