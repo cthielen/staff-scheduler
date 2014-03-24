@@ -7,16 +7,9 @@
 //= require services
 //= require ./routers/scheduler
 //= require ./controllers/confirm
-//= require ./controllers/shifts
-//= require ./controllers/planning
 //= require ./controllers/Planner
-//= require ./controllers/availability
 //= require ./controllers/employees
-//= require ./controllers/EditEmployee
-//= require ./controllers/EditSkill
-//= require ./controllers/EditLocation
 //= require ./controllers/EditSchedule
-//= require ./controllers/NewShift
 //= require ./controllers/NewAssignment
 //= require ./directives/onEnter
 //= require ./directives/stopEvent
