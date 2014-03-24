@@ -15,8 +15,10 @@ class Employee < ActiveRecord::Base
   has_many :employee_availabilities, dependent: :destroy
   has_many :employee_schedules, dependent: :destroy
   has_one :user
-  belongs_to :organization
-  belongs_to :schedule
+  has_many :schedules, through: :employee_schedules
+
+  belongs_to :organization  
+
   has_attached_file :profile, :styles => {:medium => "300x300>", :thumb => "100x100>"},
   :url => "/system/:class/:attachment/:id/:style/:basename.:extension",
   :path => ":rails_root/public/system/:class/:attachment/:id/:style/:basename.:extension"

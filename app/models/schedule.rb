@@ -5,7 +5,7 @@ class Schedule < ActiveRecord::Base
   has_many :shifts, :dependent => :destroy
   has_many :shift_assignments, through: :shifts
   has_many :employee_availabilities
-  has_many :employees
+  has_many :employees, through: :employee_schedules
   has_many :employee_schedules
   
   belongs_to :organization
