@@ -86,6 +86,12 @@ class Schedule < ActiveRecord::Base
     end
   end
   
+  def notify_schedule_ending
+    if Time.now.to_date + 2.weeks > schedule.end_date
+      StaffMailer.notify_schedule_ending.deliver
+    end
+  end
+  
   # Accepts a date range (to check a single day you can set the same day to startdate and enddate)
   # Returns an array of hashes {start_datetime, end_datetime, shift_id} where shifts were not covered by a (planned or completed) shift_assignment
   def self.staff_shortages(startdate, enddate)

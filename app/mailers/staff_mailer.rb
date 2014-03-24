@@ -1,6 +1,11 @@
 class StaffMailer < ActionMailer::Base
   default from: "no-reply@dss.ucdavis.edu"
-  
+  def notify_schedule_ending
+    subject = "Schedule ending soon"
+    message = "A schedule will be ending soon. You can begin preparing the next schedule on Staff Scheduler " + root_url 
+    recipients = Employee.active_managers.pluck(:email)
+    mail(:subject => subject, :bcc => recipients) 
+  end
   def send_email(message, recipients, subject)
     @message = message
     mail(:subject => subject, :bcc => recipients)
