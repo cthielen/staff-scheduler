@@ -27,8 +27,8 @@ class SchedulesController < ApplicationController
   def create
     @schedule = Schedule.new(schedule_params)
     
-    # Setting organization of new employee to match creating user
-    @employee.organization_id = current_user.organization_id
+    # Setting organization of new schedule to match creating user
+    @schedule.organization_id = current_user.organization_id
     
     respond_to do |format|
       if @schedule.save
