@@ -1,4 +1,4 @@
-StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeout, Schedules, Employees, CurrentEmployee, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations, EmployeeSchedules) ->
+StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeout, $location, Schedules, Employees, CurrentEmployee, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations, EmployeeSchedules) ->
 
   ## Initializations
   $scope.locationSkillCombinations = []
@@ -44,6 +44,8 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
                   $scope.selections.employee = if current then _.findWhere(employees, {id: current.id}) else employees[0]
                   $scope.selections.schedule = schedules[0]
                   $scope.populateEvents()
+                else
+                  $scope.redirectTo('employee','/employees')
               (employees) ->
                 # Error
                 $scope.error = "Error loading employees!"
@@ -64,8 +66,11 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
   ## Fetching Data
   # Fetch Location/Skill combinations
   LocationSkillCombinations.then (combinations) ->
-    $scope.locationSkillCombinations = combinations
-    $scope.populateEvents()
+    if combinations.length
+      $scope.locationSkillCombinations = combinations
+      $scope.populateEvents()
+    else
+      $scope.redirectTo('skill/location','/employees')
 
   $scope.populateEvents = ->
     switch $scope.selections.layer
