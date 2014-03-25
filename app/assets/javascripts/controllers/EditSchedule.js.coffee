@@ -32,7 +32,7 @@ StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $moda
       Schedules.save $scope.schedule,
         (data) ->
           # Success
-          $modalInstance.close $scope.schedule
+          $modalInstance.close 'new'
         (data) ->
           # Failure
           $scope.error = 'Could not save schedule, please try saving again'

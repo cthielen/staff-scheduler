@@ -22,55 +22,61 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
   ]
 
   # Fetch Schedules
-  $scope.schedules = Schedules.query {},
-    (schedules) ->
-      # Success
-      if schedules.length
-        # Fetch Current Employee
-        CurrentEmployee.query {},
-          (current) ->
-            # Success
-            $scope.currentEmployee = current
-            # Render the calendar after setting the current employee to resize the days properly
-            $timeout(->
-              $scope.plannerCalendar.fullCalendar 'render'
-            , 10) # Delaying the render was necessary: http://goo.gl/lkHOXD
+  $scope.init = ->
+    console.debug "init"
+    $scope.schedules = Schedules.query {},
+      (schedules) ->
+        # Success
+        if schedules.length
+          # Fetch Current Employee
+          CurrentEmployee.query {},
+            (current) ->
+              # Success
+              $scope.currentEmployee = current
+              # Render the calendar after setting the current employee to resize the days properly
+              $timeout(->
+                $scope.plannerCalendar.fullCalendar 'render'
+              , 10) # Delaying the render was necessary: http://goo.gl/lkHOXD
 
-            # Fetch Employees
-            $scope.employees = Employees.query {},
-              (employees) ->
-                # Success
-                if employees.length
-                  $scope.selections.employee = if current then _.findWhere(employees, {id: current.id}) else employees[0]
-                  $scope.selections.schedule = schedules[0]
-                  $scope.populateEvents()
-                else
-                  $scope.redirectTo('employee','/employees')
-              (employees) ->
-                # Error
-                $scope.error = "Error loading employees!"
-          (current) ->
-            # Error
-            $scope.error = "Error fetching current employee!"
-      else
-        $scope.editSchedule()
-    (schedules) ->
-      # Error
-      $scope.error = "Error loading schedules!"
+              # Fetch Employees
+              $scope.employees = Employees.query {},
+                (employees) ->
+                  # Success
+                  if employees.length
+                    $scope.selections.employee = if current then _.findWhere(employees, {id: current.id}) else employees[0]
+                    $scope.selections.schedule = schedules[0]
+                    $scope.populateEvents()
+                  else if !$scope.modalOpen
+                    $scope.modalOpen = true
+                    $scope.redirectTo('employee','/employees')
+                (employees) ->
+                  # Error
+                  $scope.error = "Error loading employees!"
+            (current) ->
+              # Error
+              $scope.error = "Error fetching current employee!"
+        else
+          unless $scope.modalOpen
+            $scope.modalOpen = true
+            $scope.editSchedule()
+      (schedules) ->
+        # Error
+        $scope.error = "Error loading schedules!"
 
+    # Fetch Location/Skill combinations
+    LocationSkillCombinations.then (combinations) ->
+      if combinations.length
+        $scope.locationSkillCombinations = combinations
+        $scope.populateEvents()
+      else if !$scope.modalOpen
+        $scope.modalOpen = true
+        $scope.redirectTo('skill/location','/employees')
+
+  $scope.init()
   ## Construct the calendar when selections change
   $scope.$watch "selections", (selections) ->
     $scope.populateEvents()
   , true
-
-  ## Fetching Data
-  # Fetch Location/Skill combinations
-  LocationSkillCombinations.then (combinations) ->
-    if combinations.length
-      $scope.locationSkillCombinations = combinations
-      $scope.populateEvents()
-    else
-      $scope.redirectTo('skill/location','/employees')
 
   $scope.populateEvents = ->
     switch $scope.selections.layer
@@ -201,8 +207,11 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
           schedule
 
     modalInstance.result.then (state) ->
+      $scope.modalOpen = false
       if state is 'deleted'
         $scope.deleteSchedule schedule
+      else if state is 'new'
+        $scope.init()
       else
         $scope.schedules = Schedules.query()
 
@@ -333,6 +342,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
           false
 
     modalInstance.result.then () ->
+      $scope.modalOpen = false
       $location.path path
 
   $scope.clearError = ->
