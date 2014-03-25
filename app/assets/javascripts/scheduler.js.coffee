@@ -9,6 +9,8 @@
 //= require ./controllers/confirm
 //= require ./controllers/Planner
 //= require ./controllers/employees
+//= require ./controllers/EditSkill
+//= require ./controllers/EditLocation
 //= require ./controllers/EditSchedule
 //= require ./controllers/NewAssignment
 //= require ./directives/onEnter

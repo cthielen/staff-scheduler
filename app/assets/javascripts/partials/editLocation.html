@@ -1,0 +1,25 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+  <h4 class="modal-title" id="myModalLabel">Edit {{location.name}}</h4>
+</div>
+<div class="modal-body">
+  <div class="alert alert-danger" ng-show="error">
+    <button type="button" class="close" ng-click="clearError()">&times;</button>
+    <div ng-bind-html="error"></div>
+  </div>
+  <form class="form-horizontal" role="form">
+    <div class="form-group">
+      <label for="Name" class="col-sm-3 control-label">Name</label>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="name" placeholder="Location Name" ng-model="location.name">
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger pull-left" ng-click="confirmDelete()"
+    ng-disabled="inProgress">{{deleteText}}</button>
+  <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">Close</button>
+  <button type="button" class="btn btn-primary" ng-click="save()"
+    ng-disabled="inProgress">{{submitText}}</button>
+</div>
