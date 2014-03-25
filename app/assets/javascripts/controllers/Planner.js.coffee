@@ -51,7 +51,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
             # Error
             $scope.error = "Error fetching current employee!"
       else
-        $scope.redirectTo('schedule','/schedules')
+        $scope.editSchedule()
     (schedules) ->
       # Error
       $scope.error = "Error loading schedules!"
@@ -304,12 +304,12 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     switch $scope.selections.layer
       when 0
         # assignments
-        validState = ($scope.selections.schedule.state == 3)
+        validState = $scope.selections.schedule and ($scope.selections.schedule.state == 3)
       when 1
         # availabilities
         validState = ($scope.employeeSchedule and !$scope.employeeSchedule.availability_submitted)
       when 2
-        validState = ($scope.selections.schedule.state == 1)
+        validState = $scope.selections.schedule and ($scope.selections.schedule.state == 1)
 
     validState and !loading
 
