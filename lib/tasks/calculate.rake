@@ -4,16 +4,30 @@ namespace :calculate do
   desc 'Outputs the ideal shift_assignments for a given schedule.'
   task :schedule => :environment do
 
-    employees = []
-    shifts = []
+    # For runtime estimation
+    start_time = Time.now
     schedule = Schedule.first
-    $min_time_block_size = 30
+        
+    # User Configurations
+    $min_time_block_size = 30 # In minutes
+    $min_shift_assignment_size = 120 # In minutes
+    # If employee max_hours is already constrained by this cap, 
+    # then this constraint is implicit and can be ignored
+    $global_max_hours = 20 # In hours 
+    
     # Schedule generation uses the first monday-friday block of days as its template
-    # If a schedule for example starts on a thursday, calculations will be based on the monday-friday of the following week
-    # Note: if the first week has holidays/irregular shifts/availability, calculations will be very off
+    # If a schedule for example starts on a thursday, 
+    # calculations will be based on the monday-friday of the following week
+    # Note: if the first week has holidays/irregular shifts/availability, solutions will be poor
     $first_week_start = identify_week_start(schedule)
     $first_week_end = $first_week_start + 4.days
-        
+    
+
+    # Database dump
+    employees = [] # has skills/locations/availabilities nested
+    shifts = []
+    availabilities = [] # For quickly associating shift_assignmetns back to employees
+    
     schedule.employees.each do |e|
       employees[e.id] = {id: e.id, name: e.name, max_hours: e.max_hours, skills: [], locations: [], availabilities: []}
       e.skills.each do |s|
@@ -23,23 +37,33 @@ namespace :calculate do
         employees[e.id][:locations][l.id] = {id: l.id}
       end
       e.employee_availabilities.each do |a|
+        availabilities[a.id] = {id: a.id, start_datetime: a.start_datetime, end_datetime: a.end_datetime, employee_id: e.id}
         employees[e.id][:availabilities][a.id] = {id: a.id, start_datetime: a.start_datetime, end_datetime: a.end_datetime}     
       end 
     end
     schedule.shifts.each do |shift|
       shifts[shift.id] = {id: shift.id, start_datetime: shift.start_datetime, end_datetime: shift.end_datetime, skill: shift.skill_id, location: shift.location_id}
     end
+    
+    # Prepare data for solving 
     $availabilities = generate_availability_fragments(employees)
     $shifts = generate_shift_fragments(shifts)
 
-    #(2400 + ) represents Tuesday (24 hours after Monday)
-#    $availabilities = [{start: 9, end: 9.5, skill: 1}, {start: 9.5, end: 10, skill: 1}, {start: 9.5, end: 10, skill: 0}, {start: 10, end: 10.5, skill: 1}, {start: 10.5, end: 11, skill: 1}, {start: 10.5, end: 11, skill: 1}, {start: 24 + 10, end: 24 + 10.5, skill: 1}, {start: 24 + 10.5, end: 24 + 11, skill: 1}, {start: 24 + 10.5, end: 24 + 11, skill: 1}]
-#    $shifts = [{start: 9.5, end: 10, skill: 1}, {start: 10, end: 10.5, skill: 0}, {start: 24 + 9, end: 24 + 9.5, skill: 0}, {start: 24 + 10.5, end: 24 + 11, skill: 0}]
-
+    # Generate solutions
     solution_size = $shifts.length
     assignment_space = (0..$availabilities.length - 1).to_a
+    $solutions = []
 
     ArrayNode.solve!(nil, Array.new(solution_size), assignment_space)
+
+    # Score solutions
+    $solutions.each do |solution|
+      solution[:score] = fitness_score(solution)
+    end
+
+#    puts $solutions
+    end_time = Time.now
+    puts "Total Run Time: " + (end_time - start_time).to_s
   end
 end
 
@@ -57,6 +81,35 @@ def fails_constraint(datum)
   end
   
   return false
+end
+
+def fitness_score(solution)
+  under_weekly_hour_caps?(solution)
+  # CRITICAL weights: (binary checks that result in extremely low scores when failed)
+  # Did an employee work more than weekly_hour_cap
+  # Did an employee work more than their max_hours
+  # Did an employee work more than daily_hour_cap
+  # Did an employee work a shift_assignment shorter than min_shift_assignment_size?
+  # Was a required shift not filled completely
+  # Is there a shift_assignment for an employee without the necessary skill/locations?
+  
+  # weights:
+  # What percentage of total shift time was covered?
+  # What percentage of required shift time was covered?
+  # How fair is the hour distribution amongst employees?
+#  score
+  score = 5
+end
+
+
+def under_daily_hour_cap?(solution)
+end
+
+# Considers employee's individual max_hours cap and globally set 
+def under_weekly_hour_caps?(solution)
+    solution[:solution].each do |s|
+      # TODO 
+    end
 end
 
 # Returns an array of all availabilities, cut into 'min_time_block_size' minute time blocks
@@ -109,7 +162,7 @@ class ArrayNode
     # Analyze datum for correctness
     return false if fails_constraint(datum)
 
-    puts "Solution           : " + datum.to_s
+    $solutions.push({solution: datum, score: nil})
     
     # Branch
     datum.each_with_index do |d, i|
