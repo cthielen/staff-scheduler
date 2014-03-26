@@ -7,7 +7,7 @@ class EmployeeAvailability < ActiveRecord::Base
   belongs_to :schedule
 
   validates :start_datetime, :end_datetime, :schedule_id, presence: true
-  validate :availability_should_fall_within_a_defined_shift
+  # validate :availability_should_fall_within_a_defined_shift
 
   scope :by_schedule, lambda { |schedule| where(schedule_id: schedule) unless schedule.blank? }
   scope :by_skill, lambda { |skill| joins(:employee => :skills).where('skill_assignments.skill_id = ?', skill).uniq unless skill.blank? }

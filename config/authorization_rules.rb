@@ -14,8 +14,9 @@ authorization do
     has_permission_on :shifts, :to => :read
     has_permission_on :employee_availabilities, :to => :index
     has_permission_on :employee_availabilities, :to => :manage do
-      if_attribute :employee => is { user }
+      if_attribute :employee => is { user.employee }
     end
+    has_permission_on :employees, :to => :index
     has_permission_on :employees, :to => :update do
       if_attribute :user => is { user }
     end

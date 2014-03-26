@@ -7,7 +7,7 @@ class EmployeesController < ApplicationController
   # GET /employees.json
   def index
     if params[:shift].blank? or params[:start].blank? or params[:end].blank?
-      @employees = Employee.active_employees.with_permissions_to(:read)
+      @employees = Employee.active_employees.with_permissions_to(:index)
     else
       @employees = Array.new
       Employee.active_employees.with_permissions_to(:read).each do |employee|

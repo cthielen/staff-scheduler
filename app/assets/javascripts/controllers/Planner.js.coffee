@@ -23,7 +23,6 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
 
   # Fetch Schedules
   $scope.init = ->
-    console.debug "init"
     $scope.schedules = Schedules.query {},
       (schedules) ->
         # Success
@@ -33,6 +32,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
             (current) ->
               # Success
               $scope.currentEmployee = current
+              $scope.selections.layer = 1 unless current.isManager
               # Render the calendar after setting the current employee to resize the days properly
               $timeout(->
                 $scope.plannerCalendar.fullCalendar 'render'
@@ -87,7 +87,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         # Fetch EmployeeSchedule
         EmployeeSchedules.query {
           employee: $scope.currentEmployee.id,
-          schedule: $scope.selections.schedule.id
+          schedule: $scope.selections.schedule.id if $scope.selections.schedule
         },
           (data) ->
             # Success
