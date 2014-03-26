@@ -11,6 +11,10 @@ class ShiftAssignment < ActiveRecord::Base
   validates :start_datetime, :end_datetime, :employee_id, :status_id, :shift_id, presence: true
   validates :is_confirmed, :inclusion => {:in => [true, false]}
   
+  scope :by_schedule, lambda { |schedule| joins(:shift).where(shifts: {schedule_id: schedule}) unless schedule.blank? }
+  scope :by_skill, lambda { |skill| joins(:shift).where(shifts: {skill_id: skill}) unless skill.blank? }
+  scope :by_location, lambda { |location| joins(:shift).where(shifts: {location_id: location}) unless location.blank? }
+
   def notify_absence
     if self.shift_assignment_status.present?    
       if self.shift_assignment_status.name == "absence"

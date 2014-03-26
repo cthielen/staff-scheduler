@@ -4,7 +4,7 @@ class ShiftAssignmentsController < ApplicationController
   # GET /shift_assignments
   # GET /shift_assignments.json
   def index
-    @shift_assignments = ShiftAssignment.all
+    @shift_assignments = ShiftAssignment.with_permissions_to(:read).by_schedule(params[:schedule]).by_skill(params[:skill]).by_location(params[:location])
   end
 
   # GET /shift_assignments/1
