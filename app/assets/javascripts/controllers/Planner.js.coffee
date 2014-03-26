@@ -5,7 +5,8 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
   $scope.loading = 0
   $scope.selections = {
     lsCombination: 0,
-    layer: 0
+    layer: 0,
+    tab: 0
   }
   $scope.frontEvents = []
   $scope.backEvents = []
@@ -99,6 +100,20 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         $scope.fetchEvents(Shifts,false)
         $scope.fetchEvents(Shifts,true,true)
 
+  $scope.constructParams = ->
+    switch $scope.selections.tab
+      when 0
+        {
+          schedule: $scope.selections.schedule.id,
+          skill: $scope.locationSkillCombinations[$scope.selections.lsCombination].skill.id,
+          location: $scope.locationSkillCombinations[$scope.selections.lsCombination].location.id
+        }
+      when 1
+        {
+          schedule: $scope.selections.schedule.id,
+          employee: $scope.selections.employee.id
+        }
+
   # Fetching events
   # fetchEvents(
   #     source: the angular service to perform the .query call on
@@ -113,11 +128,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     else
       unless $scope.locationSkillCombinations.length is 0 or $scope.selections.schedule is undefined
         $scope.loading++
-        source.query {
-          schedule: $scope.selections.schedule.id,
-          skill: $scope.locationSkillCombinations[$scope.selections.lsCombination].skill.id,
-          location: $scope.locationSkillCombinations[$scope.selections.lsCombination].location.id
-        }, (result) ->
+        source.query $scope.constructParams(), (result) ->
           # Success
           $scope.loading--
           events.length = 0 # Preferred way of emptying a JS array
@@ -344,6 +355,9 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     modalInstance.result.then () ->
       $scope.modalOpen = false
       $location.path path
+
+  $scope.changeTab = (tab) ->
+    $scope.selections.tab = tab
 
   $scope.clearError = ->
     $scope.error = null

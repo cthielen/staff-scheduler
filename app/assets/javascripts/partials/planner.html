@@ -1,5 +1,5 @@
 <div class="row" style="margin-top: 15px;">
-  <div ng-class="{'col-sm-9 col-md-10 col-sm-offset-3 col-md-offset-2': currentEmployee.isManager,
+  <div ng-class="{'col-sm-8 col-md-9 col-sm-offset-4 col-md-offset-3': currentEmployee.isManager,
     'col-sm-12 col-md-12': !currentEmployee.isManager}">
   <ul class="selection-dropdowns nav nav-pills nav-stacked" style="margin-bottom: 15px;">
     <li class="dropdown">
@@ -25,18 +25,31 @@
 </div>
 
 <div class="row">
-  
-  <div class="col-sm-3 col-md-2" ng-show="currentEmployee.isManager">
-    <ul class="nav nav-pills nav-stacked">
-      <li ng-repeat="locationSkill in locationSkillCombinations" ng-class="{active: selections.lsCombination == $index}">
-        <a ng-model="selections.lsCombination" ng-click="selections.lsCombination = $index" style="padding: 3px;">
-          {{locationSkill.location.name + ' ' + locationSkill.skill.title}}
-        </a>
-      </li>
-    </ul>
+
+  <div class="col-sm-4 col-md-3" ng-show="currentEmployee.isManager">
+    <tabset>
+      <tab heading="Location/Skill" active="selections.tab == 0" ng-click="changeTab(0)" disabled="loading > 0">
+        <ul class="nav nav-pills nav-stacked" style="margin-top: 15px;">
+          <li ng-repeat="locationSkill in locationSkillCombinations" ng-class="{active: selections.lsCombination == $index}">
+            <a ng-model="selections.lsCombination" ng-click="selections.lsCombination = $index" style="padding: 3px;">
+              {{locationSkill.location.name + ' ' + locationSkill.skill.title}}
+            </a>
+          </li>
+        </ul>
+      </tab>
+      <tab heading="Employees" ng-show="selections.layer == 1" active="selections.tab == 1" ng-click="changeTab(1)" disabled="loading > 0">
+        <ul class="nav nav-pills nav-stacked" style="margin-top: 15px;">
+          <li ng-repeat="employee in employees" ng-class="{active: selections.employee == employee}">
+            <a ng-model="selections.employee" ng-click="selections.employee = employee" style="padding: 3px;">
+              {{employee.name}}
+            </a>
+          </li>
+        </ul>
+      </tab>
+    </tabset>
   </div>
 
-  <div ng-class="{'col-sm-9 col-md-10': currentEmployee.isManager, 'col-sm-12 col-md-12': !currentEmployee.isManager}">
+  <div ng-class="{'col-sm-8 col-md-9': currentEmployee.isManager, 'col-sm-12 col-md-12': !currentEmployee.isManager}">
 
     <div class="alert alert-danger" ng-show="error">
       <button type="button" class="close" ng-click="clearError()">&times;</button>
