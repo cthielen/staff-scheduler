@@ -4,7 +4,11 @@ class EmployeeAvailabilitiesController < ApplicationController
   # GET /employee_availabilities
   # GET /employee_availabilities.json
   def index
-    @employee_availabilities = EmployeeAvailability.with_permissions_to(:read)#.by_schedule(params[:schedule]).by_skill(params[:skill]).by_location(params[:location])
+    if params[:schedule].present? and params[:skill].present? and params[:location].present?
+      @employee_availabilities = EmployeeAvailability.with_permissions_to(:read).by_schedule(params[:schedule]).by_skill(params[:skill]).by_location(params[:location])
+    elsif params[:schedule].present? and params[:employee].present?
+      @employee_availabilities = EmployeeAvailability.with_permissions_to(:read).by_schedule(params[:schedule]).by_employee(params[:employee])
+    end
   end
 
   # GET /employee_availabilities/1
