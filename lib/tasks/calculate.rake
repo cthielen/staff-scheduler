@@ -7,6 +7,7 @@ namespace :calculate do
     employees = []
     shifts = []
     schedule = Schedule.first
+    $min_time_block_size = 30
     # Schedule generation uses the first monday-friday block of days as its template
     # If a schedule for example starts on a thursday, calculations will be based on the monday-friday of the following week
     # Note: if the first week has holidays/irregular shifts/availability, calculations will be very off
@@ -14,7 +15,7 @@ namespace :calculate do
     $first_week_end = $first_week_start + 4.days
         
     schedule.employees.each do |e|
-      employees[e.id] = {id: e.id, name: e.name, max_hours: e.max_hours, skills: [], locations: []}
+      employees[e.id] = {id: e.id, name: e.name, max_hours: e.max_hours, skills: [], locations: [], availabilities: []}
       e.skills.each do |s|
         employees[e.id][:skills][s.id] = {id: s.id}
       end
@@ -25,18 +26,15 @@ namespace :calculate do
         employees[e.id][:availabilities][a.id] = {id: a.id, start_datetime: a.start_datetime, end_datetime: a.end_datetime}     
       end 
     end
-
     schedule.shifts.each do |shift|
-      shifts[shift.id] = {id: shift.id, start_datetime: shift.start_datetime, end_datetime: shift.end_datetime, skill: shift.skill_id, location: shift.location_id}    
+      shifts[shift.id] = {id: shift.id, start_datetime: shift.start_datetime, end_datetime: shift.end_datetime, skill: shift.skill_id, location: shift.location_id}
     end
-#    avail_fragments = generate_availability_fragments(employees)
-    shift_fragments = generate_shift_fragments(shifts)
+    $availabilities = generate_availability_fragments(employees)
+    $shifts = generate_shift_fragments(shifts)
 
-    # (2400 + ) represents Tuesday (24 hours after Monday)
-    $availabilities = [{start: 9, end: 9.5, skill: 1}, {start: 9.5, end: 10, skill: 1}, {start: 9.5, end: 10, skill: 0}, {start: 10, end: 10.5, skill: 1}, {start: 10.5, end: 11, skill: 1}, {start: 10.5, end: 11, skill: 1}, {start: 24 + 10, end: 24 + 10.5, skill: 1}, {start: 24 + 10.5, end: 24 + 11, skill: 1}, {start: 24 + 10.5, end: 24 + 11, skill: 1}]
-
-    $shifts = [{start: 9.5, end: 10, skill: 1}, {start: 10, end: 10.5, skill: 0}, {start: 24 + 9, end: 24 + 9.5, skill: 0}, {start: 24 + 10.5, end: 24 + 11, skill: 0}]
-
+    #(2400 + ) represents Tuesday (24 hours after Monday)
+#    $availabilities = [{start: 9, end: 9.5, skill: 1}, {start: 9.5, end: 10, skill: 1}, {start: 9.5, end: 10, skill: 0}, {start: 10, end: 10.5, skill: 1}, {start: 10.5, end: 11, skill: 1}, {start: 10.5, end: 11, skill: 1}, {start: 24 + 10, end: 24 + 10.5, skill: 1}, {start: 24 + 10.5, end: 24 + 11, skill: 1}, {start: 24 + 10.5, end: 24 + 11, skill: 1}]
+#    $shifts = [{start: 9.5, end: 10, skill: 1}, {start: 10, end: 10.5, skill: 0}, {start: 24 + 9, end: 24 + 9.5, skill: 0}, {start: 24 + 10.5, end: 24 + 11, skill: 0}]
 
     solution_size = $shifts.length
     assignment_space = (0..$availabilities.length - 1).to_a
@@ -53,26 +51,34 @@ def fails_constraint(datum)
     if d
       # Ensure timing of availability 'd' fits in the shift
       return true if $availabilities[d][:start] != $shifts[i][:start]
-      return true if $availabilities[d][:skill] < $shifts[i][:skill]
+      # availabilities don't have skills, seems costly to calculate
+      # return true if $availabilities[d][:skill] < $shifts[i][:skill] 
     end
   end
   
   return false
 end
 
-# Returns an array of all availabilities, cut into 30 minute time blocks
+# Returns an array of all availabilities, cut into 'min_time_block_size' minute time blocks
 def generate_availability_fragments(employees) 
   fragments = []
   employees.each do |employee|
     if employee
       employee[:availabilities].each do |availability|
-        # TODO: slice up availablity into 30min blocks
+        if availability
+          slice = availability[:start_datetime]
+          while slice < availability[:end_datetime]
+            fragments.push({availability_id: availability[:id], start: slice, end: slice + $min_time_block_size.minutes})
+            slice = slice + $min_time_block_size.minutes
+          end
+        end
       end
     end
   end
+  fragments
 end
 
-# Returns an array of all shifts in the schedule, cut into 30 minute time blocks
+# Returns an array of all shifts in the schedule, cut into time blocks
 def generate_shift_fragments(shifts)
   fragments = []
   shifts.each do |shift|
@@ -81,8 +87,8 @@ def generate_shift_fragments(shifts)
       if (shift[:start_datetime] > $first_week_start) && (shift[:start_datetime] < $first_week_end)
         slice = shift[:start_datetime]
         while slice < shift[:end_datetime]
-          fragments.push({id: shift[:id], start: slice, end: slice + 30.minutes})
-          slice = slice + 30.minutes
+          fragments.push({shift_id: shift[:id], start: slice, end: slice + $min_time_block_size.minutes})
+          slice = slice + $min_time_block_size.minutes
         end      
       end
     end
