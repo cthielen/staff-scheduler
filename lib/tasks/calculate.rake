@@ -24,21 +24,21 @@ namespace :calculate do
     
 
     # Database dump
-    employees = [] # has skills/locations/availabilities nested
+    $employees = [] # has skills/locations/availabilities nested
     shifts = []
-    availabilities = [] # For quickly associating shift_assignmetns back to employees
+    $availabilities = Hash.new # For quickly associating shift_assignments back to $employees
     
     schedule.employees.each do |e|
-      employees[e.id] = {id: e.id, name: e.name, max_hours: e.max_hours, skills: [], locations: [], availabilities: []}
+      $employees[e.id] = {id: e.id, name: e.name, max_hours: e.max_hours, skills: [], locations: [], availabilities: []}
       e.skills.each do |s|
-        employees[e.id][:skills][s.id] = {id: s.id}
+        $employees[e.id][:skills][s.id] = {id: s.id}
       end
       e.locations.each do |l|
-        employees[e.id][:locations][l.id] = {id: l.id}
+        $employees[e.id][:locations][l.id] = {id: l.id}
       end
       e.employee_availabilities.each do |a|
-        availabilities[a.id] = {id: a.id, start_datetime: a.start_datetime, end_datetime: a.end_datetime, employee_id: e.id}
-        employees[e.id][:availabilities][a.id] = {id: a.id, start_datetime: a.start_datetime, end_datetime: a.end_datetime}     
+        $availabilities[a.id] = {id: a.id, start_datetime: a.start_datetime, end_datetime: a.end_datetime, employee_id: e.id}
+        $employees[e.id][:availabilities][a.id] = {id: a.id, start_datetime: a.start_datetime, end_datetime: a.end_datetime} 
       end 
     end
     schedule.shifts.each do |shift|
@@ -46,12 +46,12 @@ namespace :calculate do
     end
     
     # Prepare data for solving 
-    $availabilities = generate_availability_fragments(employees)
-    $shifts = generate_shift_fragments(shifts)
+    $availability_fragments = generate_availability_fragments
+    $shift_fragments = generate_shift_fragments(shifts)
 
     # Generate solutions
-    solution_size = $shifts.length
-    assignment_space = (0..$availabilities.length - 1).to_a
+    solution_size = $shift_fragments.length
+    assignment_space = (0..$availability_fragments.length - 1).to_a
     $solutions = []
 
     ArrayNode.solve!(nil, Array.new(solution_size), assignment_space)
@@ -61,7 +61,7 @@ namespace :calculate do
       solution[:score] = fitness_score(solution)
     end
 
-#    puts $solutions
+  #  puts $solutions
     end_time = Time.now
     puts "Total Run Time: " + (end_time - start_time).to_s
   end
@@ -74,9 +74,9 @@ def fails_constraint(datum)
     # If one has been set (not nil ...)
     if d
       # Ensure timing of availability 'd' fits in the shift
-      return true if $availabilities[d][:start] != $shifts[i][:start]
+      return true if $availability_fragments[d][:start] != $shift_fragments[i][:start]
       # availabilities don't have skills, seems costly to calculate
-      # return true if $availabilities[d][:skill] < $shifts[i][:skill] 
+      # return true if $availability_fragments[d][:skill] < $shift_fragments[i][:skill] 
     end
   end
   
@@ -98,7 +98,6 @@ def fitness_score(solution)
   # What percentage of required shift time was covered?
   # How fair is the hour distribution amongst employees?
 #  score
-  score = 5
 end
 
 
@@ -107,15 +106,37 @@ end
 
 # Considers employee's individual max_hours cap and globally set 
 def under_weekly_hour_caps?(solution)
-    solution[:solution].each do |s|
-      # TODO 
+  employee_totals = Hash.new
+  time_total = 0
+  # Generate totals
+  solution[:solution].each do |s|      
+    if s
+      id = $availability_fragments[s][:availability_id]  
+      time = ($availability_fragments[s][:end] - $availability_fragments[s][:start]).to_i / 60    
+      employee_id = $availabilities[id][:employee_id]
+
+      unless employee_totals[employee_id].present?
+        employee_totals[employee_id] = 0
+      end
+      
+      employee_totals[employee_id] = employee_totals[employee_id] + time 
     end
+  end
+  
+  # Check totals
+  employee_totals.each do |e|
+    if e > $employees[e[0]][:max_hours] || e > $global_max_hours
+      return false
+    end
+  end
+  
+  return true
 end
 
 # Returns an array of all availabilities, cut into 'min_time_block_size' minute time blocks
-def generate_availability_fragments(employees) 
+def generate_availability_fragments 
   fragments = []
-  employees.each do |employee|
+  $employees.each do |employee|
     if employee
       employee[:availabilities].each do |availability|
         if availability
@@ -178,3 +199,13 @@ class ArrayNode
     end
   end
 end
+
+
+# lexicon
+# -------------
+# availabilities: availabilities from employees associated to schedule
+# availability_fragments: derived from availabilities for use in solution generation
+# shifts: shifts associated to schedule from database
+# shift_fragments: derived from shifts for use in solution generation
+# employees: employees associated to schedule from database
+# solution: a possible schedule arrangement - an array of availability_fragments and a score 
