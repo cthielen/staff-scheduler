@@ -25,7 +25,7 @@ namespace :calculate do
 
     # Database dump
     $employees = [] # has skills/locations/availabilities nested
-    shifts = []
+    $shifts = Hash.new
     $availabilities = Hash.new # For quickly associating shift_assignments back to $employees
     
     schedule.employees.each do |e|
@@ -42,12 +42,12 @@ namespace :calculate do
       end 
     end
     schedule.shifts.each do |shift|
-      shifts[shift.id] = {id: shift.id, start_datetime: shift.start_datetime, end_datetime: shift.end_datetime, skill: shift.skill_id, location: shift.location_id}
+      $shifts[shift.id] = {id: shift.id, start_datetime: shift.start_datetime, end_datetime: shift.end_datetime, skill: shift.skill_id, location: shift.location_id, is_mandatory: shift.is_mandatory}
     end
     
     # Prepare data for solving 
     $availability_fragments = generate_availability_fragments
-    $shift_fragments = generate_shift_fragments(shifts)
+    $shift_fragments = generate_shift_fragments
 
     # Generate solutions
     solution_size = $shift_fragments.length
@@ -84,7 +84,8 @@ def fails_constraint(datum)
 end
 
 def fitness_score(solution)
-  under_weekly_hour_caps?(solution)
+#  under_weekly_hour_caps?(solution)
+  required_shifts_filled?(solution)
   # CRITICAL weights: (binary checks that result in extremely low scores when failed)
   # Did an employee work more than weekly_hour_cap
   # Did an employee work more than their max_hours
@@ -110,6 +111,7 @@ def under_weekly_hour_caps?(solution)
   time_total = 0
   # Generate totals
   solution[:solution].each do |s|      
+    employee_id = nil
     if s
       id = $availability_fragments[s][:availability_id]  
       time = ($availability_fragments[s][:end] - $availability_fragments[s][:start]).to_i / 60    
@@ -121,17 +123,37 @@ def under_weekly_hour_caps?(solution)
       
       employee_totals[employee_id] = employee_totals[employee_id] + time 
     end
+    # Check total against caps
+    employee_totals.each do |k, v|
+
+      $employees[employee_id][:max_hours]
+      employee_max = ($employees[employee_id][:max_hours]) 
+      if v > employee_max || v > $global_max_hours
+        return false
+      end
+    end    
   end
-  
-  # Check totals
-  employee_totals.each do |e|
-    if e > $employees[e[0]][:max_hours] || e > $global_max_hours
-      return false
-    end
-  end
-  
   return true
 end
+
+def required_shifts_filled?(solution)
+  # loop through shifts, is it mandatory?
+  $shifts.each do |skey, shift|
+    if shift[:is_mandatory]
+      # Loop through shift_fragments, is it tied to above shift?
+      $shift_fragments.each_with_index do |fragment, fkey|
+        # Is that shift_fragment covered?
+        if fragment[:shift_id] == shift[:id]
+          unless solution[fkey]
+            return false
+          end
+        end        
+      end
+    end
+  end
+  return true
+end
+
 
 # Returns an array of all availabilities, cut into 'min_time_block_size' minute time blocks
 def generate_availability_fragments 
@@ -153,18 +175,16 @@ def generate_availability_fragments
 end
 
 # Returns an array of all shifts in the schedule, cut into time blocks
-def generate_shift_fragments(shifts)
+def generate_shift_fragments
   fragments = []
-  shifts.each do |shift|
-    if shift    
-      # Only interested in shifts from the first 5 weekdays)
-      if (shift[:start_datetime] > $first_week_start) && (shift[:start_datetime] < $first_week_end)
-        slice = shift[:start_datetime]
-        while slice < shift[:end_datetime]
-          fragments.push({shift_id: shift[:id], start: slice, end: slice + $min_time_block_size.minutes})
-          slice = slice + $min_time_block_size.minutes
-        end      
-      end
+  $shifts.each do |k, shift|
+    # Only interested in shifts from the first 5 weekdays)
+    if (shift[:start_datetime] > $first_week_start) && (shift[:start_datetime] < $first_week_end)
+      slice = shift[:start_datetime]
+      while slice < shift[:end_datetime]
+        fragments.push({shift_id: shift[:id], start: slice, end: slice + $min_time_block_size.minutes})
+        slice = slice + $min_time_block_size.minutes
+      end      
     end
   end
   fragments
