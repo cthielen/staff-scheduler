@@ -14,6 +14,8 @@ namespace :calculate do
     # If employee max_hours is already constrained by this cap, 
     # then this constraint is implicit and can be ignored
     $global_max_hours = 20 # In hours 
+    $important_weight
+
     
     # Schedule generation uses the first monday-friday block of days as its template
     # If a schedule for example starts on a thursday, 
@@ -84,19 +86,22 @@ def fails_constraint(datum)
 end
 
 def fitness_score(solution)
-#  under_weekly_hour_caps?(solution)
-  required_shifts_filled?(solution)
-  # CRITICAL weights: (binary checks that result in extremely low scores when failed)
+  score = 0
+  coverage_percentage(solution)
+
+  # Critical Priority (binary checks that result in a score of zero when any are failed)
   # Did an employee work more than weekly_hour_cap
   # Did an employee work more than their max_hours
   # Did an employee work more than daily_hour_cap
   # Did an employee work a shift_assignment shorter than min_shift_assignment_size?
-  # Was a required shift not filled completely
   # Is there a shift_assignment for an employee without the necessary skill/locations?
-  
-  # weights:
+  unless required_shifts_filled?(solution)
+    return 0
+  end
+  unless under_weekly_hour_caps?(solution)
+    return 0
+  end
   # What percentage of total shift time was covered?
-  # What percentage of required shift time was covered?
   # How fair is the hour distribution amongst employees?
 #  score
 end
@@ -134,6 +139,18 @@ def under_weekly_hour_caps?(solution)
     end    
   end
   return true
+end
+
+def coverage_percentage(solution)
+  total_time = $shift_fragments.length * $min_time_block_size
+  covered_time = 0
+  solution[:solution].each do |s|
+    unless s == nil
+      covered_time = covered_time + $min_time_block_size
+    end
+  end
+  percentage = covered_time.to_f / total_time.to_f
+  percentage = (percentage* 100).to_i # conversion to percentage without decimal
 end
 
 def required_shifts_filled?(solution)
