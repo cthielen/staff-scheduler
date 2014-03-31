@@ -9,4 +9,12 @@
 
 # Make sure your secret_key_base is kept private
 # if you're sharing your code publicly.
-StaffScheduler::Application.config.secret_key_base = 'e533dbe20fc49e8493bf1aafff10bc1c613206b3077a758473b58fa48f8f2ce2c63f23243b280b30ba350225a91ba9bb3317bc5d5201ef9b91bf6d1e6d49256b'
+SECRET_TOKEN_FILE = Rails.root.join( "config", "secret_token.yml")
+
+if File.file?(SECRET_TOKEN_FILE)
+  SECRET_TOKEN_SETTINGS = YAML.load_file(SECRET_TOKEN_FILE)
+  StaffScheduler::Application.config.secret_key_base = SECRET_TOKEN_SETTINGS["SECRET_TOKEN"]
+else
+  puts "You need to set up config/secret_token.yml before running this application."
+  exit
+end
