@@ -26,10 +26,7 @@ class SchedulesController < ApplicationController
   # POST /schedules.json
   def create
     @schedule = Schedule.new(schedule_params)
-    
-    # Setting organization of new schedule to match creating user
-    @schedule.organization_id = current_user.organization_id
-    
+
     respond_to do |format|
       if @schedule.save
         format.html { redirect_to @schedule, notice: 'Schedule was successfully created.' }

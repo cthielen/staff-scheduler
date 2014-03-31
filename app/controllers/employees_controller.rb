@@ -36,7 +36,7 @@ class EmployeesController < ApplicationController
 
     # Setting organization of new employee to match creating user
     @employee.organization_id = current_user.organization_id
- 
+
     if @employee.save
       update
     else
@@ -68,21 +68,22 @@ class EmployeesController < ApplicationController
   def lookup
     req = RestClient::Resource.new "https://roles.dss.ucdavis.edu/api/entities.json?q=#{params[:q]}", 'Staff Scheduler', '376d988a44b395ace5b6d3a4ae206e9b'
     @employees = req.get if params[:q].length > 1
-    
+
     respond_with @employees
   end
 
   def rm_employee
     req = RestClient::Resource.new "https://roles.dss.ucdavis.edu/people/#{params[:q]}.json", 'Staff Scheduler', '376d988a44b395ace5b6d3a4ae206e9b'
     @employee = req.get if !params[:q].blank?
-    
+
     respond_with @employee
   end
 
   def current_employee
     @currentEmployee = {
       id: Authorization.current_user.employee ? Authorization.current_user.employee.id : nil,
-      isManager: Authorization.current_user.role_symbols.include?(:manager)
+      isManager: Authorization.current_user.role_symbols.include?(:manager),
+      organizations: Authorization.current_user.organizations
     }
 
     respond_with @currentEmployee

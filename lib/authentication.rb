@@ -14,7 +14,7 @@ module Authentication
       end
     end
   end
-  
+
   # Returns the 'actual' user - usually this matches current_user but when
   # impersonating, it will return the human doing the impersonating, not the
   # account they are pretending to be. Useful for determining if actions like
@@ -50,7 +50,7 @@ module Authentication
     #   session[:user_id] = request.remote_ip
     #   session[:auth_via] = :whitelisted_ip
     #   Authorization.current_user = @whitelisted_user
-    #   
+    #
     #   Authorization.ignore_access_control(true)
     #   @whitelisted_user.logged_in_at = DateTime.now()
     #   @whitelisted_user.save
@@ -63,7 +63,7 @@ module Authentication
     # # Check if HTTP Auth is being attempted.
     # authenticate_with_http_basic { |name, secret|
     #   @api_user = ApiKeyUser.find_by_name_and_secret(name, secret)
-    # 
+    #
     #   if @api_user
     #     logger.info "API authenticated via application key"
     #     session[:user_id] = name
@@ -75,13 +75,13 @@ module Authentication
     #     Authorization.ignore_access_control(false)
     #     return
     #   end
-    # 
+    #
     #   logger.info "API authentication failed. Application key is wrong."
     #   # Note that they will only get 'access denied' if they supplied a name and
     #   # failed. If they supplied nothing for HTTP Auth, this block will get passed
     #   # over.
     #   render :text => "Invalid API key.", :status => 401
-    # 
+    #
     #   return
     # }
 
@@ -104,7 +104,7 @@ module Authentication
         session[:auth_via] = :cas
         Authorization.current_user = @user
         Authorization.ignore_access_control(true)
-        
+
         # Update 'logged_in_at' field
         @user.logged_in_at = DateTime.now()
         @user.save
@@ -120,6 +120,15 @@ module Authentication
         employee = Employee.where(is_disabled: false).find_by_email(RolesManagement.find_email_by_loginid(session[:cas_user]))
         roles = RolesManagement.fetch_role_symbols_by_loginid(session[:cas_user])
 
+        # Create user organizations if they don't exist
+        organizations = RolesManagement.fetch_organizations_by_loginid(session[:cas_user])
+        user_organizations = Array.new
+        organizations.each do |o|
+          Authorization.ignore_access_control(true)
+          user_organizations << Organization.find_or_create_by_rm_id(rm_id: o["id"], title: o["name"])
+          Authorization.ignore_access_control(false)
+        end
+
         if employee || roles.include?(:manager)
           # If user is an employee, add them to the database
           logger.info "Valid CAS user is an employee. Creating user in database."
@@ -128,6 +137,7 @@ module Authentication
           user.is_manager = roles.include?(:manager)
           user.loginid = session[:cas_user]
           user.employee_id = employee.id if employee
+          user.organizations = user_organizations
           user.logged_in_at = DateTime.now()
           user.save
           Authorization.ignore_access_control(false)

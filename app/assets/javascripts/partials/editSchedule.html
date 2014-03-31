@@ -26,6 +26,14 @@
         <input type="text" class="form-control" datepicker-popup="yyyy/MM/dd" ng-model="schedule.end_date" ng-required="true" placeholder="Start Date" />
       </div>
     </div>
+<!--     ng-show="currentEmployee.organizations.length > 1" -->
+    <div class="form-group" >
+      <label for="Organization" class="col-sm-3 control-label">Organization</label>
+      <div class="col-sm-9">
+        <select class="form-control" ng-model="schedule.organization_id"
+          ng-options="org.id as org.title for org in currentEmployee.organizations" />
+      </div>
+    </div>
   </form>
 </div>
 <div class="modal-footer">

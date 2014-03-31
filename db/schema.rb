@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140313222955) do
+ActiveRecord::Schema.define(version: 20140331212103) do
 
   create_table "employee_availabilities", force: true do |t|
     t.datetime "start_datetime"
@@ -41,7 +41,13 @@ ActiveRecord::Schema.define(version: 20140313222955) do
     t.string   "profile_content_type"
     t.integer  "profile_file_size"
     t.datetime "profile_updated_at"
+  end
+
+  create_table "employees_organizations", force: true do |t|
+    t.integer  "employee_id"
     t.integer  "organization_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "location_assignments", force: true do |t|
@@ -62,6 +68,14 @@ ActiveRecord::Schema.define(version: 20140313222955) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "title"
+    t.integer  "rm_id"
+  end
+
+  create_table "organizations_users", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "organization_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "schedules", force: true do |t|
@@ -119,12 +133,11 @@ ActiveRecord::Schema.define(version: 20140313222955) do
   create_table "users", force: true do |t|
     t.string   "loginid"
     t.integer  "employee_id"
-    t.boolean  "is_manager",      default: false
+    t.boolean  "is_manager",   default: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "disabled",        default: false
+    t.boolean  "disabled",     default: false
     t.datetime "logged_in_at"
-    t.integer  "organization_id"
   end
 
   create_table "wages", force: true do |t|

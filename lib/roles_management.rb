@@ -4,7 +4,7 @@ class RolesManagement
     require 'json'
     require 'yaml'
     # require 'openssl'
-  
+
     uri = URI(DSS_RM_SETTINGS['HOST'] + "/people/#{loginid}.json")
     req = Net::HTTP::Get.new(uri)
     req['Accept'] = "application/vnd.roles-management.v1"
@@ -33,7 +33,7 @@ class RolesManagement
     require 'json'
     require 'yaml'
     # require 'openssl'
-  
+
     uri = URI(DSS_RM_SETTINGS['HOST'] + "/people/#{loginid}.json")
     req = Net::HTTP::Get.new(uri)
     req['Accept'] = "application/vnd.roles-management.v1"
@@ -83,4 +83,31 @@ class RolesManagement
       return false
     end
   end
+
+  def self.fetch_organizations_by_loginid(loginid)
+    require 'net/http'
+    require 'json'
+    require 'yaml'
+
+    uri = URI(DSS_RM_SETTINGS['HOST'] + "/people/#{loginid}.json")
+    req = Net::HTTP::Get.new(uri)
+    req['Accept'] = "application/vnd.roles-management.v1"
+    req.basic_auth(DSS_RM_SETTINGS['USER'], DSS_RM_SETTINGS['PASSWORD'])
+
+    begin
+      # Fetch URL
+      resp = Net::HTTP.start( uri.hostname, uri.port, use_ssl: true ) { |http|
+        http.request(req)
+      }
+      # Parse results
+      buffer = resp.body
+      result = JSON.parse(buffer)
+
+      return result["organizations"]
+    rescue StandardError => e
+      $stderr.puts "Could not fetch RM URL #{e}"
+      return false
+    end
+  end
+
 end

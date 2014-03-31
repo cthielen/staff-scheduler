@@ -1,6 +1,14 @@
-StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $modalInstance, schedule, Schedules) ->
+StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $modalInstance, CurrentEmployee, schedule, Schedules) ->
   $scope.inProgress = false
   $scope.deleteText = 'Delete Schedule'
+
+  CurrentEmployee.query {},
+    (current) ->
+      # Success
+      $scope.currentEmployee = current
+    (current) ->
+      # Error
+      $scope.error = "Error fetching current employee!"
 
   if schedule
     $scope.schedule = schedule
@@ -10,7 +18,7 @@ StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $moda
     $scope.schedule = {}
     $scope.submitText = 'Create Schedule'
     $scope.actionText = 'New Schedule'
-  
+
   $scope.clearError = ->
     $scope.error = null
 
@@ -49,7 +57,7 @@ StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $moda
     $scope.error = null
     $scope.deleteText = 'Deleting...'
     $scope.inProgress = true
-    
+
     Schedules.delete {id: schedule.id},
       (data) ->
         # Success
