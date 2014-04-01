@@ -34,9 +34,6 @@ class EmployeesController < ApplicationController
   def create
     @employee = Employee.new(employee_params.except(:location_assignments_attributes).except(:skill_assignments_attributes))
 
-    # Setting organization of new employee to match creating user
-    @employee.organization_id = current_user.organization_id
-
     if @employee.save
       update
     else

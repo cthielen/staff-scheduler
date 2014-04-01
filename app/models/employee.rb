@@ -17,8 +17,6 @@ class Employee < ActiveRecord::Base
   has_one :user
   has_many :schedules, through: :employee_schedules
 
-  has_and_belongs_to_many :organizations
-
   has_attached_file :profile, :styles => {:medium => "300x300>", :thumb => "100x100>"},
   :url => "/system/:class/:attachment/:id/:style/:basename.:extension",
   :path => ":rails_root/public/system/:class/:attachment/:id/:style/:basename.:extension"
@@ -32,7 +30,8 @@ class Employee < ActiveRecord::Base
   accepts_nested_attributes_for :shift_assignments
 
   def self.active_managers
-    Employee.joins(:user).where(:users => {:is_manager => true, :disabled => false})
+    Employee..joins('LEFT OUTER JOIN users ON employees.id = users.employee_id')
+      .where(:users => {:is_manager => true, :disabled => false})
   end
 
   def self.active_employees

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140331212103) do
+ActiveRecord::Schema.define(version: 20140331234107) do
 
   create_table "employee_availabilities", force: true do |t|
     t.datetime "start_datetime"
@@ -41,13 +41,6 @@ ActiveRecord::Schema.define(version: 20140331212103) do
     t.string   "profile_content_type"
     t.integer  "profile_file_size"
     t.datetime "profile_updated_at"
-  end
-
-  create_table "employees_organizations", force: true do |t|
-    t.integer  "employee_id"
-    t.integer  "organization_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "location_assignments", force: true do |t|
