@@ -88,7 +88,7 @@ end
 def fitness_score(solution)
   score = 0
   coverage_percentage(solution)
-
+  fairness_percentage(solution)
   # Critical Priority (binary checks that result in a score of zero when any are failed)
   # Did an employee work more than weekly_hour_cap
   # Did an employee work more than their max_hours
@@ -141,16 +141,92 @@ def under_weekly_hour_caps?(solution)
   return true
 end
 
+# Returns the percentage of coverage, 100 is best possible, 0 is worst possible
 def coverage_percentage(solution)
-  total_time = $shift_fragments.length * $min_time_block_size
+  total_time = $shift_fragments.length * $min_time_block_size # In minutes
   covered_time = 0
   solution[:solution].each do |s|
-    unless s == nil
+    if s
       covered_time = covered_time + $min_time_block_size
     end
   end
   percentage = covered_time.to_f / total_time.to_f
   percentage = (percentage* 100).to_i # conversion to percentage without decimal
+end
+
+# Fairness is defined as the degree to which employee assigned hours match the avg assigned hours of all employees, tempered by their availability hours vs avg availability hours of all employees
+# Returns the percentage of fairness, 100 is best possible, 0 is worst possible
+def fairness_percentage(solution)
+  total_assigned_time = 0
+  total_availability_hours = 0
+  avg_availability_hours = 0
+  avg_assigned_hours = 0
+  employee_availability = Hash.new
+  assigned_hours = Hash.new
+  unfair_hours = 0
+  
+  # Collect assigned time
+  solution[:solution].each do |s|
+    unless s == nil
+      total_assigned_time += $min_time_block_size
+      time = ($availability_fragments[s][:end] - $availability_fragments[s][:start]).to_i / 60    
+      id = $availability_fragments[s][:availability_id]  
+      employee_id = $availabilities[id][:employee_id]
+
+      unless assigned_hours[employee_id].present?
+        assigned_hours[employee_id] = 0
+      end
+      assigned_hours[employee_id] = assigned_hours[employee_id] + time 
+    end
+  end
+  
+  avg_assigned_hours = (total_assigned_time) / $employees.count
+  
+  # Collect availability time
+  $employees.each do |e|
+    if e
+      employee_id = e[:id]
+      employee_availability[employee_id] = 0
+      e[:availabilities].each do |a|
+        if a
+          time = (a[:end_datetime] - a[:start_datetime]).to_i / 60 # Convert to minutes
+          employee_availability[employee_id] += time
+          total_availability_hours += time
+        end
+      end
+    end
+  end
+  
+  avg_availability_hours = (total_availability_hours) / $employees.count
+
+  # Score each employee
+
+  $employees.each do |e|
+    if e
+      employee_id = e[:id]
+      available_hours = employee_availability[employee_id]
+      assigned_hours = assigned_hours[employee_id]   
+      unless available_hours.nil? || available_hours == 0
+        ideal_hours = (avg_assigned_hours) * ((avg_availability_hours.to_f / available_hours.to_f).abs * 100)
+        puts "----"
+        puts available_hours
+        puts "---"
+        unfairness = assigned_hours.to_i - ideal_hours.to_i
+        unfair_hours += unfairness
+      end
+    end
+  end
+  
+  puts "total_assigned_time: " + total_assigned_time.to_s
+  puts "employee count: " + $employees.count.to_s
+  puts "avg_assigned_hours" + avg_assigned_hours.to_s
+  puts "unfair_hours:" + unfair_hours
+
+  if unfair_hours != 0
+    ret = ((total_assigned_time.to_f / unfair_hours.to_f) * 100).to_i
+    return ret
+  end
+  return 100
 end
 
 def required_shifts_filled?(solution)
