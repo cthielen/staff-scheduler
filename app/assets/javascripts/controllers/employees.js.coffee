@@ -4,6 +4,7 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
   $scope.error = null
   $scope.selectedEmployee = {}
   $scope.submitText = 'Create Employee'
+  $scope.formVisible = false
 
   Employees.query {}, (result) ->
     $scope.employees = result
@@ -23,7 +24,11 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
     angular.forEach result, (item) ->
       $scope.skills.push item if item.id
 
+  $scope.showForm = ->
+    $scope.formVisible = true
+
   $scope.selectEmployee = (employee) ->
+    $scope.showForm()
     $scope.selectedEmployee = employee
     $scope.submitText = 'Update Employee'
     angular.forEach $scope.locations, (item) ->
@@ -38,6 +43,7 @@ StaffScheduler.controller "EmployeesCtrl", @EmployeesCtrl = ($scope, $routeParam
         item.assigned = false
 
   $scope.unselectEmployee = () ->
+    $scope.formVisible = false
     $scope.selectedEmployee = {}
     $scope.submitText = 'Create Employee'
     angular.forEach $scope.locations, (item) ->

@@ -20,11 +20,12 @@
         </tr>
       </tbody>
     </table>
+    <button type="button" class="btn btn-default" ng-hide="formVisible"
+      ng-click="showForm()">New Employee</button>
   </div>
   <div class="col-sm-6">
-    <div class="panel panel-default" style="padding: 1em; margin-top: 3em;">
-      <button type="button" class="close" ng-click="unselectEmployee()"
-        ng-show="selectedEmployee.id">&times;</button>
+    <div class="panel panel-default" style="padding: 1em; margin-top: 3em;" ng-show="formVisible">
+      <button type="button" class="close" ng-click="unselectEmployee()">&times;</button>
       <h4 class="title" ng-show="selectedEmployee.id">Edit {{selectedEmployee.name}}</h4>
       <h4 class="title" ng-hide="selectedEmployee.id">New Employee</h4>
       <div class="alert alert-danger" ng-show="error">
@@ -96,10 +97,10 @@
 
         <div class="form-group">
           <div class="col-sm-offset-3 col-sm-9">
-            <button type="button" class="btn btn-default"
-              ng-click="unselectEmployee()" ng-show="selectedEmployee.id">Cancel</button>
             <button type="button" class="btn btn-primary" ng-click="save()"
               ng-disabled="submitText == 'Saving...'">{{submitText}}</button>
+            <button type="button" class="btn btn-default"
+              ng-click="unselectEmployee()">Cancel</button>
             <button type="button" class="btn btn-danger pull-right" ng-show="selectedEmployee.id"
               ng-click="confirmDeleteEmployee(selectedEmployee)">Delete</button>
           </div>
