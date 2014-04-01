@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140331234107) do
+ActiveRecord::Schema.define(version: 20140401214444) do
 
   create_table "employee_availabilities", force: true do |t|
     t.datetime "start_datetime"
@@ -31,7 +31,7 @@ ActiveRecord::Schema.define(version: 20140331234107) do
   end
 
   create_table "employees", force: true do |t|
-    t.integer  "max_hours"
+    t.integer  "global_max_hours"
     t.string   "email"
     t.string   "name"
     t.boolean  "is_disabled",          default: false
@@ -79,6 +79,7 @@ ActiveRecord::Schema.define(version: 20140331234107) do
     t.integer  "state",           default: 1
     t.string   "name"
     t.integer  "organization_id"
+    t.integer  "max_hours"
   end
 
   create_table "shift_assignment_statuses", force: true do |t|

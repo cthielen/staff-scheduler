@@ -21,7 +21,7 @@ class Employee < ActiveRecord::Base
   :url => "/system/:class/:attachment/:id/:style/:basename.:extension",
   :path => ":rails_root/public/system/:class/:attachment/:id/:style/:basename.:extension"
 
-  validates :max_hours, :email, :name, presence: true
+  validates :email, :name, presence: true
   validates :is_disabled, inclusion: { in: [true, false] }
 
   accepts_nested_attributes_for :employee_availabilities
@@ -79,7 +79,7 @@ class Employee < ActiveRecord::Base
     end
 
     # Ensure employee does not exceed weekly hours
-    if (self.hours_working(fragment_start.to_date) + shift_hours) < self.max_hours
+    if (self.hours_working(fragment_start.to_date) + shift_hours) < self.global_max_hours
       # Ensure employee has necessary skill
       if self.skills.where(id: shift.skill_id).count
         # Ensure employee has necessary location

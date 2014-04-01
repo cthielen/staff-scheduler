@@ -14,7 +14,7 @@
           ng-class="{'warning': employee == selectedEmployee}" class="clickable">
           <td><span>{{ employee.name }}</span></td>
           <td><span>{{ employee.email }}</span></td>
-          <td><span>{{ employee.max_hours }}</span></td>
+          <td><span>{{ employee.global_max_hours }}</span></td>
           <td><span class="glyphicon glyphicon-chevron-right close"
             ng-class="{'selected': employee == selectedEmployee}"></span></td>
         </tr>
@@ -50,7 +50,7 @@
         <div class="form-group">
           <label for="max-hours" class="col-sm-3 control-label">Max Hours</label>
           <div class="col-sm-9">
-            <input type="number" class="form-control" id="max-hours" placeholder="Max Hours" ng-model="selectedEmployee.max_hours">
+            <input type="number" class="form-control" id="max-hours" placeholder="Max Hours" ng-model="selectedEmployee.global_max_hours">
           </div>
         </div>
         <div class="form-group">

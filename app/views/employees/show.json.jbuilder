@@ -1,4 +1,4 @@
-json.extract! @employee, :id, :max_hours, :email, :name, :is_disabled
+json.extract! @employee, :id, :global_max_hours, :email, :name, :is_disabled
 json.skills @employee.skills do |skill|
   json.extract! skill, :id, :title
 end
