@@ -1,7 +1,6 @@
 class Schedule < ActiveRecord::Base
   using_access_control
   before_save :set_schedule_name
-  after_create :set_employee_schedules
 
   has_many :shifts, :dependent => :destroy
   has_many :shift_assignments, through: :shifts
@@ -15,13 +14,6 @@ class Schedule < ActiveRecord::Base
   validates :start_date, :end_date, :organization_id, presence: true
 
   accepts_nested_attributes_for :shifts
-
-  def set_employee_schedules
-    employees = Employee.joins(:organizations).where(:organizations => {:id => organization_id}).each do |employee|
-      e = EmployeeSchedule.new(employee_id: employee.id, schedule_id: id)
-      e.save!
-    end
-  end
 
   # Runs state machine 'loop' of currently active schedule
   def process_state
