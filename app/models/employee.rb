@@ -45,16 +45,39 @@ class Employee < ActiveRecord::Base
     total_hours = 0
     week_start = date.at_beginning_of_week
     week_end = date.at_end_of_week
-
+    logger.debug week_start
+    logger.debug week_end
     # Only shift assignments from the week of the specified date
-    self.shift_assignments.where(start_datetime: week_start .. week_end) do |assignment|
-      if assignment.scheduled?
-        total_hours += (assignment.end_datetime - assignment.start_atetime) / 3600
+    self.shift_assignments.each do |assignment|
+      if (assignment.start_datetime >= week_start) && (assignment.start_datetime <= week_end)
+        if assignment.scheduled?
+          total_hours += (assignment.end_datetime - assignment.start_datetime) / 3600
+        end
       end
     end
     total_hours
   end
+  
+  def hours_working_on_schedule(date, schedule)
+    total_hours = 0
+    week_start = date.at_beginning_of_week
+    week_end = date.at_end_of_week
 
+    # Only shift assignments from the week of the specified date
+    self.shift_assignments.each do |assignment|
+      if (assignment.start_datetime >= week_start) && (assignment.start_datetime <= week_end)
+        if assignment.scheduled?
+          # Only shift assignments from specified schedule
+          if assignment.shift.schedule.id == schedule.id
+            total_hours += (assignment.end_datetime - assignment.start_datetime) / 3600
+          end
+        end
+      end
+    end
+    total_hours  
+  end
+  
+  
   # Accepts a shift, start_timedate, and end_timedate that denote a fragment of that shift,
   # Returns true if the employee is eligible to work on that shift fragment.
   # Accounts for skills, locations, availability, max hours, and existing shift assignment conflicts.
@@ -77,21 +100,31 @@ class Employee < ActiveRecord::Base
         end
       end
     end
-
-    # Ensure employee does not exceed weekly hours
-    if (self.hours_working(fragment_start.to_date) + shift_hours) < self.global_max_hours
+    
+    # Identify hours cap
+    global_total_hours = self.hours_working(fragment_start.to_date) + shift_hours
+    schedule_total_hours = self.hours_working_on_schedule(fragment_start.to_date, shift.schedule) + shift_hours
+    
+    # Ensure employee does not exceed global weekly hours
+    if self.global_max_hours.present? 
+      if global_total_hours > self.global_max_hours
+        return false
+      end
+    elsif shift.schedule.max_hours.present?
+      if schedule_total_hours > shift.schedule.max_hours
+        return false
+      end
       # Ensure employee has necessary skill
-      if self.skills.where(id: shift.skill_id).count
-        # Ensure employee has necessary location
-        if self.locations.where(id: shift.location_id).count
-          return true
-        end
+    elsif self.skills.where(id: shift.skill_id).count
+      # Ensure employee has necessary location
+      if self.locations.where(id: shift.location_id).count
+        return true
       end
     end
     return false
   end
 
-  # Accepts a shift, shift fragment start, and shift fragmnet end, returns true if employee is avaialble to work
+  # Accepts a shift, shift fragment start, and shift fragment end, returns true if employee is available to work
   # NOTE: Checks only against employee availability, not other eligibility criteria
   def available_to_work(shift, fragment_start, fragment_end)
     employee_availabilities.where(schedule_id: shift.schedule_id).each do |availability|
