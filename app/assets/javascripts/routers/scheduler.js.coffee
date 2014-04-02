@@ -1,23 +1,20 @@
 schedulerRouter = ($routeProvider) ->
   $routeProvider
     .when "/",
-      templateUrl: "/assets/partials/planner.html"
-      controller: "PlannerCtrl"
-    .when "/shifts",
-      templateUrl: "/assets/partials/shifts.html"
-      controller: "ShiftsCtrl"
-    .when "/availability",
-      templateUrl: "/assets/partials/availability.html"
-      controller: "AvailabilityCtrl"
-    .when "/planning",
-      templateUrl: "/assets/partials/planning.html"
-      controller: "PlanningCtrl"
+      template: "{{error}} Loading..."
+      controller: "ScheduleRedirectCtrl"
     .when "/employees",
       templateUrl: "/assets/partials/employees.html"
       controller: "EmployeesCtrl"
-    .when "/schedules",
-      templateUrl: "/assets/partials/schedules.html"
-      controller: "SchedulesCtrl"
+    .when "/schedules/new",
+      templateUrl: "/assets/partials/editSchedule.html"
+      controller: "EditScheduleCtrl"
+    .when "/schedules/edit/:id",
+      templateUrl: "/assets/partials/editSchedule.html"
+      controller: "EditScheduleCtrl"
+    .when "/schedules/:id",
+      templateUrl: "/assets/partials/planner.html"
+      controller: "PlannerCtrl"
     .when "/about",
       template: '&nbsp'
       resolve:

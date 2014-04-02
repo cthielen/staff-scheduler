@@ -1,4 +1,4 @@
-StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeout, $location, Schedules, Employees, CurrentEmployee, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations, EmployeeSchedules) ->
+StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeout, $location, $routeParams, Schedules, Employees, CurrentEmployee, Skills, Locations, Shifts, Availabilities, Assignments, LocationSkillCombinations, EmployeeSchedules) ->
 
   ## Initializations
   $scope.locationSkillCombinations = []
@@ -22,47 +22,40 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     }
   ]
 
-  # Fetch Schedules
-  $scope.init = ->
-    $scope.schedules = Schedules.query {},
-      (schedules) ->
+  # Fetch Schedule
+  if $routeParams.id
+    $scope.schedule = Schedules.get {id: $routeParams.id},
+      (schedule) ->
         # Success
-        if schedules.length
-          # Fetch Current Employee
-          CurrentEmployee.query {},
-            (current) ->
-              # Success
-              $scope.currentEmployee = current
-              $scope.selections.layer = 1 unless current.isManager
-              # Render the calendar after setting the current employee to resize the days properly
-              $timeout(->
-                $scope.plannerCalendar.fullCalendar 'render'
-              , 10) # Delaying the render was necessary: http://goo.gl/lkHOXD
+        CurrentEmployee.query {},
+          (current) ->
+            # Success
+            $scope.currentEmployee = current
+            $scope.selections.layer = 1 unless current.isManager
+            # Render the calendar after setting the current employee to resize the days properly
+            $timeout(->
+              $scope.plannerCalendar.fullCalendar 'render'
+            , 10) # Delaying the render was necessary: http://goo.gl/lkHOXD
 
-              # Fetch Employees
-              $scope.employees = Employees.query {},
-                (employees) ->
-                  # Success
-                  if employees.length
-                    $scope.selections.employee = if current then _.findWhere(employees, {id: current.id}) else employees[0]
-                    $scope.selections.schedule = schedules[0]
-                    $scope.populateEvents()
-                  else if !$scope.modalOpen
-                    $scope.modalOpen = true
-                    $scope.redirectTo('employee','/employees')
-                (employees) ->
-                  # Error
-                  $scope.error = "Error loading employees!"
-            (current) ->
-              # Error
-              $scope.error = "Error fetching current employee!"
-        else
-          unless $scope.modalOpen
-            $scope.modalOpen = true
-            $scope.editSchedule()
-      (schedules) ->
+            # Fetch Employees
+            $scope.employees = Employees.query {},
+              (employees) ->
+                # Success
+                if employees.length
+                  $scope.selections.employee = if current then _.findWhere(employees, {id: current.id}) else employees[0]
+                  $scope.populateEvents()
+                else if !$scope.modalOpen
+                  $scope.modalOpen = true
+                  $scope.redirectTo('employee','/employees')
+              (employees) ->
+                # Error
+                $scope.error = "Error loading employees!"
+          (current) ->
+            # Error
+            $scope.error = "Error fetching current employee!"
+      (schedule) ->
         # Error
-        $scope.error = "Error loading schedules!"
+        $scope.error = "Error loading schedule!"
 
     # Fetch Location/Skill combinations
     LocationSkillCombinations.then (combinations) ->
@@ -73,7 +66,6 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         $scope.modalOpen = true
         $scope.redirectTo('skill/location','/employees')
 
-  $scope.init()
   ## Construct the calendar when selections change
   $scope.$watch "selections", (selections) ->
     $scope.populateEvents()
@@ -88,7 +80,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
         # Fetch EmployeeSchedule
         EmployeeSchedules.query {
           employee: $scope.currentEmployee.id,
-          schedule: $scope.selections.schedule.id if $scope.selections.schedule
+          schedule: $scope.schedule.id
         },
           (data) ->
             # Success
@@ -104,13 +96,13 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     switch $scope.selections.tab
       when 0
         {
-          schedule: $scope.selections.schedule.id,
+          schedule: $scope.schedule.id,
           skill: $scope.locationSkillCombinations[$scope.selections.lsCombination].skill.id,
           location: $scope.locationSkillCombinations[$scope.selections.lsCombination].location.id
         }
       when 1
         {
-          schedule: $scope.selections.schedule.id,
+          schedule: $scope.schedule.id,
           employee: $scope.selections.employee.id
         }
 
@@ -126,7 +118,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     if clearEvents
       events.length = 0
     else
-      unless $scope.locationSkillCombinations.length is 0 or $scope.selections.schedule is undefined
+      unless $scope.locationSkillCombinations.length is 0
         $scope.loading++
         source.query $scope.constructParams(), (result) ->
           # Success
@@ -209,7 +201,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
       $scope.$apply() if !$scope.$$phase
 
   $scope.editSchedule = (schedule_id) ->
-    schedule = _.findWhere($scope.schedules, { id: schedule_id })
+    schedule = _.findWhere($scope.schedule, { id: schedule_id })
     modalInstance = $modal.open
       templateUrl: "/assets/partials/editSchedule.html"
       controller: EditScheduleCtrl
@@ -224,7 +216,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
       else if state is 'new'
         $scope.init()
       else
-        $scope.schedules = Schedules.query()
+        $scope.schedule = Schedules.query()
 
   $scope.createShifts = (start, end) ->
     currentLS = $scope.locationSkillCombinations[$scope.selections.lsCombination]
@@ -233,12 +225,12 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
       is_mandatory: true,
       start_datetime: start,
       end_datetime: end,
-      schedule_id: $scope.selections.schedule.id,
+      schedule_id: $scope.schedule.id,
       skill_id: currentLS.skill.id,
       location_id: currentLS.location.id
     })
-    $scope.selections.schedule.shifts_attributes = $scope.selections.schedule.shifts.concat(newShifts)
-    Schedules.update $scope.selections.schedule,
+    $scope.schedule.shifts_attributes = $scope.schedule.shifts.concat(newShifts)
+    Schedules.update $scope.schedule,
       (data) ->
         # Success
         $scope.populateEvents()
@@ -255,7 +247,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     newAvailabilities = $scope.calculateRepetitions({
       start_datetime: start,
       end_datetime: end,
-      schedule_id: $scope.selections.schedule.id,
+      schedule_id: $scope.schedule.id,
     })
     $scope.selections.employee.employee_availabilities_attributes = $scope.selections.employee.availabilities.concat(newAvailabilities)
     Employees.update $scope.selections.employee,
@@ -274,7 +266,7 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     repetitions = []
     this_start_date = new Date(Date.parse(model.start_datetime))
     this_end_date = new Date(Date.parse(model.end_datetime))
-    while this_end_date <= Date.parse($scope.selections.schedule.end_date)
+    while this_end_date <= Date.parse($scope.schedule.end_date)
       copy = angular.copy(model)
       copy.start_datetime = new Date(this_start_date)
       copy.end_datetime = new Date(this_end_date)
@@ -289,15 +281,15 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     switch $scope.selections.layer
       when 0
         # assignments
-        $scope.selections.schedule.state = 4
-        Schedules.update $scope.selections.schedule,
+        $scope.schedule.state = 4
+        Schedules.update $scope.schedule,
           (data) ->
             # Success
-            $scope.selections.schedule = data
+            $scope.schedule = data
             $scope.loading--
           (data) ->
             # Failure
-            $scope.selections.schedule.state = 3
+            $scope.schedule.state = 3
             $scope.error = 'Could not mark as complete, please try again'
             $scope.loading--
       when 1
@@ -312,15 +304,15 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
             $scope.error = 'Could not mark as complete, please try again'
             $scope.loading--
       when 2
-        $scope.selections.schedule.state = 2
-        Schedules.update $scope.selections.schedule,
+        $scope.schedule.state = 2
+        Schedules.update $scope.schedule,
           (data) ->
             # Success
-            $scope.selections.schedule = data
+            $scope.schedule = data
             $scope.loading--
           (data) ->
             # Failure
-            $scope.selections.schedule.state = 1
+            $scope.schedule.state = 1
             $scope.error = 'Could not mark as complete, please try again'
             $scope.loading--
 
@@ -329,12 +321,12 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
     switch $scope.selections.layer
       when 0
         # assignments
-        validState = $scope.selections.schedule and ($scope.selections.schedule.state == 3)
+        validState = $scope.schedule and ($scope.schedule.state == 3)
       when 1
         # availabilities
         validState = ($scope.employeeSchedule and !$scope.employeeSchedule.availability_submitted)
       when 2
-        validState = $scope.selections.schedule and ($scope.selections.schedule.state == 1)
+        validState = $scope.schedule and ($scope.schedule.state == 1)
 
     validState and !loading
 

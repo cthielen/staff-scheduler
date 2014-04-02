@@ -116,8 +116,8 @@ class Schedule < ActiveRecord::Base
   end
 
   # Returns the current active schedule
-  def self.active_schedule
-    Schedule.find_by(state:6)
+  def self.active_schedules
+    Schedule.where("state < ?", 7)
   end
 
   # Returns the last completed schedule

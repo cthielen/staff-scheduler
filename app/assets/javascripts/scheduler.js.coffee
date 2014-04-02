@@ -7,6 +7,7 @@
 //= require services
 //= require ./routers/scheduler
 //= require ./controllers/confirm
+//= require ./controllers/ScheduleRedirect
 //= require ./controllers/Planner
 //= require ./controllers/Nav
 //= require ./controllers/employees
