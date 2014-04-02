@@ -8,6 +8,7 @@
 //= require ./routers/scheduler
 //= require ./controllers/confirm
 //= require ./controllers/Planner
+//= require ./controllers/Nav
 //= require ./controllers/employees
 //= require ./controllers/EditSkill
 //= require ./controllers/EditLocation

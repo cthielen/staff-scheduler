@@ -23,10 +23,10 @@
     </script>
   </head>
 
-  <body>
+  <body ng-app="scheduler">
 
     <!-- Fixed navbar -->
-    <div class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="navbar navbar-default navbar-static-top" role="navigation" ng-controller="NavCtrl">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -40,13 +40,25 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <% permitted_to? :read, :shifts do %>
-            <li class="active" id="shifts"><a href="#/">Schedule</a></li>
+            <li class="active" id="shifts">
+              <a href="#/" class="dropdown-toggle">
+                Schedule
+                <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu">
+                <li id="employees" ng-repeat="schedule in schedules">
+                  <a href="#/schedules/{{schedule.id}}">{{schedule.name}}</a>
+                </li>
+                <li class="divider" ng-show="schedules.length > 0"></li>
+                <li><a href="#/schedules/new">New Schedule</a></li>
+              </ul>
+            </li>
             <% end %>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 7px;">
-                <span class="glyphicon glyphicon-cog" style="font-size: 2.2em;"></span> 
+                <span class="glyphicon glyphicon-cog" style="font-size: 2.2em;"></span>
               </a>
               <ul class="dropdown-menu">
                 <% permitted_to? :manage, :employees do %>
@@ -63,7 +75,7 @@
     </div>
 
 
-    <div class="container" ng-app="scheduler">
+    <div class="container">
       <div ng-view></div>
     </div> <!-- /container -->
 
