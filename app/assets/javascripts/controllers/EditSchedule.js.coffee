@@ -1,26 +1,25 @@
-StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $modalInstance, CurrentEmployee, schedule, Schedules) ->
+StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $routeParams, $location, CurrentEmployee, Schedules) ->
   $scope.inProgress = false
   $scope.deleteText = 'Delete Schedule'
 
-  CurrentEmployee.query {},
-    (current) ->
-      # Success
-      $scope.currentEmployee = current
-    (current) ->
-      # Error
-      $scope.error = "Error fetching current employee!"
-
-  if schedule
-    $scope.schedule = schedule
-    $scope.submitText = 'Update Schedule'
-    $scope.actionText = 'Edit'
-  else
-    $scope.schedule = {}
-    $scope.submitText = 'Create Schedule'
-    $scope.actionText = 'New Schedule'
+  $scope.getCurrentEmployee = ->
+    CurrentEmployee.query {},
+      (current) ->
+        # Success
+        $scope.currentEmployee = current
+        $scope.schedule.organization_id = $scope.currentEmployee.organizations[0].id
+      (current) ->
+        # Error
+        $scope.error = "Error fetching current employee!"
 
   $scope.clearError = ->
     $scope.error = null
+
+  $scope.cancel = ->
+    if $scope.schedule.id
+      $location.path "/schedules/#{$scope.schedule.id}"
+    else
+      $location.path "/"
 
   $scope.save = ->
     $scope.error = null
@@ -30,7 +29,7 @@ StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $moda
       Schedules.update $scope.schedule,
         (data) ->
           # Success
-          $modalInstance.close $scope.schedule
+          $location.path "/schedules/#{data.id}"
         (data) ->
           # Failure
           $scope.error = 'Could not save schedule, please try saving again'
@@ -40,7 +39,7 @@ StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $moda
       Schedules.save $scope.schedule,
         (data) ->
           # Success
-          $modalInstance.close 'new'
+          $location.path "/schedules/#{data.id}"
         (data) ->
           # Failure
           $scope.error = 'Could not save schedule, please try saving again'
@@ -58,15 +57,29 @@ StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $moda
     $scope.deleteText = 'Deleting...'
     $scope.inProgress = true
 
-    Schedules.delete {id: schedule.id},
+    Schedules.delete {id: $scope.schedule.id},
       (data) ->
         # Success
-        $modalInstance.close 'deleted'
+        $location.path "/"
     , (data) ->
         # Error
         $scope.error = 'Could not delete schedule, please try saving again'
         $scope.deleteText = 'Try Deleting Again'
         $scope.inProgress = false
 
-  $scope.close = ->
-    $modalInstance.dismiss "cancel"
+  if $routeParams.id
+    Schedules.get {id: $routeParams.id},
+      (schedule) ->
+        # Success
+        $scope.schedule = schedule
+        $scope.getCurrentEmployee()
+        $scope.submitText = 'Update Schedule'
+        $scope.actionText = 'Edit'
+      (schedule) ->
+        # Error
+        $scope.error = "Error loading schedule"
+  else
+    $scope.schedule = {}
+    $scope.getCurrentEmployee()
+    $scope.submitText = 'Create Schedule'
+    $scope.actionText = 'New Schedule'
