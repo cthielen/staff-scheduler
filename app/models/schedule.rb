@@ -15,6 +15,13 @@ class Schedule < ActiveRecord::Base
 
   accepts_nested_attributes_for :shifts
 
+  def add_employees=(employees_arr)
+    employees_arr.each do |e|
+      employee = Employee.find_or_create_by_email(email: e[:email], name: e[:name])
+      self.employees << employee unless self.employees.include?(employee) # Avoid duplicates
+    end
+  end
+
   # Runs state machine 'loop' of currently active schedule
   def process_state
     case current_state
