@@ -10,12 +10,10 @@ namespace :calculate do
         
     # User Configurations
     $min_time_block_size = 30 # In minutes
-    $min_shift_assignment_size = 120 # In minutes
-    # If employee max_hours is already constrained by this cap, 
-    # then this constraint is implicit and can be ignored
-    $global_max_hours = 20 # In hours 
-    $important_weight
-
+    $min_shift_assignment_size = 120 # In minutes    
+    $schedule_max_hours = schedule.max_hours # In hours 
+    $coverage_importance = 70
+    $fairness_importance = 30
     
     # Schedule generation uses the first monday-friday block of days as its template
     # If a schedule for example starts on a thursday, 
@@ -31,7 +29,7 @@ namespace :calculate do
     $availabilities = Hash.new # For quickly associating shift_assignments back to $employees
     
     schedule.employees.each do |e|
-      $employees[e.id] = {id: e.id, name: e.name, max_hours: e.max_hours, skills: [], locations: [], availabilities: []}
+      $employees[e.id] = {id: e.id, name: e.name, global_max_hours: e.global_max_hours, skills: [], locations: [], availabilities: []}
       e.skills.each do |s|
         $employees[e.id][:skills][s.id] = {id: s.id}
       end
@@ -50,91 +48,105 @@ namespace :calculate do
     # Prepare data for solving 
     $availability_fragments = generate_availability_fragments
     $shift_fragments = generate_shift_fragments
-
+    puts "availability fragments count: " + $availability_fragments.count.to_s
+    puts "shift fragments count: " + $shift_fragments.count.to_s
     # Generate solutions
     solution_size = $shift_fragments.length
     assignment_space = (0..$availability_fragments.length - 1).to_a
     $solutions = []
-
+    puts "solution size: " + solution_size.to_s
+    puts "assignment space: " + assignment_space.to_s
+    puts "Beginning solution generation..."
     ArrayNode.solve!(nil, Array.new(solution_size), assignment_space)
+    puts "Solution generation complete."
+    puts "Beginning solution scoring..."
+
+    # Filter solutions for duplicates
+    
+    # TODO
 
     # Score solutions
+    top_score = 0
+    top_solution = []
     $solutions.each do |solution|
-      solution[:score] = fitness_score(solution)
+      puts "solution: " + solution[:solution].to_s
+      s = solution[:score] = fitness_score(solution)
+      puts "score: " + s.to_s
+      if s > top_score
+        top_score = s
+        top_solution = solution[:solution]
+      end
     end
 
   #  puts $solutions
     end_time = Time.now
+    puts "Top Solution: " + top_solution.inspect.to_s
+    puts "solution count: " + $solutions.count.to_s
     puts "Total Run Time: " + (end_time - start_time).to_s
   end
 end
 
-# Returns false if any constraints are not met
-def fails_constraint(datum)
-  # Go through schedule (datum) assignments made (datum[i])
-  datum.each_with_index do |d, i|
-    # If one has been set (not nil ...)
-    if d
-      # Ensure timing of availability 'd' fits in the shift
-      return true if $availability_fragments[d][:start] != $shift_fragments[i][:start]
-      # availabilities don't have skills, seems costly to calculate
-      # return true if $availability_fragments[d][:skill] < $shift_fragments[i][:skill] 
-    end
-  end
-  
-  return false
-end
-
 def fitness_score(solution)
   score = 0
-  coverage_percentage(solution)
-  fairness_percentage(solution)
+  coverage_score = coverage_percentage(solution) * $coverage_importance
+  puts "coverage_score: " + coverage_score.to_s
+  fairness_score = fairness_percentage(solution) * $fairness_importance
+  puts "fairness_score: " + fairness_score.to_s
+  
+  score += coverage_score + fairness_score
+
   # Critical Priority (binary checks that result in a score of zero when any are failed)
-  # Did an employee work more than weekly_hour_cap
-  # Did an employee work more than their max_hours
-  # Did an employee work more than daily_hour_cap
-  # Did an employee work a shift_assignment shorter than min_shift_assignment_size?
-  # Is there a shift_assignment for an employee without the necessary skill/locations?
+
   unless required_shifts_filled?(solution)
     return 0
   end
   unless under_weekly_hour_caps?(solution)
     return 0
   end
-  # What percentage of total shift time was covered?
-  # How fair is the hour distribution amongst employees?
-#  score
+
+  #TODO
+  # Did an employee work more than daily_hour_cap?
+  # Did an employee work a shift_assignment shorter than min_shift_assignment_size?
+  # Is there a shift_assignment for an employee without the necessary skill/locations?
+
+  score
 end
 
 
 def under_daily_hour_cap?(solution)
 end
 
-# Considers employee's individual max_hours cap and globally set 
+# Considers employee's global_max_hours and schedule max_hours 
 def under_weekly_hour_caps?(solution)
   employee_totals = Hash.new
   time_total = 0
+
   # Generate totals
   solution[:solution].each do |s|      
     employee_id = nil
+    
     if s
       id = $availability_fragments[s][:availability_id]  
       time = ($availability_fragments[s][:end] - $availability_fragments[s][:start]).to_i / 60    
       employee_id = $availabilities[id][:employee_id]
-
+  
       unless employee_totals[employee_id].present?
         employee_totals[employee_id] = 0
       end
-      
       employee_totals[employee_id] = employee_totals[employee_id] + time 
     end
     # Check total against caps
     employee_totals.each do |k, v|
-
-      $employees[employee_id][:max_hours]
-      employee_max = ($employees[employee_id][:max_hours]) 
-      if v > employee_max || v > $global_max_hours
-        return false
+      employee_max = $employees[k][:global_max_hours]
+      if employee_max
+        if v > employee_max
+          return false
+        end
+      end
+      if $schedule_max_hours
+        if v > $schedule_max_hours
+          return false
+        end
       end
     end    
   end
@@ -199,28 +211,20 @@ def fairness_percentage(solution)
   
   avg_availability_hours = (total_availability_hours) / $employees.count
 
-  # Score each employee
-
+  # Build unfair_hours count
   $employees.each do |e|
     if e
       employee_id = e[:id]
       available_hours = employee_availability[employee_id]
-      assigned_hours = assigned_hours[employee_id]   
+      assigned = assigned_hours[employee_id]   
       unless available_hours.nil? || available_hours == 0
-        ideal_hours = (avg_assigned_hours) * ((avg_availability_hours.to_f / available_hours.to_f).abs * 100)
-        puts "----"
-        puts available_hours
-        puts "---"
-        unfairness = assigned_hours.to_i - ideal_hours.to_i
+        ideal_hours = (avg_assigned_hours) * ((avg_availability_hours.to_f / available_hours.to_f) * 100)
+        # Capturing the degree of difference between fair and assigned
+        unfairness = (assigned.to_i - ideal_hours.to_i).abs
         unfair_hours += unfairness
       end
     end
   end
-  
-  puts "total_assigned_time: " + total_assigned_time.to_s
-  puts "employee count: " + $employees.count.to_s
-  puts "avg_assigned_hours" + avg_assigned_hours.to_s
-  puts "unfair_hours:" + unfair_hours
 
   if unfair_hours != 0
     ret = ((total_assigned_time.to_f / unfair_hours.to_f) * 100).to_i
@@ -255,10 +259,12 @@ def generate_availability_fragments
     if employee
       employee[:availabilities].each do |availability|
         if availability
-          slice = availability[:start_datetime]
-          while slice < availability[:end_datetime]
-            fragments.push({availability_id: availability[:id], start: slice, end: slice + $min_time_block_size.minutes})
-            slice = slice + $min_time_block_size.minutes
+          if (availability[:start_datetime] > $first_week_start) && (availability[:start_datetime] < $first_week_end)
+            slice = availability[:start_datetime]
+            while slice < availability[:end_datetime]
+              fragments.push({availability_id: availability[:id], start: slice, end: slice + $min_time_block_size.minutes})
+              slice = slice + $min_time_block_size.minutes
+            end
           end
         end
       end
@@ -297,7 +303,6 @@ class ArrayNode
     return false if fails_constraint(datum)
 
     $solutions.push({solution: datum, score: nil})
-    
     # Branch
     datum.each_with_index do |d, i|
       if d == nil
@@ -313,6 +318,21 @@ class ArrayNode
   end
 end
 
+# Returns false if any constraints are not met
+def fails_constraint(datum)
+  # Go through schedule (datum) assignments made (datum[i])
+  datum.each_with_index do |d, i|
+    # If one has been set (not nil ...)
+    if d
+      # Ensure timing of availability 'd' fits in the shift
+      return true if $availability_fragments[d][:start] != $shift_fragments[i][:start]
+      # availabilities don't have skills, seems costly to calculate
+      # return true if $availability_fragments[d][:skill] < $shift_fragments[i][:skill] 
+    end
+  end
+  
+  return false
+end
 
 # lexicon
 # -------------
