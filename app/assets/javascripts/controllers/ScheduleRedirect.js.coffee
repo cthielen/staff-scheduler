@@ -3,7 +3,10 @@ StaffScheduler.controller "ScheduleRedirectCtrl", @ScheduleRedirectCtrl = ($scop
   Schedules.query { active: true },
     (schedules) ->
       # Success
-      $location.path "/schedules/#{schedules[0].id}"
+      if schedules.length
+        $location.path "/schedules/#{schedules[0].id}"
+      else
+        $location.path "/schedules/new"
     (schedule) ->
       # Error
       $scope.error = "Error"

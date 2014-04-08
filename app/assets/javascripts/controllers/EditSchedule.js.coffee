@@ -102,7 +102,7 @@ StaffScheduler.controller "EditScheduleCtrl", @EditScheduleCtrl = ($scope, $rout
         # Error
         $scope.error = "Error loading schedule"
   else
-    $scope.schedule = {}
+    $scope.schedule = {employees: []}
     $scope.getCurrentEmployee()
     $scope.submitText = 'Create Schedule'
     $scope.actionText = 'New Schedule'

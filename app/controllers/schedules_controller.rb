@@ -29,17 +29,15 @@ class SchedulesController < ApplicationController
   # POST /schedules
   # POST /schedules.json
   def create
-    @schedule = Schedule.new(schedule_params)
+    @schedule = Schedule.new(schedule_params.except(:add_employees))
 
-    respond_to do |format|
       if @schedule.save
-        format.html { redirect_to @schedule, notice: 'Schedule was successfully created.' }
-        format.json { render action: 'show', status: :created, location: @schedule }
+        update
       else
-        format.html { render action: 'new' }
-        format.json { render json: @schedule.errors, status: :unprocessable_entity }
+        respond_to do |format|
+          format.json { render json: @schedule.errors, status: :unprocessable_entity }
+        end
       end
-    end
   end
 
   # PATCH/PUT /schedules/1
