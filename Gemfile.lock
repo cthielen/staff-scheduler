@@ -83,6 +83,7 @@ GEM
       json (~> 1.4)
     rest-client (1.6.7)
       mime-types (>= 1.16)
+    ruby-prof (0.14.2)
     rubycas-client (2.3.9)
       activesupport
     sass (3.2.14)
@@ -131,6 +132,7 @@ DEPENDENCIES
   phantomjs
   rails (= 4.0.3)
   rest-client
+  ruby-prof
   rubycas-client
   sass-rails (~> 4.0.0)
   sdoc

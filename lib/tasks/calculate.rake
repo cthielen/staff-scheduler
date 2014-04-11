@@ -4,10 +4,15 @@ namespace :calculate do
   desc 'Outputs the ideal shift_assignments for a given schedule.'
   task :schedule => :environment do
 
+    require 'ruby-prof'
+
+    # Profile the code
+ #   RubyProf.start
+
     # For runtime estimation
     start_time = Time.now
     schedule = Schedule.first
-        
+    $node_count = 0
     # User Configurations
     $min_time_block_size = 30 # In minutes
     $min_shift_assignment_size = 120 # In minutes    
@@ -19,8 +24,8 @@ namespace :calculate do
     # If a schedule for example starts on a thursday, 
     # calculations will be based on the monday-friday of the following week
     # Note: if the first week has holidays/irregular shifts/availability, solutions will be poor
-    $first_week_start = identify_week_start(schedule)
-    $first_week_end = $first_week_start + 4.days
+    $first_week_start = (identify_week_start(schedule)).to_datetime.to_i / 60
+    $first_week_end = $first_week_start + (4.days.to_i / 60)
     
 
     # Database dump
@@ -28,6 +33,8 @@ namespace :calculate do
     $shifts = Hash.new
     $availabilities = Hash.new # For quickly associating shift_assignments back to $employees
     
+    puts "Beginning preliminary work"
+    time = Time.now
     schedule.employees.each do |e|
       $employees[e.id] = {id: e.id, name: e.name, global_max_hours: e.global_max_hours, skills: [], locations: [], availabilities: []}
       e.skills.each do |s|
@@ -37,14 +44,14 @@ namespace :calculate do
         $employees[e.id][:locations][l.id] = {id: l.id}
       end
       e.employee_availabilities.each do |a|
-        $availabilities[a.id] = {id: a.id, start_datetime: a.start_datetime, end_datetime: a.end_datetime, employee_id: e.id}
-        $employees[e.id][:availabilities][a.id] = {id: a.id, start_datetime: a.start_datetime, end_datetime: a.end_datetime} 
+        $availabilities[a.id] = {id: a.id, start_datetime: ((a.start_datetime.to_i) / 60), end_datetime: ((a.end_datetime.to_i) / 60), employee_id: e.id}
+        $employees[e.id][:availabilities][a.id] = {id: a.id, start_datetime: ((a.start_datetime.to_i) / 60), end_datetime: ((a.end_datetime.to_i) / 60)} 
       end 
     end
     schedule.shifts.each do |shift|
-      $shifts[shift.id] = {id: shift.id, start_datetime: shift.start_datetime, end_datetime: shift.end_datetime, skill: shift.skill_id, location: shift.location_id, is_mandatory: shift.is_mandatory}
+      $shifts[shift.id] = {id: shift.id, start_datetime: ((shift.start_datetime.to_i) / 60), end_datetime: ((shift.end_datetime.to_i) / 60), skill: shift.skill_id, location: shift.location_id, is_mandatory: shift.is_mandatory}
     end
-    
+        
     # Prepare data for solving 
     $availability_fragments = generate_availability_fragments
     $shift_fragments = generate_shift_fragments
@@ -56,9 +63,12 @@ namespace :calculate do
     $solutions = []
     puts "solution size: " + solution_size.to_s
     puts "assignment space: " + assignment_space.to_s
+    puts "Preliminary work complete. Elapse Time " + (Time.now - time).to_s
+    time = Time.now
     puts "Beginning solution generation..."
-    ArrayNode.solve!(nil, Array.new(solution_size), assignment_space)
-    puts "Solution generation complete."
+    depth = 0
+    ArrayNode.solve!(nil, Array.new(solution_size), assignment_space, depth)
+    puts "Solution generation complete. Elapsed Time " + (Time.now - time).to_s
     puts "Beginning solution scoring..."
 
     # Filter solutions for duplicates
@@ -69,9 +79,9 @@ namespace :calculate do
     top_score = 0
     top_solution = []
     $solutions.each do |solution|
-      puts "solution: " + solution[:solution].to_s
+ #     puts "solution: " + solution[:solution].to_s
       s = solution[:score] = fitness_score(solution)
-      puts "score: " + s.to_s
+ #     puts "score: " + s.to_s
       if s > top_score
         top_score = s
         top_solution = solution[:solution]
@@ -81,28 +91,36 @@ namespace :calculate do
   #  puts $solutions
     end_time = Time.now
     puts "Top Solution: " + top_solution.inspect.to_s
+    puts "Top Score: " + top_score.to_s
     puts "solution count: " + $solutions.count.to_s
     puts "Total Run Time: " + (end_time - start_time).to_s
+    puts "Nodes considered Count " + $node_count.to_s
+    
+ #   result = RubyProf.stop
+
+    # Print a flat profile to text
+#    printer = RubyProf::FlatPrinter.new(result)
+#    printer.print(STDOUT)
   end
 end
 
 def fitness_score(solution)
   score = 0
-  coverage_score = coverage_percentage(solution) * $coverage_importance
-  puts "coverage_score: " + coverage_score.to_s
-  fairness_score = fairness_percentage(solution) * $fairness_importance
-  puts "fairness_score: " + fairness_score.to_s
+#  coverage_score = coverage_percentage(solution) * $coverage_importance
+#  puts "coverage_score: " + coverage_score.to_s
+#  fairness_score = fairness_percentage(solution) * $fairness_importance
+#  puts "fairness_score: " + fairness_score.to_s
   
-  score += coverage_score + fairness_score
+#  score += coverage_score + fairness_score
 
   # Critical Priority (binary checks that result in a score of zero when any are failed)
 
-  unless required_shifts_filled?(solution)
-    return 0
-  end
-  unless under_weekly_hour_caps?(solution)
-    return 0
-  end
+#  unless required_shifts_filled?(solution)
+#    return 0
+#  end
+#  unless under_weekly_hour_caps?(solution)
+#    return 0
+#  end
 
   #TODO
   # Did an employee work more than daily_hour_cap?
@@ -201,7 +219,7 @@ def fairness_percentage(solution)
       employee_availability[employee_id] = 0
       e[:availabilities].each do |a|
         if a
-          time = (a[:end_datetime] - a[:start_datetime]).to_i / 60 # Convert to minutes
+          time = a[:end_datetime] - a[:start_datetime]
           employee_availability[employee_id] += time
           total_availability_hours += time
         end
@@ -259,11 +277,17 @@ def generate_availability_fragments
     if employee
       employee[:availabilities].each do |availability|
         if availability
+    puts "+++"
+    puts $first_week_start  
+    puts availability[:start_datetime]    
+    puts $first_week_end
+    puts "---"
+
           if (availability[:start_datetime] > $first_week_start) && (availability[:start_datetime] < $first_week_end)
             slice = availability[:start_datetime]
             while slice < availability[:end_datetime]
-              fragments.push({availability_id: availability[:id], start: slice, end: slice + $min_time_block_size.minutes})
-              slice = slice + $min_time_block_size.minutes
+              fragments.push({availability_id: availability[:id], start: slice, end: (slice + $min_time_block_size) })
+              slice = slice + $min_time_block_size.to_i
             end
           end
         end
@@ -281,8 +305,8 @@ def generate_shift_fragments
     if (shift[:start_datetime] > $first_week_start) && (shift[:start_datetime] < $first_week_end)
       slice = shift[:start_datetime]
       while slice < shift[:end_datetime]
-        fragments.push({shift_id: shift[:id], start: slice, end: slice + $min_time_block_size.minutes})
-        slice = slice + $min_time_block_size.minutes
+        fragments.push({shift_id: shift[:id], start: slice, end: slice + $min_time_block_size})
+        slice = slice + $min_time_block_size
       end      
     end
   end
@@ -298,10 +322,10 @@ def identify_week_start(schedule)
 end
 
 class ArrayNode
-  def ArrayNode.solve!(parent, datum, references)
+  def ArrayNode.solve!(parent, datum, references, depth)
+    $node_count+=1
     # Analyze datum for correctness
     return false if fails_constraint(datum)
-
     $solutions.push({solution: datum, score: nil})
     # Branch
     datum.each_with_index do |d, i|
@@ -311,7 +335,7 @@ class ArrayNode
           modified_datum[i] = r
           modified_references = references.clone
           modified_references.delete_at(j)
-          ArrayNode.solve!(self, modified_datum, modified_references)
+          ArrayNode.solve!(self, modified_datum, modified_references, (depth + 1))
         end
       end
     end
