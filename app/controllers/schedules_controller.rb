@@ -90,6 +90,16 @@ class SchedulesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def schedule_params
+      if params[:calculate] == 'true'
+        logger.debug "----"
+        logger.debug "----"
+        logger.debug "----"
+        logger.debug params[:id]
+        logger.debug "----"
+        logger.debug "----"
+        logger.debug "----"
+        # system "rake calculate:schedule SCHEDULE_ID=#{params[:id]} &"
+      end
       params.require(:schedule).permit(:start_date, :end_date, :name, :organization_id, :state, shifts_attributes: [:id, :start_datetime, :end_datetime, :is_mandatory, :location_id, :skill_id], add_employees: [:name, :email])
     end
 end

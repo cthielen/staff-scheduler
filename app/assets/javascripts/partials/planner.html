@@ -49,6 +49,7 @@
     <div style="margin-top: 15px;">
       <button type="button" class="btn btn-default pull-left" ng-click="changeState()"
         ng-disabled="!readyToSubmit()">Mark as Complete</button>
+      <button type="button" class="btn btn-default pull-left" ng-click="triggerCalculationEngine(schedule)">Auto generate with calculation engine</button>
 
       <div class="btn-group pull-right" ng-show="currentEmployee.isManager">
           <button type="button" class="btn btn-default" ng-click="selections.layer = 0"

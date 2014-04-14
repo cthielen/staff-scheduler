@@ -316,6 +316,19 @@ StaffScheduler.controller "PlannerCtrl", @PlannerCtrl = ($scope, $modal, $timeou
             $scope.error = 'Could not mark as complete, please try again'
             $scope.loading--
 
+  $scope.triggerCalculationEngine = (schedule) ->
+    $scope.loading++
+    Schedules.calculate $scope.schedule,
+      (data) ->
+        # Success
+        $scope.schedule = data
+        $scope.loading--
+      (data) ->
+        # Failure
+        $scope.schedule.state = 1
+        $scope.error = 'Could not auto generate, please try again'
+        $scope.loading--
+    
   $scope.readyToSubmit = () ->
     loading = $scope.loading > 0
     switch $scope.selections.layer
