@@ -7,7 +7,7 @@ namespace :calculate do
     require 'ruby-prof'
 
     # Profile the code
- #   RubyProf.start
+    RubyProf.start
 
     # For runtime estimation
     start_time = Time.now
@@ -78,49 +78,46 @@ namespace :calculate do
     # Score solutions
     top_score = 0
     top_solution = []
-    $solutions.each do |solution|
- #     puts "solution: " + solution[:solution].to_s
-      s = solution[:score] = fitness_score(solution)
- #     puts "score: " + s.to_s
-      if s > top_score
-        top_score = s
-        top_solution = solution[:solution]
-      end
-    end
-
-  #  puts $solutions
+ #  $solutions.each do |solution|
+ #    puts "solution: " + solution[:solution].to_s
+ #    s = solution[:score] = fitness_score(solution)
+ #    puts "score: " + s.to_s
+ #    if s > top_score
+ #      top_score = s
+ #      top_solution = solution[:solution]
+ #    end
+ #   end
     end_time = Time.now
-    puts "Top Solution: " + top_solution.inspect.to_s
-    puts "Top Score: " + top_score.to_s
-    puts "solution count: " + $solutions.count.to_s
+#    puts "Top Solution: " + top_solution.inspect.to_s
+#    puts "Top Score: " + top_score.to_s
+#    puts "solution count: " + $solutions.count.to_s
     puts "Total Run Time: " + (end_time - start_time).to_s
     puts "Nodes considered Count " + $node_count.to_s
-    
- #   result = RubyProf.stop
+    result = RubyProf.stop
 
     # Print a flat profile to text
-#    printer = RubyProf::FlatPrinter.new(result)
-#    printer.print(STDOUT)
+    printer = RubyProf::FlatPrinter.new(result)
+    printer.print(STDOUT)
   end
 end
 
 def fitness_score(solution)
   score = 0
-#  coverage_score = coverage_percentage(solution) * $coverage_importance
+  coverage_score = coverage_percentage(solution) * $coverage_importance
 #  puts "coverage_score: " + coverage_score.to_s
-#  fairness_score = fairness_percentage(solution) * $fairness_importance
+  fairness_score = fairness_percentage(solution) * $fairness_importance
 #  puts "fairness_score: " + fairness_score.to_s
   
-#  score += coverage_score + fairness_score
+  score += coverage_score + fairness_score
 
   # Critical Priority (binary checks that result in a score of zero when any are failed)
 
-#  unless required_shifts_filled?(solution)
-#    return 0
-#  end
-#  unless under_weekly_hour_caps?(solution)
-#    return 0
-#  end
+  unless required_shifts_filled?(solution)
+    return 0
+  end
+  unless under_weekly_hour_caps?(solution)
+    return 0
+  end
 
   #TODO
   # Did an employee work more than daily_hour_cap?
@@ -277,12 +274,6 @@ def generate_availability_fragments
     if employee
       employee[:availabilities].each do |availability|
         if availability
-    puts "+++"
-    puts $first_week_start  
-    puts availability[:start_datetime]    
-    puts $first_week_end
-    puts "---"
-
           if (availability[:start_datetime] > $first_week_start) && (availability[:start_datetime] < $first_week_end)
             slice = availability[:start_datetime]
             while slice < availability[:end_datetime]
@@ -325,8 +316,13 @@ class ArrayNode
   def ArrayNode.solve!(parent, datum, references, depth)
     $node_count+=1
     # Analyze datum for correctness
-    return false if fails_constraint(datum)
-    $solutions.push({solution: datum, score: nil})
+    return false if fails_constraint(datum, depth)
+
+    unless $solutions[depth]
+      $solutions[depth] = []
+    end
+    $solutions[depth].push({solution: datum, score: nil})
+
     # Branch
     datum.each_with_index do |d, i|
       if d == nil
@@ -343,7 +339,7 @@ class ArrayNode
 end
 
 # Returns false if any constraints are not met
-def fails_constraint(datum)
+def fails_constraint(datum, depth)
   # Go through schedule (datum) assignments made (datum[i])
   datum.each_with_index do |d, i|
     # If one has been set (not nil ...)
@@ -355,7 +351,15 @@ def fails_constraint(datum)
     end
   end
   
-  return false
+  # Ensuring solution is not a duplicate
+  if $solutions[depth]
+    $solutions[depth].each_with_index do |s, i|
+      if datum == s[:solution]
+        return true
+      end
+    end
+    return false
+  end
 end
 
 # lexicon
